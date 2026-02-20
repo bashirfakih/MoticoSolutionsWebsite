@@ -7,16 +7,16 @@ import CustomCursor from '@/components/ui/CustomCursor'
 const inter = Inter({ subsets: ['latin'] })
 
 export const viewport: Viewport = {
-  themeColor: '#0a1628',
+  themeColor: '#004560',
 }
 
 export const metadata: Metadata = {
   title: 'Motico Solutions — Industrial Abrasives & Tools | Beirut, Lebanon',
   description:
-    'Premium industrial abrasives, cutting tools, and equipment. Authorized distributor for Norton, 3M, Bosch, Makita & more. Serving MENA since 2009.',
+    'Premium abrasive belts, grinding tools, industrial machines and finishing equipment. Market leaders in Lebanon and across the Middle East and West Africa since 2004.',
   openGraph: {
     title: 'Motico Solutions — Industrial Abrasives & Tools',
-    description: 'Powering manufacturing excellence across the Middle East & North Africa since 2009.',
+    description: 'Market leaders in Lebanon and across the Middle East and West Africa since 2004.',
     siteName: 'Motico Solutions',
   },
 }

@@ -31,7 +31,7 @@ const categories = [
     count: '350+',
     desc: 'Precision grinding solutions for metal, stone, and composite materials.',
     icon: Disc,
-    color: '#dc2626',
+    color: '#bb0c15',
     wide: true,
   },
   {
@@ -50,7 +50,7 @@ const categories = [
     count: '190+',
     desc: 'Ultra-thin cutting discs for steel, stainless, and non-ferrous metals.',
     icon: Scissors,
-    color: '#0a1628',
+    color: '#004560',
     wide: false,
   },
   {
@@ -59,7 +59,7 @@ const categories = [
     count: '120+',
     desc: 'Professional-grade angle grinders, sanders, and drilling equipment.',
     icon: Wrench,
-    color: '#dc2626',
+    color: '#bb0c15',
     wide: false,
   },
   {
@@ -77,7 +77,7 @@ const categories = [
     count: '220+',
     desc: 'Custom and specialty abrasive solutions for unique industrial needs.',
     icon: Star,
-    color: '#0a1628',
+    color: '#004560',
     wide: false,
   },
 ]
@@ -86,17 +86,17 @@ const categories = [
 const features = [
   {
     icon: BadgeCheck,
-    title: 'Authorized Brand Distributor',
-    desc: 'Official distributor for Norton, 3M, Klingspor, Bosch, Makita, and more. Every product is 100% genuine with full manufacturer warranty.',
+    title: 'Official Brand Distributor',
+    desc: 'Official distributor for Hermes, Eisenblätter, Hoffmann, Osborn, and more. Every product is 100% genuine with full manufacturer warranty.',
   },
   {
     icon: Truck,
-    title: 'Fast MENA-Wide Delivery',
-    desc: 'Reliable logistics across Lebanon, UAE, Saudi Arabia, Egypt, and 15+ other MENA countries. Most orders delivered within 24–72 hours.',
+    title: 'Fast Regional Delivery',
+    desc: 'Reliable logistics across Lebanon, Middle East, and West Africa. Most orders delivered within 24–72 hours.',
   },
   {
     icon: Users,
-    title: '500+ Satisfied Clients',
+    title: '300+ Satisfied Clients',
     desc: 'From small workshops to major manufacturing plants, we serve businesses of all sizes across industries.',
   },
   {
@@ -111,13 +111,13 @@ const features = [
   },
   {
     icon: Globe,
-    title: 'MENA Market Expertise',
-    desc: 'Over 15 years serving the unique demands of Middle East & North Africa industries. We understand your market.',
+    title: 'Regional Market Expertise',
+    desc: 'Over 20 years serving the unique demands of Lebanon, Middle East & West Africa industries. We understand your market.',
   },
 ]
 
 /* ─── Brands ─────────────────────────────────────────────── */
-const brands = ['Norton', '3M', 'Klingspor', 'Bosch', 'Makita', 'Tyrolit', 'Pferd', 'DeWalt']
+const brands = ['Hermes', 'Eisenblätter', 'Hoffmann', 'Osborn', 'ZAT (OEM)', 'Sandwox', 'DCA']
 
 /* ─── Carousel Slides ───────────────────────────────────── */
 const carouselSlides = [
@@ -126,7 +126,7 @@ const carouselSlides = [
     category: 'Grinding Solutions',
     desc: 'Precision grinding wheels & cutting discs for every surface',
     tag: 'Best Seller',
-    tagColor: '#dc2626',
+    tagColor: '#bb0c15',
   },
   {
     image: '/slide-2-belt.png',
@@ -140,7 +140,7 @@ const carouselSlides = [
     category: 'Power Tools & Machines',
     desc: 'Professional belt sanders, disc grinders & more',
     tag: 'ZAT Brand',
-    tagColor: '#0a1628',
+    tagColor: '#004560',
   },
   {
     image: '/slide-4-brush.png',
@@ -214,7 +214,7 @@ export default function Home() {
       ════════════════════════════════════════ */}
       <header className="fixed top-0 left-0 right-0 z-50">
         {/* Top bar */}
-        <div style={{ background: '#0a1628' }} className="py-2">
+        <div style={{ background: '#004560' }} className="py-2">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
             {/* Contact info */}
             <div className="flex items-center gap-5">
@@ -249,7 +249,7 @@ export default function Home() {
                   style={{
                     background: 'rgba(255,255,255,0.08)',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#dc2626')}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#bb0c15')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
                 >
                   <Icon className="w-3.5 h-3.5 text-white" />
@@ -278,13 +278,13 @@ export default function Home() {
               <div className="flex items-baseline gap-0.5">
                 <span
                   className="text-2xl font-black"
-                  style={{ color: '#0a1628', letterSpacing: '-0.03em' }}
+                  style={{ color: '#004560', letterSpacing: '-0.03em' }}
                 >
                   Motico
                 </span>
                 <span
                   className="text-2xl font-black"
-                  style={{ color: '#dc2626', letterSpacing: '-0.03em' }}
+                  style={{ color: '#bb0c15', letterSpacing: '-0.03em' }}
                 >
                   Solutions
                 </span>
@@ -293,7 +293,7 @@ export default function Home() {
                 className="text-[9px] tracking-[0.15em] uppercase mt-0.5"
                 style={{ color: '#9ca3af' }}
               >
-                Est. 2009 · Beirut, Lebanon
+                Est. 2004 · Beirut, Lebanon
               </div>
             </a>
 
@@ -305,7 +305,7 @@ export default function Home() {
                   href={link.href}
                   className="nav-link text-sm font-medium pb-0.5"
                   style={{ color: '#4b5563' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#0a1628')}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#004560')}
                   onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}
                 >
                   {link.label}
@@ -315,6 +315,29 @@ export default function Home() {
 
             {/* Right buttons */}
             <div className="hidden md:flex items-center gap-3">
+              {/* App icons - Coming Soon */}
+              <div className="flex items-center gap-1.5 mr-2">
+                <div
+                  className="group relative flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all"
+                  style={{ background: 'rgba(0,69,96,0.08)' }}
+                  title="iOS App Coming Soon"
+                >
+                  <svg className="w-4 h-4" style={{ color: '#004560' }} viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                  </svg>
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Coming Soon" />
+                </div>
+                <div
+                  className="group relative flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all"
+                  style={{ background: 'rgba(0,69,96,0.08)' }}
+                  title="Android App Coming Soon"
+                >
+                  <svg className="w-4 h-4" style={{ color: '#004560' }} viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
+                  </svg>
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Coming Soon" />
+                </div>
+              </div>
               <a
                 href="#"
                 className="text-sm font-medium px-4 py-2 rounded-lg border transition-all active:scale-95"
@@ -323,8 +346,8 @@ export default function Home() {
                   color: '#4b5563',
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = '#dc2626'
-                  e.currentTarget.style.color = '#dc2626'
+                  e.currentTarget.style.borderColor = '#bb0c15'
+                  e.currentTarget.style.color = '#bb0c15'
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.borderColor = '#e5e7eb'
@@ -337,7 +360,7 @@ export default function Home() {
                 href="#cta"
                 className="btn-shimmer text-sm font-semibold px-5 py-2 rounded-lg text-white active:scale-95 transition-transform"
                 style={{
-                  background: 'linear-gradient(135deg, #dc2626, #f97316)',
+                  background: 'linear-gradient(135deg, #bb0c15, #f97316)',
                   boxShadow: '0 4px 14px rgba(220,38,38,0.3)',
                 }}
               >
@@ -348,7 +371,7 @@ export default function Home() {
             {/* Mobile hamburger */}
             <button
               className="md:hidden p-2 rounded-lg"
-              style={{ color: '#0a1628' }}
+              style={{ color: '#004560' }}
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
@@ -371,7 +394,7 @@ export default function Home() {
                   onClick={() => setMenuOpen(false)}
                   className="text-xl font-semibold py-3 border-b"
                   style={{
-                    color: '#0a1628',
+                    color: '#004560',
                     borderColor: '#f1f5f9',
                     animation: `lineReveal 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 60}ms both`,
                   }}
@@ -382,7 +405,7 @@ export default function Home() {
               <a
                 href="#"
                 className="text-xl font-semibold py-3 border-b"
-                style={{ color: '#0a1628', borderColor: '#f1f5f9', animation: `lineReveal 0.4s cubic-bezier(0.16,1,0.3,1) ${4 * 60}ms both` }}
+                style={{ color: '#004560', borderColor: '#f1f5f9', animation: `lineReveal 0.4s cubic-bezier(0.16,1,0.3,1) ${4 * 60}ms both` }}
                 onClick={() => setMenuOpen(false)}
               >
                 Login
@@ -391,7 +414,7 @@ export default function Home() {
                 href="#cta"
                 onClick={() => setMenuOpen(false)}
                 className="mt-4 text-center font-bold text-white py-4 rounded-xl active:scale-95 transition-transform"
-                style={{ background: 'linear-gradient(135deg, #dc2626, #f97316)' }}
+                style={{ background: 'linear-gradient(135deg, #bb0c15, #f97316)' }}
               >
                 Get Quote →
               </a>
@@ -459,7 +482,7 @@ export default function Home() {
           {/* Red curve - outer */}
           <path
             d="M50 50 Q 150 0, 200 80 T 350 120 Q 500 150, 550 300 T 500 450 Q 400 500, 300 480"
-            stroke="#dc2626"
+            stroke="#bb0c15"
             strokeWidth="3"
             strokeLinecap="round"
             fill="none"
@@ -496,9 +519,9 @@ export default function Home() {
                 <div className="clip-reveal-parent">
                   <div
                     className="line-reveal"
-                    style={{ color: '#0a1628', animationDelay: '0.2s' }}
+                    style={{ color: '#004560', animationDelay: '0.2s' }}
                   >
-                    Industr<span style={{ color: '#dc2626' }}>i</span>al
+                    Industr<span style={{ color: '#bb0c15' }}>i</span>al
                   </div>
                 </div>
                 <div className="clip-reveal-parent">
@@ -512,9 +535,9 @@ export default function Home() {
                 <div className="clip-reveal-parent">
                   <div
                     className="line-reveal"
-                    style={{ color: '#0a1628', animationDelay: '0.6s' }}
+                    style={{ color: '#004560', animationDelay: '0.6s' }}
                   >
-                    Del<span style={{ color: '#dc2626' }}>i</span>vered.
+                    Del<span style={{ color: '#bb0c15' }}>i</span>vered
                   </div>
                 </div>
               </h1>
@@ -527,8 +550,8 @@ export default function Home() {
                   animation: 'lineReveal 0.6s cubic-bezier(0.16,1,0.3,1) 0.8s both',
                 }}
               >
-                Premium abrasives, cutting tools, and industrial equipment.
-                Powering manufacturing excellence across the Middle East &amp; North Africa since 2009.
+                Premium abrasive belts, grinding tools, industrial machines and finishing equipment.
+                Market leaders in Lebanon and across the Middle East and West Africa since 2004.
               </p>
 
               {/* CTA buttons */}
@@ -540,7 +563,7 @@ export default function Home() {
                   href="#products"
                   className="btn-shimmer inline-flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold text-base active:scale-95 transition-all"
                   style={{
-                    background: 'linear-gradient(135deg, #dc2626, #f97316)',
+                    background: 'linear-gradient(135deg, #bb0c15, #f97316)',
                     boxShadow: '0 8px 30px rgba(220,38,38,0.3)',
                   }}
                   onMouseEnter={e =>
@@ -557,8 +580,8 @@ export default function Home() {
                   className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-base border-2 active:scale-95 transition-all"
                   style={{ borderColor: '#d1d5db', color: '#374151' }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = '#dc2626'
-                    e.currentTarget.style.color = '#dc2626'
+                    e.currentTarget.style.borderColor = '#bb0c15'
+                    e.currentTarget.style.color = '#bb0c15'
                   }}
                   onMouseLeave={e => {
                     e.currentTarget.style.borderColor = '#d1d5db'
@@ -580,7 +603,7 @@ export default function Home() {
                   borderRadius: 32,
                   height: 620,
                   boxShadow: '0 32px 64px rgba(10,22,40,0.18), 0 0 0 1px rgba(10,22,40,0.06)',
-                  background: '#0a1628',
+                  background: '#004560',
                 }}
               >
                 {carouselSlides.map((slide, i) => (
@@ -652,7 +675,7 @@ export default function Home() {
                 }}>
                   <div style={{
                     height: '100%',
-                    background: 'linear-gradient(90deg, #dc2626, #f97316)',
+                    background: 'linear-gradient(90deg, #bb0c15, #f97316)',
                     width: `${((activeSlide + 1) / carouselSlides.length) * 100}%`,
                     transition: 'width 3.5s linear',
                     borderRadius: '0 2px 2px 0',
@@ -671,7 +694,7 @@ export default function Home() {
                       width: i === activeSlide ? 28 : 8,
                       height: 8, borderRadius: 99,
                       background: i === activeSlide
-                        ? 'linear-gradient(90deg, #dc2626, #f97316)'
+                        ? 'linear-gradient(90deg, #bb0c15, #f97316)'
                         : '#d1d5db',
                       border: 'none', cursor: 'pointer',
                       transition: 'all 0.4s ease', padding: 0,
@@ -683,9 +706,9 @@ export default function Home() {
               {/* Mini stats strip */}
               <div className="w-full grid grid-cols-3 gap-3">
                 {[
-                  { value: '2,000+', label: 'Products', icon: Package },
-                  { value: '500+',   label: 'Clients',  icon: Users   },
-                  { value: '15+',    label: 'Years',    icon: Clock   },
+                  { value: '700+', label: 'Products', icon: Package },
+                  { value: '300+', label: 'Clients',  icon: Users   },
+                  { value: '20+',  label: 'Years',    icon: Clock   },
                 ].map(({ value, label, icon: Icon }) => (
                   <div
                     key={label}
@@ -696,8 +719,8 @@ export default function Home() {
                       boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
                     }}
                   >
-                    <Icon className="w-4 h-4 mb-1" style={{ color: '#dc2626' }} />
-                    <div className="font-black text-base" style={{ color: '#0a1628' }}>{value}</div>
+                    <Icon className="w-4 h-4 mb-1" style={{ color: '#bb0c15' }} />
+                    <div className="font-black text-base" style={{ color: '#004560' }}>{value}</div>
                     <div className="text-[10px] uppercase tracking-wider" style={{ color: '#9ca3af' }}>
                       {label}
                     </div>
@@ -718,7 +741,7 @@ export default function Home() {
               />
               <div
                 className="scroll-dot absolute top-0 w-1.5 h-1.5 rounded-full"
-                style={{ background: '#dc2626' }}
+                style={{ background: '#bb0c15' }}
               />
             </div>
           </div>
@@ -726,31 +749,55 @@ export default function Home() {
       </section>
 
       {/* ════════════════════════════════════════
-          BRAND MARQUEE
+          DISTRIBUTED BRANDS
       ════════════════════════════════════════ */}
       <div
-        style={{ background: '#0a1628', borderTop: '1px solid rgba(255,255,255,0.08)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
-        className="py-5"
+        style={{
+          background: 'linear-gradient(135deg, #004560 0%, #002d3d 100%)',
+          borderTop: '3px solid #bb0c15',
+        }}
+        className="py-10"
       >
-        <div
-          className="text-center text-[9px] tracking-[0.2em] uppercase mb-3"
-          style={{ color: 'rgba(255,255,255,0.3)' }}
-        >
-          Authorized Distributor For
-        </div>
-        <div className="marquee-wrapper overflow-hidden">
-          <div className="marquee-track">
-            {[...brands, ...brands].map((brand, i) => (
-              <span key={i} className="flex items-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div
+            className="text-center text-xs tracking-[0.2em] uppercase mb-6 font-semibold"
+            style={{ color: 'rgba(255,255,255,0.5)' }}
+          >
+            Distributed Brands
+          </div>
+          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6">
+            {brands.map((brand, i) => (
+              <div
+                key={i}
+                className="group px-6 py-3 rounded-xl transition-all duration-300 cursor-pointer"
+                style={{
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.15)'
+                  e.currentTarget.style.borderColor = 'rgba(187,12,21,0.5)'
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                }}
+              >
                 <span
-                  className="font-bold tracking-widest uppercase text-sm"
-                  style={{ color: 'rgba(255,255,255,0.4)', whiteSpace: 'nowrap', padding: '0 24px' }}
+                  className="font-bold tracking-wide text-sm md:text-base"
+                  style={{ color: 'rgba(255,255,255,0.85)' }}
                 >
                   {brand}
                 </span>
-                <span style={{ color: 'rgba(220,38,38,0.5)', fontSize: 10 }}>◆</span>
-              </span>
+              </div>
             ))}
+          </div>
+          <div className="text-center mt-6">
+            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              Premium quality products from trusted manufacturers
+            </span>
           </div>
         </div>
       </div>
@@ -770,17 +817,17 @@ export default function Home() {
             left: 0,
             right: 0,
             height: 4,
-            background: 'linear-gradient(90deg, transparent, #dc2626 30%, #f97316 70%, transparent)',
+            background: 'linear-gradient(90deg, transparent, #bb0c15 30%, #f97316 70%, transparent)',
           }}
         />
         <h2 id="stats-heading" className="sr-only">Company statistics</h2>
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4">
             {[
-              { icon: Clock, value: 15, suffix: '+', label: 'Years of Experience' },
-              { icon: Package, value: 2000, suffix: '+', label: 'Products Available' },
-              { icon: Users, value: 500, suffix: '+', label: 'Happy Clients' },
-              { icon: Globe, value: 15, suffix: '+', label: 'MENA Countries Served' },
+              { icon: Clock, value: 20, suffix: '+', label: 'Years of Experience' },
+              { icon: Package, value: 700, suffix: '+', label: 'Products Available' },
+              { icon: Users, value: 300, suffix: '+', label: 'Happy Clients' },
+              { icon: Globe, value: 10, suffix: '+', label: 'Countries Served' },
             ].map(({ icon: Icon, value, suffix, label }, i) => (
               <RevealOnScroll key={label} delay={i * 100}>
                 <div
@@ -790,10 +837,10 @@ export default function Home() {
                     borderBottom: i < 2 ? '1px solid #e5e7eb' : 'none',
                   }}
                 >
-                  <Icon className="w-8 h-8 mb-4" style={{ color: '#dc2626' }} />
+                  <Icon className="w-8 h-8 mb-4" style={{ color: '#bb0c15' }} />
                   <div
                     className="font-black leading-none"
-                    style={{ fontSize: 'clamp(48px, 5vw, 72px)', color: '#0a1628' }}
+                    style={{ fontSize: 'clamp(48px, 5vw, 72px)', color: '#004560' }}
                   >
                     <CountUp target={value} suffix={suffix} />
                   </div>
@@ -827,7 +874,7 @@ export default function Home() {
               style={{
                 background: 'rgba(220,38,38,0.08)',
                 border: '1px solid rgba(220,38,38,0.15)',
-                color: '#dc2626',
+                color: '#bb0c15',
               }}
             >
               Product Catalog
@@ -835,7 +882,7 @@ export default function Home() {
             <h2
               id="products-heading"
               className="font-black leading-none"
-              style={{ fontSize: 'clamp(36px, 4.5vw, 60px)', color: '#0a1628', letterSpacing: '-0.02em' }}
+              style={{ fontSize: 'clamp(36px, 4.5vw, 60px)', color: '#004560', letterSpacing: '-0.02em' }}
             >
               Built for Every
               <br />
@@ -853,7 +900,7 @@ export default function Home() {
             <RevealOnScroll delay={0} className="md:col-span-3">
               <div
                 className="group relative rounded-3xl p-8 overflow-hidden h-64 flex flex-col justify-between cursor-pointer"
-                style={{ background: '#0a1628' }}
+                style={{ background: '#004560' }}
               >
                 {/* Background image */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -914,7 +961,7 @@ export default function Home() {
                   <button
                     className="inline-flex items-center gap-2 text-sm font-semibold text-white rounded-xl px-5 py-2.5 active:scale-95 transition-all"
                     style={{ background: 'rgba(220,38,38,0.9)', backdropFilter: 'blur(8px)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#dc2626')}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#bb0c15')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'rgba(220,38,38,0.9)')}
                   >
                     Browse All <ArrowRight className="w-4 h-4" />
@@ -956,7 +1003,7 @@ export default function Home() {
                 >
                   280+ Products
                 </div>
-                <h3 className="font-bold text-xl mb-2" style={{ color: '#0a1628' }}>
+                <h3 className="font-bold text-xl mb-2" style={{ color: '#004560' }}>
                   Abrasive Belts
                 </h3>
                 <p className="text-sm leading-relaxed flex-1" style={{ color: '#6b7280' }}>
@@ -966,7 +1013,7 @@ export default function Home() {
                 <a
                   href="#"
                   className="inline-flex items-center gap-1 text-sm font-semibold mt-4 transition-all group-hover:gap-2"
-                  style={{ color: '#dc2626' }}
+                  style={{ color: '#bb0c15' }}
                 >
                   Browse <ChevronRight className="w-4 h-4" />
                 </a>
@@ -1002,7 +1049,7 @@ export default function Home() {
                   >
                     {count} Products
                   </div>
-                  <h3 className="font-bold text-lg mb-1.5" style={{ color: '#0a1628' }}>
+                  <h3 className="font-bold text-lg mb-1.5" style={{ color: '#004560' }}>
                     {title}
                   </h3>
                   <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
@@ -1011,7 +1058,7 @@ export default function Home() {
                   <a
                     href="#"
                     className="inline-flex items-center gap-1 text-sm font-semibold mt-4 transition-all group-hover:gap-2"
-                    style={{ color: '#dc2626' }}
+                    style={{ color: '#bb0c15' }}
                   >
                     Browse <ChevronRight className="w-4 h-4" />
                   </a>
@@ -1042,7 +1089,7 @@ export default function Home() {
                   style={{
                     background: 'rgba(220,38,38,0.08)',
                     border: '1px solid rgba(220,38,38,0.15)',
-                    color: '#dc2626',
+                    color: '#bb0c15',
                   }}
                 >
                   Why Motico
@@ -1052,7 +1099,7 @@ export default function Home() {
                 <h2
                   id="why-heading"
                   className="font-black leading-none mb-6"
-                  style={{ fontSize: 'clamp(40px, 4vw, 56px)', color: '#0a1628', letterSpacing: '-0.02em' }}
+                  style={{ fontSize: 'clamp(40px, 4vw, 56px)', color: '#004560', letterSpacing: '-0.02em' }}
                 >
                   Your Trusted
                   <br />
@@ -1065,7 +1112,7 @@ export default function Home() {
               </RevealOnScroll>
               <RevealOnScroll delay={200}>
                 <p className="text-gray-500 leading-relaxed max-w-sm mb-8">
-                  Since 2009, Motico Solutions has been the go-to distributor for industrial
+                  Since 2004, Motico Solutions has been the go-to distributor for industrial
                   businesses across MENA, combining premium brands with expert technical
                   support and reliable logistics.
                 </p>
@@ -1075,7 +1122,7 @@ export default function Home() {
                 <a
                   href="#"
                   className="inline-flex items-center gap-2 font-semibold text-sm transition-all hover:gap-3"
-                  style={{ color: '#dc2626' }}
+                  style={{ color: '#bb0c15' }}
                 >
                   Learn More About Us <ArrowRight className="w-4 h-4" />
                 </a>
@@ -1113,14 +1160,14 @@ export default function Home() {
                           className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                           style={{
                             background: isEven
-                              ? 'linear-gradient(135deg, #dc2626, #f97316)'
-                              : '#0a1628',
+                              ? 'linear-gradient(135deg, #bb0c15, #f97316)'
+                              : '#004560',
                           }}
                         >
                           <Icon className="w-6 h-6 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-lg mb-2" style={{ color: '#0a1628' }}>
+                          <h3 className="font-bold text-lg mb-2" style={{ color: '#004560' }}>
                             {feature.title}
                           </h3>
                           <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
@@ -1130,7 +1177,7 @@ export default function Home() {
                         <div
                           className="opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-[-8px] group-hover:translate-x-0 flex-shrink-0"
                         >
-                          <ArrowRight className="w-5 h-5" style={{ color: '#dc2626' }} />
+                          <ArrowRight className="w-5 h-5" style={{ color: '#bb0c15' }} />
                         </div>
                       </div>
                     </div>
@@ -1158,7 +1205,7 @@ export default function Home() {
               style={{
                 background: 'rgba(220,38,38,0.08)',
                 border: '1px solid rgba(220,38,38,0.15)',
-                color: '#dc2626',
+                color: '#bb0c15',
               }}
             >
               Trusted Partners
@@ -1166,7 +1213,7 @@ export default function Home() {
             <h2
               id="brands-heading"
               className="font-black"
-              style={{ fontSize: 'clamp(32px, 4vw, 52px)', color: '#0a1628', letterSpacing: '-0.02em' }}
+              style={{ fontSize: 'clamp(32px, 4vw, 52px)', color: '#004560', letterSpacing: '-0.02em' }}
             >
               World-Class Brands,
               <br />
@@ -1195,7 +1242,7 @@ export default function Home() {
                   <div
                     className="font-black text-2xl transition-colors duration-300"
                     style={{ color: '#e5e7eb' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#0a1628')}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#004560')}
                     onMouseLeave={e => (e.currentTarget.style.color = '#e5e7eb')}
                   >
                     {brand}
@@ -1203,14 +1250,14 @@ export default function Home() {
                   <div
                     className="text-[10px] tracking-widest uppercase mt-1.5 transition-colors duration-300"
                     style={{ color: '#e5e7eb' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#dc2626')}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#bb0c15')}
                     onMouseLeave={e => (e.currentTarget.style.color = '#e5e7eb')}
                   >
                     Official Partner
                   </div>
                   <div
                     className="mt-2 h-0.5 rounded-full transition-all duration-300"
-                    style={{ background: '#dc2626', width: 0 }}
+                    style={{ background: '#bb0c15', width: 0 }}
                     ref={(el) => {
                       if (!el) return
                       const parent = el.closest('[class*="group"]') as HTMLElement
@@ -1232,7 +1279,7 @@ export default function Home() {
       <section
         id="cta"
         className="relative py-32 overflow-hidden hero-grain"
-        style={{ background: '#0a1628' }}
+        style={{ background: '#004560' }}
         aria-labelledby="cta-heading"
       >
         {/* Rings */}
@@ -1265,7 +1312,7 @@ export default function Home() {
           <RevealOnScroll>
             <div
               className="btn-shimmer inline-flex items-center gap-2 px-5 py-2 rounded-full text-white text-sm font-semibold mb-8"
-              style={{ background: 'linear-gradient(135deg, #dc2626, #f97316)' }}
+              style={{ background: 'linear-gradient(135deg, #bb0c15, #f97316)' }}
             >
               Get Started Today
             </div>
@@ -1287,7 +1334,7 @@ export default function Home() {
           </RevealOnScroll>
           <RevealOnScroll delay={200}>
             <p className="text-lg mb-10 max-w-lg mx-auto leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
-              Join 500+ businesses across MENA who trust Motico Solutions
+              Join 300+ businesses across Lebanon and the Middle East who trust Motico Solutions
               for their industrial abrasive and tooling needs.
             </p>
           </RevealOnScroll>
@@ -1297,7 +1344,7 @@ export default function Home() {
                 href="mailto:info@moticosolutions.com"
                 className="btn-shimmer inline-flex items-center justify-center gap-2 px-10 py-5 rounded-full text-white font-bold text-lg active:scale-95 transition-all"
                 style={{
-                  background: 'linear-gradient(135deg, #dc2626, #f97316)',
+                  background: 'linear-gradient(135deg, #bb0c15, #f97316)',
                   boxShadow: '0 0 60px rgba(220,38,38,0.5)',
                 }}
                 onMouseEnter={e =>
@@ -1333,11 +1380,11 @@ export default function Home() {
           <RevealOnScroll delay={500}>
             <div className="mt-14 pt-10" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               <div className="flex items-center justify-center gap-2 mb-4">
-                <Smartphone className="w-5 h-5" style={{ color: '#dc2626' }} />
+                <Smartphone className="w-5 h-5" style={{ color: '#bb0c15' }} />
                 <span className="text-sm font-semibold text-white">Mobile App</span>
                 <span
                   className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
-                  style={{ background: 'rgba(220,38,38,0.2)', color: '#dc2626' }}
+                  style={{ background: 'rgba(220,38,38,0.2)', color: '#bb0c15' }}
                 >
                   Coming Soon
                 </span>
@@ -1411,7 +1458,7 @@ export default function Home() {
               />
               <button
                 className="btn-shimmer px-5 py-3 rounded-xl text-white text-sm font-semibold active:scale-95 transition-transform flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #dc2626, #f97316)' }}
+                style={{ background: 'linear-gradient(135deg, #bb0c15, #f97316)' }}
               >
                 Subscribe →
               </button>
@@ -1427,10 +1474,10 @@ export default function Home() {
             <div className="col-span-2 md:col-span-1">
               <div className="flex items-baseline gap-0.5 mb-2">
                 <span className="text-xl font-black text-white">Motico</span>
-                <span className="text-xl font-black" style={{ color: '#dc2626' }}>Solutions</span>
+                <span className="text-xl font-black" style={{ color: '#bb0c15' }}>Solutions</span>
               </div>
               <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                Premium industrial abrasives &amp; tools distributor. Serving MENA since 2009.
+                Premium industrial abrasives &amp; tools distributor. Serving MENA since 2004.
               </p>
               <div className="flex flex-col gap-3 mb-6">
                 <a
@@ -1438,7 +1485,7 @@ export default function Home() {
                   className="flex items-center gap-2.5 text-xs transition-colors hover:text-white"
                   style={{ color: 'rgba(255,255,255,0.5)' }}
                 >
-                  <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#dc2626' }} />
+                  <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
                   +961 3 741 565
                 </a>
                 <a
@@ -1446,11 +1493,11 @@ export default function Home() {
                   className="flex items-center gap-2.5 text-xs transition-colors hover:text-white"
                   style={{ color: 'rgba(255,255,255,0.5)' }}
                 >
-                  <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#dc2626' }} />
+                  <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
                   info@moticosolutions.com
                 </a>
                 <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#dc2626' }} />
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
                   Beirut, Lebanon
                 </div>
               </div>
@@ -1468,7 +1515,7 @@ export default function Home() {
                     aria-label={label}
                     className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
                     style={{ background: 'rgba(255,255,255,0.08)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#dc2626')}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#bb0c15')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
                   >
                     <Icon className="w-4 h-4 text-white" />
@@ -1501,7 +1548,7 @@ export default function Home() {
                   className="text-sm font-semibold uppercase tracking-wider mb-5 pl-3"
                   style={{
                     color: 'white',
-                    borderLeft: '2px solid #dc2626',
+                    borderLeft: '2px solid #bb0c15',
                   }}
                 >
                   {col.heading}
