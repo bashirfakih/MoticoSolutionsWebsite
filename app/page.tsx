@@ -122,7 +122,7 @@ const brands = [
   { name: 'Eisenblätter', logo: null },
   { name: 'Hoffmann', logo: '/logo-hoffmann.png' },
   { name: 'Osborn', logo: '/logo-osborn.svg' },
-  { name: 'ZAT (OEM)', logo: null },
+  { name: 'ZAT (OEM)', logo: '/logo-zat.jpg' },
   { name: 'Sandwox', logo: '/logo-sandwox.png' },
   { name: 'DCA', logo: '/logo-dca.png' },
 ]
