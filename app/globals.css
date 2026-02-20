@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: #dc2626;
+  color: white;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #dc2626;
+  border-radius: 3px;
+}
+
+/* Grain texture overlay */
+.hero-grain {
+  position: relative;
+}
+.hero-grain::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Dot grid background */
+.dot-grid {
+  background-image: radial-gradient(circle, #0a1628 1px, transparent 1px);
+  background-size: 28px 28px;
+  opacity: 0.04;
+}
+
+/* Marquee animation */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee 28s linear infinite;
+  display: flex;
+  width: max-content;
+}
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+.marquee-wrapper {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+}
+
+/* Float animation for badge pills */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(var(--rot, 0deg)); }
+  50%       { transform: translateY(-10px) rotate(var(--rot, 0deg)); }
+}
+.float-badge {
+  animation: float 4s ease-in-out infinite;
+}
+.float-badge-delayed {
+  animation: float 4s ease-in-out infinite 2s;
+}
+
+/* Animated scroll dot */
+@keyframes scrollDot {
+  0%   { transform: translateY(0); opacity: 1; }
+  100% { transform: translateY(44px); opacity: 0; }
+}
+.scroll-dot {
+  animation: scrollDot 1.6s ease-in-out infinite;
+}
+
+/* Rotating rings */
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.spin-ring {
+  animation: spinRing 60s linear infinite;
+}
+.spin-ring-slow {
+  animation: spinRing 90s linear infinite reverse;
+}
+
+/* Shimmer on CTA button */
+@keyframes shimmer {
+  0%   { transform: translateX(-100%) skewX(-20deg); }
+  100% { transform: translateX(250%) skewX(-20deg); }
+}
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+  transform: skewX(-20deg);
+}
+.btn-shimmer:hover::after {
+  animation: shimmer 0.7s ease forwards;
+}
+
+/* Animated underline nav links */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: #dc2626;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+.nav-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* Gradient text utility */
+.gradient-text {
+  background: linear-gradient(135deg, #dc2626, #f97316);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtle pulsing ring on active dot */
+@keyframes pulseRing {
+  0%   { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.pulse-ring::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: #dc2626;
+  animation: pulseRing 1.5s ease-out infinite;
+}
+
+/* Hero line clip reveal */
+.clip-reveal-parent {
+  overflow: hidden;
+}
+@keyframes lineReveal {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0); opacity: 1; }
+}
+.line-reveal {
+  animation: lineReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Morphing decorative lines animation */
+@keyframes morphLine {
+  0%, 100% {
+    d: path("M50 50 Q 150 0, 200 80 T 350 120 Q 500 150, 550 300 T 500 450 Q 400 500, 300 480");
+  }
+  50% {
+    d: path("M50 70 Q 130 10, 210 90 T 360 130 Q 490 160, 540 310 T 490 440 Q 390 490, 290 470");
+  }
+}
+@keyframes morphLineDelayed {
+  0%, 100% {
+    d: path("M80 80 Q 180 30, 230 110 T 380 150 Q 530 180, 520 330 T 470 420 Q 370 470, 270 450");
+  }
+  50% {
+    d: path("M80 100 Q 160 40, 240 120 T 390 160 Q 520 190, 510 340 T 460 410 Q 360 460, 260 440");
+  }
+}
+.morph-line {
+  animation: morphLine 8s ease-in-out infinite;
+}
+.morph-line-delayed {
+  animation: morphLineDelayed 8s ease-in-out infinite 2s;
+}
