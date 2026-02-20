@@ -117,7 +117,15 @@ const features = [
 ]
 
 /* ─── Brands ─────────────────────────────────────────────── */
-const brands = ['Hermes', 'Eisenblätter', 'Hoffmann', 'Osborn', 'ZAT (OEM)', 'Sandwox', 'DCA']
+const brands = [
+  { name: 'Hermes', logo: '/logo-hermes.svg' },
+  { name: 'Eisenblätter', logo: null },
+  { name: 'Hoffmann', logo: '/logo-hoffmann.png' },
+  { name: 'Osborn', logo: '/logo-osborn.svg' },
+  { name: 'ZAT (OEM)', logo: null },
+  { name: 'Sandwox', logo: '/logo-sandwox.png' },
+  { name: 'DCA', logo: '/logo-dca.png' },
+]
 
 /* ─── Carousel Slides ───────────────────────────────────── */
 const carouselSlides = [
@@ -756,45 +764,55 @@ export default function Home() {
           background: 'linear-gradient(135deg, #004560 0%, #002d3d 100%)',
           borderTop: '3px solid #bb0c15',
         }}
-        className="py-10"
+        className="py-12"
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div
-            className="text-center text-xs tracking-[0.2em] uppercase mb-6 font-semibold"
+            className="text-center text-xs tracking-[0.2em] uppercase mb-8 font-semibold"
             style={{ color: 'rgba(255,255,255,0.5)' }}
           >
             Distributed Brands
           </div>
-          <div className="flex flex-wrap justify-center items-center gap-4 md:gap-6">
+          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8">
             {brands.map((brand, i) => (
               <div
                 key={i}
-                className="group px-6 py-3 rounded-xl transition-all duration-300 cursor-pointer"
+                className="group flex items-center justify-center px-6 py-4 rounded-2xl transition-all duration-300 cursor-pointer"
                 style={{
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.1)',
+                  background: 'rgba(255,255,255,0.95)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  minWidth: 140,
+                  minHeight: 70,
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.15)'
-                  e.currentTarget.style.borderColor = 'rgba(187,12,21,0.5)'
-                  e.currentTarget.style.transform = 'translateY(-2px)'
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'
+                  e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.3)'
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.background = 'rgba(255,255,255,0.08)'
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
-                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)'
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
-                <span
-                  className="font-bold tracking-wide text-sm md:text-base"
-                  style={{ color: 'rgba(255,255,255,0.85)' }}
-                >
-                  {brand}
-                </span>
+                {brand.logo ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={brand.logo}
+                    alt={brand.name}
+                    className="max-h-10 md:max-h-12 w-auto object-contain"
+                    style={{ filter: 'grayscale(0%)' }}
+                  />
+                ) : (
+                  <span
+                    className="font-bold tracking-wide text-sm md:text-base"
+                    style={{ color: '#004560' }}
+                  >
+                    {brand.name}
+                  </span>
+                )}
               </div>
             ))}
           </div>
-          <div className="text-center mt-6">
+          <div className="text-center mt-8">
             <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
               Premium quality products from trusted manufacturers
             </span>
@@ -1186,89 +1204,6 @@ export default function Home() {
               })}
             </div>
 
-          </div>
-        </div>
-      </section>
-
-      {/* ════════════════════════════════════════
-          TRUSTED BRANDS
-      ════════════════════════════════════════ */}
-      <section
-        style={{ background: '#f8fafc' }}
-        className="py-20"
-        aria-labelledby="brands-heading"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <RevealOnScroll className="text-center mb-12">
-            <div
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] tracking-[0.12em] uppercase font-semibold mb-5"
-              style={{
-                background: 'rgba(220,38,38,0.08)',
-                border: '1px solid rgba(220,38,38,0.15)',
-                color: '#bb0c15',
-              }}
-            >
-              Trusted Partners
-            </div>
-            <h2
-              id="brands-heading"
-              className="font-black"
-              style={{ fontSize: 'clamp(32px, 4vw, 52px)', color: '#004560', letterSpacing: '-0.02em' }}
-            >
-              World-Class Brands,
-              <br />
-              <span className="gradient-text">One Reliable Source</span>
-            </h2>
-          </RevealOnScroll>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {brands.map((brand, i) => (
-              <RevealOnScroll key={brand} delay={i * 50}>
-                <div
-                  className="group rounded-2xl flex flex-col items-center justify-center py-8 px-6 cursor-default transition-all duration-300"
-                  style={{
-                    background: 'white',
-                    border: '1px solid #f1f5f9',
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = 'rgba(220,38,38,0.2)'
-                    e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.08)'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = '#f1f5f9'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
-                >
-                  <div
-                    className="font-black text-2xl transition-colors duration-300"
-                    style={{ color: '#e5e7eb' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#004560')}
-                    onMouseLeave={e => (e.currentTarget.style.color = '#e5e7eb')}
-                  >
-                    {brand}
-                  </div>
-                  <div
-                    className="text-[10px] tracking-widest uppercase mt-1.5 transition-colors duration-300"
-                    style={{ color: '#e5e7eb' }}
-                    onMouseEnter={e => (e.currentTarget.style.color = '#bb0c15')}
-                    onMouseLeave={e => (e.currentTarget.style.color = '#e5e7eb')}
-                  >
-                    Official Partner
-                  </div>
-                  <div
-                    className="mt-2 h-0.5 rounded-full transition-all duration-300"
-                    style={{ background: '#bb0c15', width: 0 }}
-                    ref={(el) => {
-                      if (!el) return
-                      const parent = el.closest('[class*="group"]') as HTMLElement
-                      if (!parent) return
-                      parent.addEventListener('mouseenter', () => { el.style.width = '40px' })
-                      parent.addEventListener('mouseleave', () => { el.style.width = '0px' })
-                    }}
-                  />
-                </div>
-              </RevealOnScroll>
-            ))}
           </div>
         </div>
       </section>
