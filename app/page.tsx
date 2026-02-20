@@ -25,61 +25,18 @@ function useScrolled(threshold = 60) {
 
 /* ─── Product Categories Data ───────────────────────────── */
 const categories = [
-  {
-    id: 'grinding',
-    title: 'Grinding Wheels',
-    count: '350+',
-    desc: 'Precision grinding solutions for metal, stone, and composite materials.',
-    icon: Disc,
-    color: '#bb0c15',
-    wide: true,
-  },
-  {
-    id: 'abrasive-belts',
-    title: 'Abrasive Belts',
-    count: '280+',
-    desc: 'High-performance belts for surface finishing and stock removal.',
-    icon: Layers,
-    color: '#f97316',
-    wide: false,
-    tall: true,
-  },
-  {
-    id: 'cutting-discs',
-    title: 'Cutting Discs',
-    count: '190+',
-    desc: 'Ultra-thin cutting discs for steel, stainless, and non-ferrous metals.',
-    icon: Scissors,
-    color: '#004560',
-    wide: false,
-  },
-  {
-    id: 'power-tools',
-    title: 'Power Tools',
-    count: '120+',
-    desc: 'Professional-grade angle grinders, sanders, and drilling equipment.',
-    icon: Wrench,
-    color: '#bb0c15',
-    wide: false,
-  },
-  {
-    id: 'flap-discs',
-    title: 'Flap Discs',
-    count: '160+',
-    desc: 'Versatile flap discs for grinding and finishing in one operation.',
-    icon: Settings,
-    color: '#f97316',
-    wide: false,
-  },
-  {
-    id: 'specialty',
-    title: 'Specialty Abrasives',
-    count: '220+',
-    desc: 'Custom and specialty abrasive solutions for unique industrial needs.',
-    icon: Star,
-    color: '#004560',
-    wide: false,
-  },
+  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15' },
+  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004560' },
+  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15' },
+  { id: 'stationery-machines', title: 'Stationery Machines', icon: Package, color: '#004560' },
+  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15' },
+  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004560' },
+  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15' },
+  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004560' },
+  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15' },
+  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004560' },
+  { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15' },
+  { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004560' },
 ]
 
 /* ─── Why Motico Features ───────────────────────────────── */
@@ -895,7 +852,7 @@ export default function Home() {
                 color: '#bb0c15',
               }}
             >
-              Product Catalog
+              Motico Solutions Products
             </div>
             <h2
               id="products-heading"
@@ -907,15 +864,15 @@ export default function Home() {
               Industrial <span className="gradient-text">Challenge</span>
             </h2>
             <p className="text-gray-500 mt-5 max-w-xl mx-auto leading-relaxed">
-              From grinding to finishing, cutting to drilling — we stock the full range
-              of industrial abrasives and tools your operation demands.
+              From grinding to cutting, polishing to finishing. We stock the full range
+              of industrial abrasives and special tools your operation demands.
             </p>
           </RevealOnScroll>
 
           {/* Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {/* Full width dark card — Grinding Wheels */}
-            <RevealOnScroll delay={0} className="md:col-span-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Full width dark card — Abrasive Belts */}
+            <RevealOnScroll delay={0} className="sm:col-span-2 lg:col-span-4">
               <div
                 className="group relative rounded-3xl p-8 overflow-hidden h-64 flex flex-col justify-between cursor-pointer"
                 style={{ background: '#004560' }}
@@ -923,7 +880,7 @@ export default function Home() {
                 {/* Background image */}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src="/slide-1-grinding.png"
+                  src="/slide-2-belt.png"
                   alt=""
                   className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 group-hover:scale-105 transition-all duration-700"
                 />
@@ -931,7 +888,7 @@ export default function Home() {
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(10,22,40,0.85) 0%, rgba(10,22,40,0.6) 100%)',
+                    background: 'linear-gradient(135deg, rgba(0,69,96,0.85) 0%, rgba(0,69,96,0.6) 100%)',
                   }}
                 />
                 {/* Decorative circle bg */}
@@ -940,7 +897,7 @@ export default function Home() {
                   style={{
                     width: 280,
                     height: 280,
-                    border: '50px solid rgba(220,38,38,0.08)',
+                    border: '50px solid rgba(187,12,21,0.08)',
                     borderRadius: '50%',
                     transition: 'all 0.5s ease',
                   }}
@@ -950,7 +907,7 @@ export default function Home() {
                   style={{
                     width: 160,
                     height: 160,
-                    border: '2px solid rgba(220,38,38,0.15)',
+                    border: '2px solid rgba(187,12,21,0.15)',
                     borderRadius: '50%',
                   }}
                 />
@@ -958,21 +915,21 @@ export default function Home() {
                   <div
                     className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium mb-4"
                     style={{
-                      background: 'rgba(220,38,38,0.2)',
+                      background: 'rgba(187,12,21,0.2)',
                       color: '#fff',
                       backdropFilter: 'blur(8px)',
                     }}
                   >
-                    <Disc className="w-3 h-3" /> 350+ Products
+                    <Layers className="w-3 h-3" /> Featured Category
                   </div>
                   <h3
                     className="font-bold text-white leading-tight"
                     style={{ fontSize: 32 }}
                   >
-                    Grinding Wheels
+                    Abrasive Belts
                   </h3>
                   <p className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                    Precision solutions for metal, stone &amp; composite materials.
+                    Wide solutions for stainless steel, wood, glass and other materials.
                   </p>
                 </div>
                 <div className="relative z-10">
@@ -993,60 +950,15 @@ export default function Home() {
               </div>
             </RevealOnScroll>
 
-            {/* Abrasive Belts — now in row below Grinding Wheels */}
-            <RevealOnScroll delay={80} id="abrasive-belts">
-              <div
-                className="group rounded-3xl p-6 h-full flex flex-col cursor-pointer transition-all duration-300"
-                style={{ background: 'white', border: '1px solid #f1f5f9' }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = 'rgba(220,38,38,0.3)'
-                  e.currentTarget.style.boxShadow = '0 10px 40px rgba(0,0,0,0.08)'
-                  e.currentTarget.style.transform = 'translateY(-2px)'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = '#f1f5f9'
-                  e.currentTarget.style.boxShadow = 'none'
-                  e.currentTarget.style.transform = 'translateY(0)'
-                }}
-              >
+            {/* All Product Category Cards */}
+            {categories.map(({ id, title, icon: Icon, color }, i) => (
+              <RevealOnScroll key={id} delay={(i + 1) * 60}>
                 <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
-                  style={{ background: 'rgba(249,115,22,0.1)' }}
-                >
-                  <Layers className="w-7 h-7" style={{ color: '#f97316' }} />
-                </div>
-                <div
-                  className="inline-flex self-start items-center px-2.5 py-1 rounded-full text-xs font-medium mb-3"
-                  style={{ background: '#f9fafb', color: '#6b7280' }}
-                >
-                  280+ Products
-                </div>
-                <h3 className="font-bold text-xl mb-2" style={{ color: '#004560' }}>
-                  Abrasive Belts
-                </h3>
-                <p className="text-sm leading-relaxed flex-1" style={{ color: '#6b7280' }}>
-                  High-performance belts for surface finishing and stock removal.
-                  Available in all grits, widths, and lengths for every machine type.
-                </p>
-                <a
-                  href="#"
-                  className="inline-flex items-center gap-1 text-sm font-semibold mt-4 transition-all group-hover:gap-2"
-                  style={{ color: '#bb0c15' }}
-                >
-                  Browse <ChevronRight className="w-4 h-4" />
-                </a>
-              </div>
-            </RevealOnScroll>
-
-            {/* Remaining category cards */}
-            {categories.slice(2, 5).map(({ id, title, count, desc, icon: Icon, color }, i) => (
-              <RevealOnScroll key={id} delay={(i + 2) * 80}>
-                <div
-                  className="group rounded-3xl p-6 cursor-pointer transition-all duration-300"
+                  className="group rounded-2xl p-5 cursor-pointer transition-all duration-300 flex items-center gap-4"
                   style={{ background: 'white', border: '1px solid #f1f5f9' }}
                   onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = 'rgba(220,38,38,0.3)'
-                    e.currentTarget.style.boxShadow = '0 10px 40px rgba(0,0,0,0.08)'
+                    e.currentTarget.style.borderColor = color
+                    e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.08)'
                     e.currentTarget.style.transform = 'translateY(-2px)'
                   }}
                   onMouseLeave={e => {
@@ -1056,30 +968,23 @@ export default function Home() {
                   }}
                 >
                   <div
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center mb-4"
-                    style={{ background: `${color}18` }}
+                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
+                    style={{ background: `${color}15` }}
                   >
-                    <Icon className="w-7 h-7" style={{ color }} />
+                    <Icon className="w-6 h-6" style={{ color }} />
                   </div>
-                  <div
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium mb-2"
-                    style={{ background: '#f9fafb', color: '#6b7280' }}
-                  >
-                    {count} Products
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-bold text-base" style={{ color: '#004560' }}>
+                      {title}
+                    </h3>
+                    <a
+                      href="#"
+                      className="inline-flex items-center gap-1 text-xs font-semibold mt-1 transition-all group-hover:gap-2"
+                      style={{ color }}
+                    >
+                      View Products <ChevronRight className="w-3 h-3" />
+                    </a>
                   </div>
-                  <h3 className="font-bold text-lg mb-1.5" style={{ color: '#004560' }}>
-                    {title}
-                  </h3>
-                  <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
-                    {desc}
-                  </p>
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-1 text-sm font-semibold mt-4 transition-all group-hover:gap-2"
-                    style={{ color: '#bb0c15' }}
-                  >
-                    Browse <ChevronRight className="w-4 h-4" />
-                  </a>
                 </div>
               </RevealOnScroll>
             ))}
