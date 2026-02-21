@@ -2,6 +2,14 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  border: none !important;
+  outline: none !important;
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 ::selection {
@@ -47,9 +55,10 @@ html {
   to   { transform: translateX(-50%); }
 }
 .marquee-track {
-  animation: marquee 28s linear infinite;
+  animation: marquee 35s linear infinite;
   display: flex;
   width: max-content;
+  will-change: transform;
 }
 .marquee-track:hover {
   animation-play-state: paused;
@@ -58,17 +67,27 @@ html {
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0%,
-    black 10%,
-    black 90%,
+    black 8%,
+    black 92%,
     transparent 100%
   );
   mask-image: linear-gradient(
     to right,
     transparent 0%,
-    black 10%,
-    black 90%,
+    black 8%,
+    black 92%,
     transparent 100%
   );
+}
+
+/* Brand card hover effects */
+.marquee-wrapper .group:hover {
+  z-index: 10;
+}
+.marquee-wrapper .group:hover > div {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 20px 40px rgba(0, 69, 96, 0.15), 0 0 0 1px rgba(187, 12, 21, 0.1);
+  border-color: rgba(187, 12, 21, 0.2) !important;
 }
 
 /* Float animation for badge pills */
@@ -203,4 +222,323 @@ html {
 }
 .morph-line-delayed {
   animation: morphLineDelayed 8s ease-in-out infinite 2s;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PRODUCT CARD SPECTACULAR ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+
+/* Card entrance animations */
+@keyframes cardSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes cardGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(187, 12, 21, 0);
+  }
+  50% {
+    box-shadow: 0 0 30px 5px rgba(187, 12, 21, 0.15);
+  }
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-5px) rotate(-3deg);
+  }
+  75% {
+    transform: translateY(-3px) rotate(3deg);
+  }
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: brightness(1.2);
+  }
+}
+
+@keyframes borderDance {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes shimmerSlide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes bgZoom {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes textGlow {
+  0%, 100% {
+    text-shadow: 0 0 0 transparent;
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  }
+}
+
+/* Product card base styles */
+.product-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+.product-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  padding: 2px;
+  background: linear-gradient(135deg, transparent, rgba(187, 12, 21, 0.3), transparent);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.product-card:hover::before {
+  opacity: 1;
+  background: linear-gradient(135deg, #bb0c15, #f97316, #bb0c15);
+  background-size: 200% 200%;
+  animation: borderDance 2s ease infinite;
+}
+
+.product-card:hover {
+  transform: translateY(-12px) rotateX(2deg);
+  box-shadow:
+    0 30px 60px -15px rgba(0, 0, 0, 0.25),
+    0 0 40px rgba(187, 12, 21, 0.1);
+}
+
+/* Background image animation */
+.product-card .card-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+  filter: grayscale(30%) brightness(0.4);
+}
+
+.product-card:hover .card-bg {
+  transform: scale(1.15);
+  filter: grayscale(0%) brightness(0.5);
+}
+
+/* Glassmorphism overlay */
+.product-card .card-glass {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 69, 96, 0.85) 0%,
+    rgba(0, 45, 61, 0.9) 50%,
+    rgba(0, 69, 96, 0.85) 100%
+  );
+  backdrop-filter: blur(2px);
+  transition: all 0.5s ease;
+}
+
+.product-card:hover .card-glass {
+  background: linear-gradient(
+    135deg,
+    rgba(0, 69, 96, 0.75) 0%,
+    rgba(187, 12, 21, 0.15) 50%,
+    rgba(0, 69, 96, 0.75) 100%
+  );
+}
+
+/* Icon container */
+.product-card .card-icon {
+  position: relative;
+  z-index: 10;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.product-card:hover .card-icon {
+  animation: iconFloat 2s ease-in-out infinite;
+}
+
+.product-card .card-icon svg {
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 0 0 transparent);
+}
+
+.product-card:hover .card-icon svg {
+  filter: drop-shadow(0 0 15px currentColor);
+  animation: iconPulse 1.5s ease-in-out infinite;
+}
+
+/* Card content */
+.product-card .card-content {
+  position: relative;
+  z-index: 10;
+}
+
+.product-card .card-title {
+  transition: all 0.3s ease;
+}
+
+.product-card:hover .card-title {
+  animation: textGlow 2s ease-in-out infinite;
+}
+
+/* Shimmer effect on hover */
+.product-card .card-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.product-card:hover .card-shimmer {
+  animation: shimmerSlide 1s ease forwards;
+}
+
+/* Floating particles effect */
+.product-card .card-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.product-card .particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(187, 12, 21, 0.6);
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.product-card:hover .particle {
+  opacity: 1;
+  animation: particleFloat 3s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(100%) scale(0);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%) scale(1);
+    opacity: 0;
+  }
+}
+
+/* Staggered card animations */
+.product-card-0 { animation-delay: 0ms; }
+.product-card-1 { animation-delay: 80ms; }
+.product-card-2 { animation-delay: 160ms; }
+.product-card-3 { animation-delay: 240ms; }
+.product-card-4 { animation-delay: 320ms; }
+.product-card-5 { animation-delay: 400ms; }
+.product-card-6 { animation-delay: 480ms; }
+.product-card-7 { animation-delay: 560ms; }
+.product-card-8 { animation-delay: 640ms; }
+.product-card-9 { animation-delay: 720ms; }
+.product-card-10 { animation-delay: 800ms; }
+.product-card-11 { animation-delay: 880ms; }
+
+/* Corner accent */
+.product-card .corner-accent {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, transparent 50%, rgba(187, 12, 21, 0.2) 50%);
+  opacity: 0;
+  transition: all 0.4s ease;
+  z-index: 4;
+}
+
+.product-card:hover .corner-accent {
+  opacity: 1;
+  width: 100px;
+  height: 100px;
+}
+
+/* Arrow animation */
+.product-card .card-arrow {
+  transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.product-card:hover .card-arrow {
+  transform: translateX(8px);
+}
+
+/* WhatsApp Floating Button */
+.whatsapp-btn {
+  animation: whatsappBounce 2s ease-in-out infinite;
+}
+
+.whatsapp-btn:hover {
+  animation: none;
+}
+
+@keyframes whatsappBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }

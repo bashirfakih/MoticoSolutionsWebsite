@@ -25,18 +25,18 @@ function useScrolled(threshold = 60) {
 
 /* ─── Product Categories Data ───────────────────────────── */
 const categories = [
-  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15' },
-  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004560' },
-  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15' },
-  { id: 'stationery-machines', title: 'Stationery Machines', icon: Package, color: '#004560' },
-  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15' },
-  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004560' },
-  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15' },
-  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004560' },
-  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15' },
-  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004560' },
-  { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15' },
-  { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004560' },
+  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/slide-2-belt.png' },
+  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004560', bg: '/slide-3-disc.png' },
+  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/slide-1-grinding.png' },
+  { id: 'stationery-machines', title: 'Stationery Machines', icon: Package, color: '#004560', bg: '/slide-3-disc.png' },
+  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/slide-1-grinding.png' },
+  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004560', bg: '/slide-5-abrasiv.png' },
+  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/slide-1-grinding.png' },
+  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004560', bg: '/slide-5-abrasiv.png' },
+  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15', bg: '/slide-2-belt.png' },
+  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004560', bg: '/slide-4-brush.png' },
+  { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/slide-1-grinding.png' },
+  { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004560', bg: '/slide-3-disc.png' },
 ]
 
 /* ─── Why Motico Features ───────────────────────────────── */
@@ -75,10 +75,10 @@ const features = [
 
 /* ─── Brands ─────────────────────────────────────────────── */
 const brands = [
-  { name: 'Hermes', logo: '/logo-hermes.svg' },
-  { name: 'Eisenblätter', logo: null },
+  { name: 'Hermes', logo: '/logo-hermes.png' },
+  { name: 'Eisenblätter', logo: '/logo-eisenblaetter.png' },
   { name: 'Hoffmann', logo: '/logo-hoffmann.png' },
-  { name: 'Osborn', logo: '/logo-osborn.svg' },
+  { name: 'Osborn', logo: '/logo-osborn.png' },
   { name: 'ZAT (OEM)', logo: '/logo-zat.jpg' },
   { name: 'Sandwox', logo: '/logo-sandwox.png' },
   { name: 'DCA', logo: '/logo-dca.png' },
@@ -240,26 +240,12 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
             {/* Logo */}
             <a href="#" className="flex-shrink-0">
-              <div className="flex items-baseline gap-0.5">
-                <span
-                  className="text-2xl font-black"
-                  style={{ color: '#004560', letterSpacing: '-0.03em' }}
-                >
-                  Motico
-                </span>
-                <span
-                  className="text-2xl font-black"
-                  style={{ color: '#bb0c15', letterSpacing: '-0.03em' }}
-                >
-                  Solutions
-                </span>
-              </div>
-              <div
-                className="text-[9px] tracking-[0.15em] uppercase mt-0.5"
-                style={{ color: '#9ca3af' }}
-              >
-                Est. 2004 · Beirut, Lebanon
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-moticosolutions.png"
+                alt="Motico Solutions"
+                className="h-9 w-auto object-contain"
+              />
             </a>
 
             {/* Desktop nav links */}
@@ -714,67 +700,153 @@ export default function Home() {
       </section>
 
       {/* ════════════════════════════════════════
-          DISTRIBUTED BRANDS
+          DISTRIBUTED BRANDS — Infinite Marquee
       ════════════════════════════════════════ */}
-      <div
-        style={{
-          background: 'linear-gradient(135deg, #004560 0%, #002d3d 100%)',
-          borderTop: '3px solid #bb0c15',
-        }}
-        className="py-12"
-      >
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <div
-            className="text-center text-xs tracking-[0.2em] uppercase mb-8 font-semibold"
-            style={{ color: 'rgba(255,255,255,0.5)' }}
-          >
-            Distributed Brands
-          </div>
-          <div className="flex flex-wrap justify-center items-center gap-6 md:gap-8">
-            {brands.map((brand, i) => (
-              <div
-                key={i}
-                className="group flex items-center justify-center px-6 py-4 rounded-2xl transition-all duration-300 cursor-pointer"
-                style={{
-                  background: 'rgba(255,255,255,0.95)',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  minWidth: 140,
-                  minHeight: 70,
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)'
-                  e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,0,0,0.3)'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.transform = 'translateY(0) scale(1)'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
+      <div className="relative overflow-hidden" style={{ background: 'white' }}>
+        {/* Top Gradient Line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-1"
+          style={{
+            background: 'linear-gradient(90deg, #004560 0%, #bb0c15 25%, #f97316 50%, #bb0c15 75%, #004560 100%)',
+          }}
+        />
+
+        {/* Animated glow effect on top line */}
+        <div
+          className="absolute top-0 left-0 right-0 h-1 opacity-60"
+          style={{
+            background: 'linear-gradient(90deg, transparent, #bb0c15, transparent)',
+            animation: 'shimmerSlide 3s ease-in-out infinite',
+          }}
+        />
+
+        <div className="py-16">
+          {/* Section Header */}
+          <div className="text-center mb-10">
+            <div
+              className="inline-flex items-center gap-3 px-5 py-2 rounded-full mb-4"
+              style={{
+                background: 'linear-gradient(135deg, rgba(0,69,96,0.08), rgba(187,12,21,0.08))',
+                border: '1px solid rgba(0,69,96,0.1)',
+              }}
+            >
+              <span
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ background: '#bb0c15' }}
+              />
+              <span
+                className="text-xs tracking-[0.15em] uppercase font-semibold"
+                style={{ color: '#004560' }}
               >
-                {brand.logo ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={brand.logo}
-                    alt={brand.name}
-                    className="max-h-10 md:max-h-12 w-auto object-contain"
-                    style={{ filter: 'grayscale(0%)' }}
-                  />
-                ) : (
-                  <span
-                    className="font-bold tracking-wide text-sm md:text-base"
-                    style={{ color: '#004560' }}
-                  >
-                    {brand.name}
-                  </span>
-                )}
-              </div>
-            ))}
+                Official Distribution Partners
+              </span>
+              <span
+                className="w-2 h-2 rounded-full animate-pulse"
+                style={{ background: '#004560', animationDelay: '0.5s' }}
+              />
+            </div>
+            <h3
+              className="text-2xl md:text-3xl font-black"
+              style={{ color: '#004560', letterSpacing: '-0.02em' }}
+            >
+              Trusted by <span className="gradient-text">World-Class</span> Brands
+            </h3>
           </div>
-          <div className="text-center mt-8">
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              Premium quality products from trusted manufacturers
-            </span>
+
+          {/* Marquee Container */}
+          <div className="marquee-wrapper overflow-hidden">
+            <div className="marquee-track">
+              {/* First set of brands */}
+              {[...brands, ...brands].map((brand, i) => (
+                <div
+                  key={i}
+                  className="group flex-shrink-0 mx-4"
+                >
+                  <div
+                    className="relative flex items-center justify-center w-48 h-24 rounded-2xl transition-all duration-500 cursor-pointer overflow-hidden"
+                    style={{
+                      background: 'linear-gradient(135deg, #f8fafc 0%, #ffffff 100%)',
+                      border: '1px solid #e5e7eb',
+                      boxShadow: '0 4px 20px rgba(0,0,0,0.03)',
+                    }}
+                  >
+                    {/* Hover gradient background */}
+                    <div
+                      className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(0,69,96,0.03) 0%, rgba(187,12,21,0.03) 100%)',
+                      }}
+                    />
+
+                    {/* Corner accent on hover */}
+                    <div
+                      className="absolute top-0 right-0 w-0 h-0 group-hover:w-16 group-hover:h-16 transition-all duration-500"
+                      style={{
+                        background: 'linear-gradient(135deg, transparent 50%, rgba(187,12,21,0.1) 50%)',
+                      }}
+                    />
+
+                    {/* Brand content */}
+                    <div className="relative z-10 flex items-center justify-center p-4">
+                      {brand.logo ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="max-h-12 w-auto object-contain transition-all duration-500 group-hover:scale-110"
+                          style={{
+                            filter: 'grayscale(20%)',
+                          }}
+                          onMouseEnter={e => (e.currentTarget.style.filter = 'grayscale(0%) drop-shadow(0 0 8px rgba(187,12,21,0.3))')}
+                          onMouseLeave={e => (e.currentTarget.style.filter = 'grayscale(20%)')}
+                        />
+                      ) : (
+                        <span
+                          className="font-bold text-lg tracking-wide transition-all duration-500 group-hover:scale-110"
+                          style={{ color: '#004560' }}
+                        >
+                          {brand.name}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Bottom accent line on hover */}
+                    <div
+                      className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-0 group-hover:w-3/4 transition-all duration-500"
+                      style={{
+                        background: 'linear-gradient(90deg, transparent, #bb0c15, transparent)',
+                      }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Bottom tagline */}
+          <div className="text-center mt-10">
+            <p className="text-sm" style={{ color: '#9ca3af' }}>
+              Premium quality products from <span style={{ color: '#004560', fontWeight: 600 }}>trusted manufacturers</span> worldwide
+            </p>
           </div>
         </div>
+
+        {/* Bottom Gradient Line */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-1"
+          style={{
+            background: 'linear-gradient(90deg, #004560 0%, #bb0c15 25%, #f97316 50%, #bb0c15 75%, #004560 100%)',
+          }}
+        />
+
+        {/* Animated glow effect on bottom line */}
+        <div
+          className="absolute bottom-0 left-0 right-0 h-1 opacity-60"
+          style={{
+            background: 'linear-gradient(90deg, transparent, #f97316, transparent)',
+            animation: 'shimmerSlide 3s ease-in-out infinite 1.5s',
+          }}
+        />
       </div>
 
       {/* ════════════════════════════════════════
@@ -869,126 +941,146 @@ export default function Home() {
             </p>
           </RevealOnScroll>
 
-          {/* Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {/* Full width dark card — Abrasive Belts */}
-            <RevealOnScroll delay={0} className="sm:col-span-2 lg:col-span-4">
-              <div
-                className="group relative rounded-3xl p-8 overflow-hidden h-64 flex flex-col justify-between cursor-pointer"
-                style={{ background: '#004560' }}
-              >
-                {/* Background image */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/slide-2-belt.png"
-                  alt=""
-                  className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 group-hover:scale-105 transition-all duration-700"
-                />
-                {/* Dark overlay */}
+          {/* Spectacular Product Cards Grid — 3 columns x 4 rows */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {categories.map(({ id, title, icon: Icon, color, bg }, i) => (
+              <RevealOnScroll key={id} delay={i * 80}>
                 <div
-                  className="absolute inset-0 pointer-events-none"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(0,69,96,0.85) 0%, rgba(0,69,96,0.6) 100%)',
-                  }}
-                />
-                {/* Decorative circle bg */}
-                <div
-                  className="absolute right-[-60px] top-[-60px] pointer-events-none"
-                  style={{
-                    width: 280,
-                    height: 280,
-                    border: '50px solid rgba(187,12,21,0.08)',
-                    borderRadius: '50%',
-                    transition: 'all 0.5s ease',
-                  }}
-                />
-                <div
-                  className="absolute right-[-20px] top-[-20px] pointer-events-none"
-                  style={{
-                    width: 160,
-                    height: 160,
-                    border: '2px solid rgba(187,12,21,0.15)',
-                    borderRadius: '50%',
-                  }}
-                />
-                <div className="relative z-10">
-                  <div
-                    className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium mb-4"
-                    style={{
-                      background: 'rgba(187,12,21,0.2)',
-                      color: '#fff',
-                      backdropFilter: 'blur(8px)',
-                    }}
-                  >
-                    <Layers className="w-3 h-3" /> Featured Category
-                  </div>
-                  <h3
-                    className="font-bold text-white leading-tight"
-                    style={{ fontSize: 32 }}
-                  >
-                    Abrasive Belts
-                  </h3>
-                  <p className="text-sm mt-1.5" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                    Wide solutions for stainless steel, wood, glass and other materials.
-                  </p>
-                </div>
-                <div className="relative z-10">
-                  <button
-                    className="inline-flex items-center gap-2 text-sm font-semibold text-white rounded-xl px-5 py-2.5 active:scale-95 transition-all"
-                    style={{ background: 'rgba(220,38,38,0.9)', backdropFilter: 'blur(8px)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#bb0c15')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(220,38,38,0.9)')}
-                  >
-                    Browse All <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-                {/* Hover glow */}
-                <div
-                  className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500"
-                  style={{ boxShadow: 'inset 0 0 60px rgba(220,38,38,0.2)' }}
-                />
-              </div>
-            </RevealOnScroll>
-
-            {/* All Product Category Cards */}
-            {categories.map(({ id, title, icon: Icon, color }, i) => (
-              <RevealOnScroll key={id} delay={(i + 1) * 60}>
-                <div
-                  className="group rounded-2xl p-5 cursor-pointer transition-all duration-300 flex items-center gap-4"
-                  style={{ background: 'white', border: '1px solid #f1f5f9' }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = color
-                    e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,0,0,0.08)'
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = '#f1f5f9'
-                    e.currentTarget.style.boxShadow = 'none'
-                    e.currentTarget.style.transform = 'translateY(0)'
-                  }}
+                  className={`product-card product-card-${i} group relative h-72 cursor-pointer`}
+                  style={{ animationFillMode: 'both' }}
                 >
+                  {/* Background Image */}
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ background: `${color}15` }}
-                  >
-                    <Icon className="w-6 h-6" style={{ color }} />
+                    className="card-bg"
+                    style={{ backgroundImage: `url(${bg})` }}
+                  />
+
+                  {/* Glassmorphism Overlay */}
+                  <div className="card-glass" />
+
+                  {/* Shimmer Effect */}
+                  <div className="card-shimmer" />
+
+                  {/* Floating Particles */}
+                  <div className="card-particles">
+                    {[...Array(6)].map((_, j) => (
+                      <div
+                        key={j}
+                        className="particle"
+                        style={{
+                          left: `${15 + j * 15}%`,
+                          animationDelay: `${j * 0.5}s`,
+                          width: j % 2 === 0 ? '3px' : '5px',
+                          height: j % 2 === 0 ? '3px' : '5px',
+                          background: j % 2 === 0 ? 'rgba(187, 12, 21, 0.6)' : 'rgba(255, 255, 255, 0.4)',
+                        }}
+                      />
+                    ))}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="font-bold text-base" style={{ color: '#004560' }}>
-                      {title}
-                    </h3>
-                    <a
-                      href="#"
-                      className="inline-flex items-center gap-1 text-xs font-semibold mt-1 transition-all group-hover:gap-2"
-                      style={{ color }}
-                    >
-                      View Products <ChevronRight className="w-3 h-3" />
-                    </a>
+
+                  {/* Corner Accent */}
+                  <div className="corner-accent" />
+
+                  {/* Card Content */}
+                  <div className="card-content relative z-10 h-full flex flex-col justify-between p-6">
+                    {/* Top Section */}
+                    <div>
+                      {/* Icon Container */}
+                      <div
+                        className="card-icon w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
+                        style={{
+                          background: color === '#bb0c15'
+                            ? 'linear-gradient(135deg, rgba(187,12,21,0.9), rgba(249,115,22,0.8))'
+                            : 'linear-gradient(135deg, rgba(0,69,96,0.9), rgba(0,45,61,0.8))',
+                          boxShadow: `0 8px 32px ${color}40`,
+                        }}
+                      >
+                        <Icon className="w-8 h-8 text-white" />
+                      </div>
+
+                      {/* Title */}
+                      <h3
+                        className="card-title font-bold text-xl text-white leading-tight mb-2"
+                        style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}
+                      >
+                        {title}
+                      </h3>
+
+                      {/* Category Badge */}
+                      <div
+                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider"
+                        style={{
+                          background: 'rgba(255,255,255,0.1)',
+                          backdropFilter: 'blur(8px)',
+                          color: 'rgba(255,255,255,0.8)',
+                          border: '1px solid rgba(255,255,255,0.15)',
+                        }}
+                      >
+                        <span
+                          className="w-1.5 h-1.5 rounded-full"
+                          style={{ background: color }}
+                        />
+                        Industrial Grade
+                      </div>
+                    </div>
+
+                    {/* Bottom Section */}
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="text-sm font-medium"
+                        style={{ color: 'rgba(255,255,255,0.6)' }}
+                      >
+                        Explore Products
+                      </span>
+                      <div
+                        className="card-arrow w-10 h-10 rounded-full flex items-center justify-center"
+                        style={{
+                          background: 'rgba(255,255,255,0.1)',
+                          backdropFilter: 'blur(8px)',
+                          border: '1px solid rgba(255,255,255,0.2)',
+                        }}
+                      >
+                        <ArrowRight className="w-5 h-5 text-white" />
+                      </div>
+                    </div>
                   </div>
+
+                  {/* Hover Glow Ring */}
+                  <div
+                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700"
+                    style={{
+                      boxShadow: `inset 0 0 80px ${color}30, 0 0 40px ${color}20`,
+                    }}
+                  />
                 </div>
               </RevealOnScroll>
             ))}
           </div>
+
+          {/* Browse All Products CTA */}
+          <RevealOnScroll delay={600}>
+            <div className="flex justify-center mt-14">
+              <a
+                href="#"
+                className="btn-shimmer group inline-flex items-center gap-3 px-10 py-5 rounded-full text-white font-bold text-lg active:scale-95 transition-all"
+                style={{
+                  background: 'linear-gradient(135deg, #bb0c15, #f97316)',
+                  boxShadow: '0 12px 40px rgba(220,38,38,0.35)',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.boxShadow = '0 16px 50px rgba(220,38,38,0.5)'
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.boxShadow = '0 12px 40px rgba(220,38,38,0.35)'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                }}
+              >
+                View All 700+ Products
+                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+              </a>
+            </div>
+          </RevealOnScroll>
         </div>
       </section>
 
@@ -1312,10 +1404,13 @@ export default function Home() {
 
             {/* Col 1 — Brand */}
             <div className="col-span-2 md:col-span-1">
-              <div className="flex items-baseline gap-0.5 mb-2">
-                <span className="text-xl font-black text-white">Motico</span>
-                <span className="text-xl font-black" style={{ color: '#bb0c15' }}>Solutions</span>
-              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-moticosolutions.png"
+                alt="Motico Solutions"
+                className="h-8 w-auto object-contain mb-4"
+                style={{ filter: 'brightness(0) invert(1)' }}
+              />
               <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 Premium industrial abrasives &amp; tools distributor. Serving MENA since 2004.
               </p>
@@ -1448,6 +1543,63 @@ export default function Home() {
           </div>
         </div>
       </footer>
+
+      {/* ════════════════════════════════════════
+          WHATSAPP FLOATING BUTTON
+      ════════════════════════════════════════ */}
+      <a
+        href="https://wa.me/9613741565?text=Hello%20Motico%20Solutions!%20I%27m%20interested%20in%20your%20industrial%20products."
+        target="_blank"
+        rel="noopener noreferrer"
+        className="whatsapp-btn fixed z-50 flex items-center gap-3 group"
+        style={{
+          bottom: 24,
+          right: 24,
+        }}
+        aria-label="Chat on WhatsApp"
+      >
+        {/* Tooltip */}
+        <div
+          className="hidden md:flex items-center px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
+          style={{
+            background: 'white',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            color: '#004560',
+            fontSize: 13,
+            fontWeight: 600,
+          }}
+        >
+          Chat with us!
+        </div>
+
+        {/* WhatsApp Button */}
+        <div
+          className="relative flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 group-hover:scale-110"
+          style={{
+            background: '#25D366',
+            boxShadow: '0 4px 20px rgba(37, 211, 102, 0.4)',
+          }}
+        >
+          {/* Pulse ring */}
+          <div
+            className="absolute inset-0 rounded-full animate-ping"
+            style={{
+              background: '#25D366',
+              opacity: 0.3,
+              animationDuration: '2s',
+            }}
+          />
+
+          {/* WhatsApp Icon */}
+          <svg
+            className="w-7 h-7 text-white relative z-10"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+        </div>
+      </a>
 
     </div>
   )
