@@ -44,7 +44,7 @@ body {
 
 /* Dot grid background */
 .dot-grid {
-  background-image: radial-gradient(circle, #004560 1px, transparent 1px);
+  background-image: radial-gradient(circle, #004D8B 1px, transparent 1px);
   background-size: 28px 28px;
   opacity: 0.04;
 }
@@ -357,34 +357,34 @@ body {
   background-size: cover;
   background-position: center;
   transition: all 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-  filter: grayscale(30%) brightness(0.4);
+  filter: grayscale(10%) brightness(0.85);
 }
 
 .product-card:hover .card-bg {
   transform: scale(1.15);
-  filter: grayscale(0%) brightness(0.5);
+  filter: grayscale(0%) brightness(0.95);
 }
 
-/* Glassmorphism overlay */
+/* Glassmorphism overlay - bottom-heavy gradient for text readability */
 .product-card .card-glass {
   position: absolute;
   inset: 0;
   background: linear-gradient(
-    135deg,
-    rgba(0, 69, 96, 0.85) 0%,
-    rgba(0, 45, 61, 0.9) 50%,
-    rgba(0, 69, 96, 0.85) 100%
+    to bottom,
+    rgba(0, 45, 61, 0.3) 0%,
+    rgba(0, 45, 61, 0.5) 40%,
+    rgba(0, 45, 61, 0.85) 100%
   );
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(1px);
   transition: all 0.5s ease;
 }
 
 .product-card:hover .card-glass {
   background: linear-gradient(
-    135deg,
-    rgba(0, 69, 96, 0.75) 0%,
-    rgba(187, 12, 21, 0.15) 50%,
-    rgba(0, 69, 96, 0.75) 100%
+    to bottom,
+    rgba(0, 45, 61, 0.2) 0%,
+    rgba(0, 45, 61, 0.4) 40%,
+    rgba(0, 45, 61, 0.8) 100%
   );
 }
 

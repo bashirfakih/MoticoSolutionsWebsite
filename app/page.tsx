@@ -25,18 +25,18 @@ function useScrolled(threshold = 60) {
 
 /* ─── Product Categories Data ───────────────────────────── */
 const categories = [
-  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/slide-2-belt.png' },
-  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004560', bg: '/slide-3-disc.png' },
-  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/slide-1-grinding.png' },
-  { id: 'stationery-machines', title: 'Stationery Machines', icon: Package, color: '#004560', bg: '/slide-3-disc.png' },
-  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/slide-1-grinding.png' },
-  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004560', bg: '/slide-5-abrasiv.png' },
-  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/slide-1-grinding.png' },
-  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004560', bg: '/slide-5-abrasiv.png' },
+  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/product-abrasive-belts.png' },
+  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B', bg: '/product-air-power-tools.png' },
+  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/product-belt-disc-sander.png' },
+  { id: 'stationery-machines', title: 'Stationery Machines', icon: Package, color: '#004D8B', bg: '/product-stationery-machines.png' },
+  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/product-grinding-sleeves.png' },
+  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004D8B', bg: '/product-abrasive-discs.png' },
+  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/product-cutting-discs.png' },
+  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B', bg: '/product-mounted-points.png' },
   { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15', bg: '/slide-2-belt.png' },
-  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004560', bg: '/slide-4-brush.png' },
+  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004D8B', bg: '/slide-4-brush.png' },
   { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/slide-1-grinding.png' },
-  { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004560', bg: '/slide-3-disc.png' },
+  { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004D8B', bg: '/product-accessories.png' },
 ]
 
 /* ─── Why Motico Features ───────────────────────────────── */
@@ -79,9 +79,12 @@ const brands = [
   { name: 'Eisenblätter', logo: '/logo-eisenblaetter.png' },
   { name: 'Hoffmann', logo: '/logo-hoffmann.png' },
   { name: 'Osborn', logo: '/logo-osborn.png' },
+  { name: '3M', logo: '/logo-3m.png' },
   { name: 'ZAT (OEM)', logo: '/logo-zat.jpg' },
   { name: 'Sandwox', logo: '/logo-sandwox.png' },
   { name: 'DCA', logo: '/logo-dca.png' },
+  { name: 'Egeli', logo: '/logo-egeli.png' },
+  { name: 'NS', logo: '/logo-ns.png' },
 ]
 
 /* ─── Carousel Slides ───────────────────────────────────── */
@@ -105,7 +108,7 @@ const carouselSlides = [
     category: 'Power Tools & Machines',
     desc: 'Professional belt sanders, disc grinders & more',
     tag: 'ZAT Brand',
-    tagColor: '#004560',
+    tagColor: '#004D8B',
   },
   {
     image: '/slide-4-brush.png',
@@ -179,7 +182,7 @@ export default function Home() {
       ════════════════════════════════════════ */}
       <header className="fixed top-0 left-0 right-0 z-50">
         {/* Top bar */}
-        <div style={{ background: '#004560' }} className="py-2">
+        <div style={{ background: '#004D8B' }} className="py-2">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
             {/* Contact info */}
             <div className="flex items-center gap-5">
@@ -237,31 +240,49 @@ export default function Home() {
             transition: 'all 0.3s ease',
           }}
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
             {/* Logo */}
             <a href="#" className="flex-shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-moticosolutions.png"
                 alt="Motico Solutions"
-                className="h-9 w-auto object-contain"
+                className="h-11 w-auto object-contain"
               />
             </a>
 
             {/* Desktop nav links */}
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-6">
               {navLinks.map(link => (
                 <a
                   key={link.label}
                   href={link.href}
                   className="nav-link text-sm font-medium pb-0.5"
                   style={{ color: '#4b5563' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#004560')}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#004D8B')}
                   onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}
                 >
                   {link.label}
                 </a>
               ))}
+
+              {/* Search */}
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  className="w-44 pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 focus:border-[#004D8B] focus:outline-none focus:ring-1 focus:ring-[#004D8B] transition-all"
+                  style={{ background: '#f8fafc' }}
+                />
+                <svg
+                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
             </div>
 
             {/* Right buttons */}
@@ -273,7 +294,7 @@ export default function Home() {
                   style={{ background: 'rgba(0,69,96,0.08)' }}
                   title="iOS App Coming Soon"
                 >
-                  <svg className="w-4 h-4" style={{ color: '#004560' }} viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-4 h-4" style={{ color: '#004D8B' }} viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
                   </svg>
                   <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Coming Soon" />
@@ -283,7 +304,7 @@ export default function Home() {
                   style={{ background: 'rgba(0,69,96,0.08)' }}
                   title="Android App Coming Soon"
                 >
-                  <svg className="w-4 h-4" style={{ color: '#004560' }} viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-4 h-4" style={{ color: '#004D8B' }} viewBox="0 0 24 24" fill="currentColor">
                     <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
                   </svg>
                   <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Coming Soon" />
@@ -322,7 +343,7 @@ export default function Home() {
             {/* Mobile hamburger */}
             <button
               className="md:hidden p-2 rounded-lg"
-              style={{ color: '#004560' }}
+              style={{ color: '#004D8B' }}
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
@@ -345,7 +366,7 @@ export default function Home() {
                   onClick={() => setMenuOpen(false)}
                   className="text-xl font-semibold py-3 border-b"
                   style={{
-                    color: '#004560',
+                    color: '#004D8B',
                     borderColor: '#f1f5f9',
                     animation: `lineReveal 0.4s cubic-bezier(0.16,1,0.3,1) ${i * 60}ms both`,
                   }}
@@ -356,7 +377,7 @@ export default function Home() {
               <a
                 href="#"
                 className="text-xl font-semibold py-3 border-b"
-                style={{ color: '#004560', borderColor: '#f1f5f9', animation: `lineReveal 0.4s cubic-bezier(0.16,1,0.3,1) ${4 * 60}ms both` }}
+                style={{ color: '#004D8B', borderColor: '#f1f5f9', animation: `lineReveal 0.4s cubic-bezier(0.16,1,0.3,1) ${4 * 60}ms both` }}
                 onClick={() => setMenuOpen(false)}
               >
                 Login
@@ -457,41 +478,22 @@ export default function Home() {
 
             {/* LEFT COLUMN */}
             <div className="flex flex-col justify-center gap-6" style={{ minHeight: 620 }}>
-              {/* H1 */}
-              <h1
-                id="hero-heading"
-                style={{
-                  fontSize: 'clamp(48px, 6vw, 86px)',
-                  fontWeight: 900,
-                  lineHeight: 0.95,
-                  letterSpacing: '-0.03em',
-                }}
+              {/* H1 - Hero Image */}
+              <h1 id="hero-heading" className="sr-only">Industrial Excellence Delivered</h1>
+              <div
+                className="line-reveal"
+                style={{ animation: 'lineReveal 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both' }}
               >
-                <div className="clip-reveal-parent">
-                  <div
-                    className="line-reveal"
-                    style={{ color: '#004560', animationDelay: '0.2s' }}
-                  >
-                    Industr<span style={{ color: '#bb0c15' }}>i</span>al
-                  </div>
-                </div>
-                <div className="clip-reveal-parent">
-                  <div
-                    className="line-reveal gradient-text"
-                    style={{ animationDelay: '0.4s' }}
-                  >
-                    Excellence
-                  </div>
-                </div>
-                <div className="clip-reveal-parent">
-                  <div
-                    className="line-reveal"
-                    style={{ color: '#004560', animationDelay: '0.6s' }}
-                  >
-                    Del<span style={{ color: '#bb0c15' }}>i</span>vered
-                  </div>
-                </div>
-              </h1>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/Industrial-Excellence-Delivered.png"
+                  alt="Industrial Excellence Delivered"
+                  className="w-full max-w-lg h-auto"
+                  style={{
+                    mixBlendMode: 'multiply',
+                  }}
+                />
+              </div>
 
               {/* Subheadline */}
               <p
@@ -554,7 +556,7 @@ export default function Home() {
                   borderRadius: 32,
                   height: 620,
                   boxShadow: '0 32px 64px rgba(10,22,40,0.18), 0 0 0 1px rgba(10,22,40,0.06)',
-                  background: '#004560',
+                  background: '#004D8B',
                 }}
               >
                 {carouselSlides.map((slide, i) => (
@@ -671,7 +673,7 @@ export default function Home() {
                     }}
                   >
                     <Icon className="w-4 h-4 mb-1" style={{ color: '#bb0c15' }} />
-                    <div className="font-black text-base" style={{ color: '#004560' }}>{value}</div>
+                    <div className="font-black text-base" style={{ color: '#004D8B' }}>{value}</div>
                     <div className="text-[10px] uppercase tracking-wider" style={{ color: '#9ca3af' }}>
                       {label}
                     </div>
@@ -707,7 +709,7 @@ export default function Home() {
         <div
           className="absolute top-0 left-0 right-0 h-1"
           style={{
-            background: 'linear-gradient(90deg, #004560 0%, #bb0c15 25%, #f97316 50%, #bb0c15 75%, #004560 100%)',
+            background: 'linear-gradient(90deg, #004D8B 0%, #bb0c15 25%, #f97316 50%, #bb0c15 75%, #004D8B 100%)',
           }}
         />
 
@@ -736,18 +738,18 @@ export default function Home() {
               />
               <span
                 className="text-xs tracking-[0.15em] uppercase font-semibold"
-                style={{ color: '#004560' }}
+                style={{ color: '#004D8B' }}
               >
-                Official Distribution Partners
+                Official Distribution Partners & Supplied Products
               </span>
               <span
                 className="w-2 h-2 rounded-full animate-pulse"
-                style={{ background: '#004560', animationDelay: '0.5s' }}
+                style={{ background: '#004D8B', animationDelay: '0.5s' }}
               />
             </div>
             <h3
               className="text-2xl md:text-3xl font-black"
-              style={{ color: '#004560', letterSpacing: '-0.02em' }}
+              style={{ color: '#004D8B', letterSpacing: '-0.02em' }}
             >
               Trusted by <span className="gradient-text">World-Class</span> Brands
             </h3>
@@ -803,7 +805,7 @@ export default function Home() {
                       ) : (
                         <span
                           className="font-bold text-lg tracking-wide transition-all duration-500 group-hover:scale-110"
-                          style={{ color: '#004560' }}
+                          style={{ color: '#004D8B' }}
                         >
                           {brand.name}
                         </span>
@@ -826,7 +828,7 @@ export default function Home() {
           {/* Bottom tagline */}
           <div className="text-center mt-10">
             <p className="text-sm" style={{ color: '#9ca3af' }}>
-              Premium quality products from <span style={{ color: '#004560', fontWeight: 600 }}>trusted manufacturers</span> worldwide
+              Premium quality products from <span style={{ color: '#004D8B', fontWeight: 600 }}>trusted manufacturers</span> worldwide
             </p>
           </div>
         </div>
@@ -835,7 +837,7 @@ export default function Home() {
         <div
           className="absolute bottom-0 left-0 right-0 h-1"
           style={{
-            background: 'linear-gradient(90deg, #004560 0%, #bb0c15 25%, #f97316 50%, #bb0c15 75%, #004560 100%)',
+            background: 'linear-gradient(90deg, #004D8B 0%, #bb0c15 25%, #f97316 50%, #bb0c15 75%, #004D8B 100%)',
           }}
         />
 
@@ -887,7 +889,7 @@ export default function Home() {
                   <Icon className="w-8 h-8 mb-4" style={{ color: '#bb0c15' }} />
                   <div
                     className="font-black leading-none"
-                    style={{ fontSize: 'clamp(48px, 5vw, 72px)', color: '#004560' }}
+                    style={{ fontSize: 'clamp(48px, 5vw, 72px)', color: '#004D8B' }}
                   >
                     <CountUp target={value} suffix={suffix} />
                   </div>
@@ -929,7 +931,7 @@ export default function Home() {
             <h2
               id="products-heading"
               className="font-black leading-none"
-              style={{ fontSize: 'clamp(36px, 4.5vw, 60px)', color: '#004560', letterSpacing: '-0.02em' }}
+              style={{ fontSize: 'clamp(36px, 4.5vw, 60px)', color: '#004D8B', letterSpacing: '-0.02em' }}
             >
               Built for Every
               <br />
@@ -1114,7 +1116,7 @@ export default function Home() {
                 <h2
                   id="why-heading"
                   className="font-black leading-none mb-6"
-                  style={{ fontSize: 'clamp(40px, 4vw, 56px)', color: '#004560', letterSpacing: '-0.02em' }}
+                  style={{ fontSize: 'clamp(40px, 4vw, 56px)', color: '#004D8B', letterSpacing: '-0.02em' }}
                 >
                   Your Trusted
                   <br />
@@ -1176,13 +1178,13 @@ export default function Home() {
                           style={{
                             background: isEven
                               ? 'linear-gradient(135deg, #bb0c15, #f97316)'
-                              : '#004560',
+                              : '#004D8B',
                           }}
                         >
                           <Icon className="w-6 h-6 text-white" />
                         </div>
                         <div className="flex-1">
-                          <h3 className="font-bold text-lg mb-2" style={{ color: '#004560' }}>
+                          <h3 className="font-bold text-lg mb-2" style={{ color: '#004D8B' }}>
                             {feature.title}
                           </h3>
                           <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
@@ -1211,7 +1213,7 @@ export default function Home() {
       <section
         id="cta"
         className="relative py-32 overflow-hidden hero-grain"
-        style={{ background: '#004560' }}
+        style={{ background: '#004D8B' }}
         aria-labelledby="cta-heading"
       >
         {/* Rings */}
@@ -1406,10 +1408,9 @@ export default function Home() {
             <div className="col-span-2 md:col-span-1">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/logo-moticosolutions.png"
+                src="/logo-moticosolutions-white.png"
                 alt="Motico Solutions"
                 className="h-8 w-auto object-contain mb-4"
-                style={{ filter: 'brightness(0) invert(1)' }}
               />
               <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 Premium industrial abrasives &amp; tools distributor. Serving MENA since 2004.
@@ -1564,7 +1565,7 @@ export default function Home() {
           style={{
             background: 'white',
             boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            color: '#004560',
+            color: '#004D8B',
             fontSize: 13,
             fontWeight: 600,
           }}

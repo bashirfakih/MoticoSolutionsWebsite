@@ -7,7 +7,7 @@ import CustomCursor from '@/components/ui/CustomCursor'
 const inter = Inter({ subsets: ['latin'] })
 
 export const viewport: Viewport = {
-  themeColor: '#004560',
+  themeColor: '#004D8B',
 }
 
 export const metadata: Metadata = {
