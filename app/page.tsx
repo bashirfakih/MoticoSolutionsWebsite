@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import {
   BadgeCheck, Zap, Headphones, Package, Users, Globe,
   Clock, Truck, ShieldCheck, Phone, Mail, MapPin,
-  Menu, X, ChevronRight, ArrowRight, CircleCheck,
+  Menu, X, ChevronRight, ChevronLeft, ArrowRight, CircleCheck,
   Facebook, Instagram, Linkedin, Youtube,
   Star, Layers, Scissors, Wrench, Disc, Settings,
   Smartphone,
@@ -87,42 +87,47 @@ const brands = [
   { name: 'NS', logo: '/logo-ns.png' },
 ]
 
-/* ─── Carousel Slides ───────────────────────────────────── */
-const carouselSlides = [
+/* ─── Hero Slides ───────────────────────────────────────── */
+const heroSlides = [
   {
     image: '/slide-1-grinding.png',
-    category: 'Grinding Solutions',
-    desc: 'Precision grinding wheels & cutting discs for every surface',
-    tag: 'Best Seller',
-    tagColor: '#bb0c15',
+    tag: 'GRINDING SOLUTIONS',
+    headline: ['Precision', 'That Cuts', 'Through Steel.'],
+    tagline: 'Industrial grinding wheels & cutting discs for every metal surface.',
+    accent: '#bb0c15',
+    accentSecondary: '#004D8B',
   },
   {
     image: '/slide-2-belt.png',
-    category: 'Abrasive Belts',
-    desc: 'High-performance sanding belts in all grits & sizes',
-    tag: 'New Arrivals',
-    tagColor: '#f97316',
+    tag: 'ABRASIVE BELTS',
+    headline: ['Surface', 'Finishing,', 'Perfected.'],
+    tagline: 'High-performance sanding belts in all grits, widths and lengths.',
+    accent: '#004D8B',
+    accentSecondary: '#bb0c15',
   },
   {
     image: '/slide-3-disc.png',
-    category: 'Power Tools & Machines',
-    desc: 'Professional belt sanders, disc grinders & more',
-    tag: 'ZAT Brand',
-    tagColor: '#004D8B',
+    tag: 'POWER TOOLS',
+    headline: ['Power', 'Built for', 'Industry.'],
+    tagline: 'Professional belt sanders, disc grinders and machines by ZAT.',
+    accent: '#bb0c15',
+    accentSecondary: '#004D8B',
   },
   {
     image: '/slide-4-brush.png',
-    category: 'Wire Brushes',
-    desc: 'Surface preparation & finishing tools for all metals',
-    tag: 'Industrial Grade',
-    tagColor: '#059669',
+    tag: 'WIRE BRUSHES',
+    headline: ['Clean.', 'Prepare.', 'Deliver.'],
+    tagline: 'Surface preparation tools trusted by 500+ businesses across MENA.',
+    accent: '#004D8B',
+    accentSecondary: '#bb0c15',
   },
   {
     image: '/slide-5-abrasiv.png',
-    category: 'Specialty Abrasives',
-    desc: 'Custom ceramic & zirconia solutions for demanding jobs',
-    tag: 'MENA Stocked',
-    tagColor: '#7c3aed',
+    tag: 'SPECIALTY ABRASIVES',
+    headline: ['Ceramic.', 'Zirconia.', 'Excellence.'],
+    tagline: 'Advanced abrasive solutions for the most demanding applications.',
+    accent: '#bb0c15',
+    accentSecondary: '#004D8B',
   },
 ]
 
@@ -140,13 +145,15 @@ export default function Home() {
 
   useEffect(() => { setMounted(true) }, [])
 
-  /* Auto-advance carousel */
+  /* Auto-advance hero slider */
+  const [isPaused, setIsPaused] = useState(false)
   useEffect(() => {
+    if (isPaused) return
     const timer = setInterval(() => {
-      setActiveSlide(prev => (prev + 1) % carouselSlides.length)
-    }, 3500)
+      setActiveSlide(prev => (prev + 1) % heroSlides.length)
+    }, 5000)
     return () => clearInterval(timer)
-  }, [])
+  }, [isPaused])
 
   /* Feature scroll spy */
   useEffect(() => {
@@ -396,308 +403,318 @@ export default function Home() {
       </header>
 
       {/* ════════════════════════════════════════
-          HERO SECTION
+          HERO SECTION — Full Viewport Cinematic Slider
       ════════════════════════════════════════ */}
       <section
         ref={heroRef}
-        className="relative min-h-screen flex items-center overflow-hidden"
+        className="relative flex items-center overflow-hidden"
         style={{
-          background: '#f8fafc',
-          paddingTop: '104px',
+          height: '100vh',
+          minHeight: 700,
+          paddingTop: 104,
         }}
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
         aria-labelledby="hero-heading"
       >
-        {/* Dot grid bg */}
+        <h1 id="hero-heading" className="sr-only">Industrial Excellence Delivered</h1>
+
+        {/* LAYER 1 — Slide backgrounds */}
+        {heroSlides.map((slide, i) => (
+          <div
+            key={i}
+            className="absolute inset-0"
+            style={{
+              zIndex: 0,
+              opacity: activeSlide === i ? 1 : 0,
+              transition: 'opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
+            }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={slide.image}
+              alt={slide.tag}
+              className="w-full h-full object-cover"
+              style={{
+                transform: activeSlide === i ? 'scale(1.06)' : 'scale(1.0)',
+                transition: 'transform 6s cubic-bezier(0.4, 0, 0.2, 1)',
+              }}
+            />
+          </div>
+        ))}
+
+        {/* LAYER 2 — Gradient overlay */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            zIndex: 1,
+            background: 'linear-gradient(105deg, rgba(10,22,40,0.92) 0%, rgba(10,22,40,0.75) 35%, rgba(10,22,40,0.35) 65%, rgba(10,22,40,0.15) 100%)',
+          }}
+        />
+
+        {/* LAYER 3 — Dot grid texture */}
         <div
           className="dot-grid absolute inset-0 pointer-events-none"
-          style={{ zIndex: 0 }}
+          style={{ zIndex: 2 }}
         />
-        {/* Soft orbs */}
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            top: '-10%',
-            right: '-5%',
-            width: 500,
-            height: 500,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(220,38,38,0.10) 0%, transparent 70%)',
-            zIndex: 0,
-          }}
-        />
-        <div
-          className="absolute pointer-events-none"
-          style={{
-            bottom: '-10%',
-            left: '-5%',
-            width: 600,
-            height: 600,
-            borderRadius: '50%',
-            background: 'radial-gradient(circle, rgba(10,22,40,0.08) 0%, transparent 70%)',
-            zIndex: 0,
-          }}
-        />
-        {/* Curved morphing decorative lines */}
-        <svg
-          className="absolute hidden lg:block pointer-events-none"
-          style={{
-            top: '10%',
-            right: '5%',
-            width: '55%',
-            height: '80%',
-            zIndex: 1,
-          }}
-          viewBox="0 0 600 500"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          {/* Red curve - outer */}
-          <path
-            d="M50 50 Q 150 0, 200 80 T 350 120 Q 500 150, 550 300 T 500 450 Q 400 500, 300 480"
-            stroke="#bb0c15"
-            strokeWidth="3"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.6"
-            className="morph-line"
-          />
-          {/* Blue/Navy curve - inner */}
-          <path
-            d="M80 80 Q 180 30, 230 110 T 380 150 Q 530 180, 520 330 T 470 420 Q 370 470, 270 450"
-            stroke="#1e3a5f"
-            strokeWidth="3"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.5"
-            className="morph-line-delayed"
-          />
-        </svg>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full relative z-10 py-16 lg:py-24">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-
-            {/* LEFT COLUMN */}
-            <div className="flex flex-col justify-center gap-6" style={{ minHeight: 620 }}>
-              {/* H1 - Hero Image */}
-              <h1 id="hero-heading" className="sr-only">Industrial Excellence Delivered</h1>
-              <div
-                className="line-reveal"
-                style={{ animation: 'lineReveal 0.6s cubic-bezier(0.16,1,0.3,1) 0.2s both' }}
+        {/* LAYER 4 — Content */}
+        <div className="relative z-10 max-w-3xl pl-4 sm:pl-6 lg:pl-16">
+          {/* Kinetic Typography — re-mounts on slide change */}
+          <div key={activeSlide}>
+            {/* TAG LINE */}
+            <div
+              className="inline-flex items-center px-4 py-1.5 rounded-full mb-6"
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                backdropFilter: 'blur(8px)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                animation: 'fadeSlideUp 0.5s cubic-bezier(0.16,1,0.3,1) 0ms both',
+              }}
+            >
+              <span
+                className="text-[11px] font-bold tracking-[0.2em] uppercase"
+                style={{ color: 'rgba(255,255,255,0.9)' }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/Industrial-Excellence-Delivered.png"
-                  alt="Industrial Excellence Delivered"
-                  className="w-full max-w-lg h-auto"
-                  style={{
-                    mixBlendMode: 'multiply',
-                  }}
-                />
-              </div>
-
-              {/* Subheadline */}
-              <p
-                className="text-lg max-w-md leading-relaxed"
-                style={{
-                  color: '#6b7280',
-                  animation: 'lineReveal 0.6s cubic-bezier(0.16,1,0.3,1) 0.8s both',
-                }}
-              >
-                Premium abrasive belts, grinding tools, industrial machines and finishing equipment.
-                Market leaders in Lebanon and across the Middle East and West Africa since 2004.
-              </p>
-
-              {/* CTA buttons */}
-              <div
-                className="flex flex-wrap gap-4"
-                style={{ animation: 'lineReveal 0.6s cubic-bezier(0.16,1,0.3,1) 1.1s both' }}
-              >
-                <a
-                  href="#products"
-                  className="btn-shimmer inline-flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold text-base active:scale-95 transition-all"
-                  style={{
-                    background: 'linear-gradient(135deg, #bb0c15, #f97316)',
-                    boxShadow: '0 8px 30px rgba(220,38,38,0.3)',
-                  }}
-                  onMouseEnter={e =>
-                    (e.currentTarget.style.boxShadow = '0 12px 40px rgba(220,38,38,0.45)')
-                  }
-                  onMouseLeave={e =>
-                    (e.currentTarget.style.boxShadow = '0 8px 30px rgba(220,38,38,0.3)')
-                  }
-                >
-                  Explore Products <ArrowRight className="w-4 h-4" />
-                </a>
-                <a
-                  href="#cta"
-                  className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-base border-2 active:scale-95 transition-all"
-                  style={{ borderColor: '#d1d5db', color: '#374151' }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.borderColor = '#bb0c15'
-                    e.currentTarget.style.color = '#bb0c15'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = '#d1d5db'
-                    e.currentTarget.style.color = '#374151'
-                  }}
-                >
-                  Request Quote
-                </a>
-              </div>
+                {heroSlides[activeSlide].tag}
+              </span>
             </div>
 
-            {/* RIGHT COLUMN — Product Image Carousel */}
-            <div className="relative hidden lg:flex flex-col items-center gap-5">
-
-              {/* Carousel container */}
-              <div
-                className="relative w-full overflow-hidden"
-                style={{
-                  borderRadius: 32,
-                  height: 620,
-                  boxShadow: '0 32px 64px rgba(10,22,40,0.18), 0 0 0 1px rgba(10,22,40,0.06)',
-                  background: '#004D8B',
-                }}
-              >
-                {carouselSlides.map((slide, i) => (
+            {/* HEADLINE — 3 lines, staggered */}
+            <div className="mb-6">
+              {heroSlides[activeSlide].headline.map((line, idx) => (
+                <div key={idx} style={{ overflow: 'hidden' }}>
                   <div
-                    key={i}
                     style={{
-                      position: 'absolute', inset: 0,
-                      opacity: i === activeSlide ? 1 : 0,
-                      transition: 'opacity 0.8s cubic-bezier(0.4,0,0.2,1)',
-                      pointerEvents: i === activeSlide ? 'auto' : 'none',
+                      fontSize: 'clamp(52px, 7vw, 96px)',
+                      fontWeight: 900,
+                      lineHeight: 0.92,
+                      letterSpacing: '-0.03em',
+                      color: idx === 1 ? 'transparent' : 'white',
+                      background: idx === 1
+                        ? `linear-gradient(135deg, ${heroSlides[activeSlide].accent}, ${heroSlides[activeSlide].accentSecondary})`
+                        : 'none',
+                      WebkitBackgroundClip: idx === 1 ? 'text' : 'unset',
+                      backgroundClip: idx === 1 ? 'text' : 'unset',
+                      animation: `fadeSlideUp 0.7s ease ${100 + idx * 100}ms both`,
                     }}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={slide.image}
-                      alt={slide.category}
-                      style={{
-                        width: '100%', height: '100%', objectFit: 'cover',
-                        transform: i === activeSlide ? 'scale(1.03)' : 'scale(1)',
-                        transition: 'transform 4s ease',
-                      }}
-                    />
-                    {/* Dark gradient overlay */}
-                    <div style={{
-                      position: 'absolute', inset: 0,
-                      background: 'linear-gradient(to top, rgba(10,22,40,0.85) 0%, rgba(10,22,40,0.25) 50%, rgba(10,22,40,0.05) 100%)',
-                    }} />
-                    {/* Slide counter top-left */}
-                    <div style={{
-                      position: 'absolute', top: 20, left: 20,
-                      background: 'rgba(255,255,255,0.12)',
-                      backdropFilter: 'blur(8px)',
-                      color: 'rgba(255,255,255,0.8)',
-                      fontSize: 11, fontWeight: 600,
-                      padding: '5px 12px', borderRadius: 99,
-                      border: '1px solid rgba(255,255,255,0.15)',
-                    }}>
-                      {String(i + 1).padStart(2,'0')} / {String(carouselSlides.length).padStart(2,'0')}
-                    </div>
-                    {/* Tag pill top-right */}
-                    <div style={{
-                      position: 'absolute', top: 20, right: 20,
-                      background: slide.tagColor, color: 'white',
-                      fontSize: 11, fontWeight: 700,
-                      letterSpacing: '0.08em', textTransform: 'uppercase',
-                      padding: '5px 12px', borderRadius: 99,
-                    }}>
-                      {slide.tag}
-                    </div>
-                    {/* Bottom content */}
-                    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '28px 24px' }}>
-                      <div style={{
-                        fontSize: 22, fontWeight: 800, color: 'white',
-                        letterSpacing: '-0.02em', marginBottom: 6,
-                      }}>
-                        {slide.category}
-                      </div>
-                      <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.6)', lineHeight: 1.5 }}>
-                        {slide.desc}
-                      </div>
-                    </div>
+                    {line}
                   </div>
-                ))}
-
-                {/* Progress bar at bottom of card */}
-                <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0,
-                  height: 3, background: 'rgba(255,255,255,0.1)', zIndex: 10,
-                }}>
-                  <div style={{
-                    height: '100%',
-                    background: 'linear-gradient(90deg, #bb0c15, #f97316)',
-                    width: `${((activeSlide + 1) / carouselSlides.length) * 100}%`,
-                    transition: 'width 3.5s linear',
-                    borderRadius: '0 2px 2px 0',
-                  }} />
                 </div>
-              </div>
-
-              {/* Dot indicators */}
-              <div className="flex items-center gap-3">
-                {carouselSlides.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setActiveSlide(i)}
-                    aria-label={`Go to slide ${i + 1}`}
-                    style={{
-                      width: i === activeSlide ? 28 : 8,
-                      height: 8, borderRadius: 99,
-                      background: i === activeSlide
-                        ? 'linear-gradient(90deg, #bb0c15, #f97316)'
-                        : '#d1d5db',
-                      border: 'none', cursor: 'pointer',
-                      transition: 'all 0.4s ease', padding: 0,
-                    }}
-                  />
-                ))}
-              </div>
-
-              {/* Mini stats strip */}
-              <div className="w-full grid grid-cols-3 gap-3">
-                {[
-                  { value: '700+', label: 'Products', icon: Package },
-                  { value: '300+', label: 'Clients',  icon: Users   },
-                  { value: '20+',  label: 'Years',    icon: Clock   },
-                ].map(({ value, label, icon: Icon }) => (
-                  <div
-                    key={label}
-                    className="flex flex-col items-center py-3 rounded-2xl"
-                    style={{
-                      background: 'white',
-                      border: '1px solid #f1f5f9',
-                      boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                    }}
-                  >
-                    <Icon className="w-4 h-4 mb-1" style={{ color: '#bb0c15' }} />
-                    <div className="font-black text-base" style={{ color: '#004D8B' }}>{value}</div>
-                    <div className="text-[10px] uppercase tracking-wider" style={{ color: '#9ca3af' }}>
-                      {label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
+              ))}
             </div>
 
-          </div>
+            {/* TAGLINE TEXT */}
+            <p
+              className="text-lg max-w-md leading-relaxed mb-6"
+              style={{
+                color: 'rgba(255,255,255,0.6)',
+                animation: 'fadeSlideUp 0.7s ease 450ms both',
+              }}
+            >
+              {heroSlides[activeSlide].tagline}
+            </p>
 
-          {/* Scroll indicator */}
-          <div className="flex justify-center mt-16">
-            <div className="relative flex flex-col items-center" style={{ height: 56 }}>
-              <div
-                className="w-px"
-                style={{ height: 56, background: 'rgba(10,22,40,0.15)' }}
-              />
-              <div
-                className="scroll-dot absolute top-0 w-1.5 h-1.5 rounded-full"
-                style={{ background: '#bb0c15' }}
-              />
+            {/* FEATURE PILLS */}
+            <div
+              className="flex flex-wrap gap-3 mb-8"
+              style={{ animation: 'fadeSlideUp 0.7s ease 550ms both' }}
+            >
+              {[
+                { icon: BadgeCheck, label: 'Quality Brands' },
+                { icon: Zap, label: 'Fast Delivery' },
+                { icon: Headphones, label: 'Expert Support' },
+              ].map(({ icon: Icon, label }) => (
+                <div
+                  key={label}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm"
+                  style={{
+                    background: 'rgba(255,255,255,0.08)',
+                    border: '1px solid rgba(255,255,255,0.15)',
+                    color: 'rgba(255,255,255,0.7)',
+                  }}
+                >
+                  <Icon className="w-4 h-4" style={{ color: heroSlides[activeSlide].accent }} />
+                  {label}
+                </div>
+              ))}
+            </div>
+
+            {/* CTA BUTTONS */}
+            <div
+              className="flex flex-wrap gap-4"
+              style={{ animation: 'fadeSlideUp 0.7s ease 650ms both' }}
+            >
+              <a
+                href="#products"
+                className="btn-shimmer inline-flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold text-base active:scale-95 transition-all"
+                style={{
+                  background: `linear-gradient(135deg, ${heroSlides[activeSlide].accent}, ${heroSlides[activeSlide].accentSecondary})`,
+                  boxShadow: `0 8px 30px ${heroSlides[activeSlide].accent}66`,
+                }}
+              >
+                Explore Products <ArrowRight className="w-4 h-4" />
+              </a>
+              <a
+                href="#cta"
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-base border-2 text-white active:scale-95 transition-all hover:bg-white/10"
+                style={{
+                  borderColor: 'rgba(255,255,255,0.3)',
+                  animation: 'fadeSlideUp 0.7s ease 700ms both',
+                }}
+              >
+                Request Quote
+              </a>
             </div>
           </div>
+        </div>
+
+        {/* FLOATING TRUST BADGES */}
+        <div
+          className="float-badge hidden lg:flex absolute items-center gap-2 px-4 py-2 rounded-full bg-white shadow-xl"
+          style={{
+            top: '20%',
+            left: '8%',
+            zIndex: 20,
+            '--rot': '-3deg',
+          } as React.CSSProperties}
+        >
+          <Truck className="w-5 h-5 text-emerald-500" />
+          <span className="font-semibold text-sm text-gray-800">Free Shipping 24-48h</span>
+        </div>
+        <div
+          className="float-badge-delayed hidden lg:flex absolute items-center gap-2 px-4 py-2 rounded-full bg-white shadow-xl"
+          style={{
+            top: '65%',
+            right: '8%',
+            zIndex: 20,
+            '--rot': '3deg',
+          } as React.CSSProperties}
+        >
+          <ShieldCheck className="w-5 h-5 text-blue-500" />
+          <span className="font-semibold text-sm text-gray-800">ISO Certified</span>
+        </div>
+
+        {/* SLIDE COUNTER — bottom left */}
+        <div
+          className="absolute hidden md:flex items-baseline gap-2"
+          style={{ bottom: 48, left: 16, zIndex: 20 }}
+        >
+          <div key={activeSlide} style={{ animation: 'slideCounterUp 0.4s ease both' }}>
+            <span className="font-black text-5xl text-white leading-none">
+              {String(activeSlide + 1).padStart(2, '0')}
+            </span>
+          </div>
+          <span className="text-white/30 text-lg mx-1">/</span>
+          <span className="text-white/30 text-2xl font-bold">
+            {String(heroSlides.length).padStart(2, '0')}
+          </span>
+        </div>
+
+        {/* MOBILE SLIDE COUNTER — top right on mobile */}
+        <div
+          className="absolute flex md:hidden items-baseline gap-1"
+          style={{ top: 120, right: 16, zIndex: 20 }}
+        >
+          <span className="font-black text-2xl text-white leading-none">
+            {String(activeSlide + 1).padStart(2, '0')}
+          </span>
+          <span className="text-white/30 text-sm">/</span>
+          <span className="text-white/30 text-lg font-bold">
+            {String(heroSlides.length).padStart(2, '0')}
+          </span>
+        </div>
+
+        {/* VERTICAL PROGRESS DOTS — right side */}
+        <div
+          className="absolute hidden md:flex flex-col gap-3"
+          style={{ right: 32, top: '50%', transform: 'translateY(-50%)', zIndex: 20 }}
+        >
+          {heroSlides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setActiveSlide(i)}
+              aria-label={`Go to slide ${i + 1}`}
+              className="transition-all duration-400"
+              style={{
+                width: 6,
+                height: activeSlide === i ? 40 : 6,
+                borderRadius: 99,
+                background: activeSlide === i ? 'white' : 'rgba(255,255,255,0.3)',
+                border: 'none',
+                cursor: 'pointer',
+                padding: 0,
+              }}
+            />
+          ))}
+        </div>
+
+        {/* PREV/NEXT ARROWS — bottom right */}
+        <div
+          className="absolute hidden md:flex items-center gap-3"
+          style={{ bottom: 36, right: 60, zIndex: 20 }}
+        >
+          <button
+            onClick={() => setActiveSlide(prev => (prev - 1 + heroSlides.length) % heroSlides.length)}
+            className="w-12 h-12 rounded-full flex items-center justify-center text-white active:scale-95 transition-all hover:bg-white/15"
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255,255,255,0.2)',
+            }}
+            aria-label="Previous slide"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => setActiveSlide(prev => (prev + 1) % heroSlides.length)}
+            className="w-12 h-12 rounded-full flex items-center justify-center text-white active:scale-95 transition-all hover:bg-white/15"
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255,255,255,0.2)',
+            }}
+            aria-label="Next slide"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* MINI STATS STRIP — bottom center (hidden on mobile) */}
+        <div
+          className="absolute hidden lg:flex items-center gap-6"
+          style={{ bottom: 48, left: '50%', transform: 'translateX(-50%)', zIndex: 20 }}
+        >
+          {[
+            { value: '2,000+', label: 'Products' },
+            { value: '500+', label: 'Clients' },
+            { value: '15+', label: 'Years' },
+          ].map(({ value, label }, i, arr) => (
+            <div key={label} className="flex items-center gap-4">
+              <div className="text-center">
+                <div className="font-bold text-white text-sm">{value}</div>
+                <div className="text-white/40 text-xs">{label}</div>
+              </div>
+              {i < arr.length - 1 && (
+                <div className="w-px h-6" style={{ background: 'rgba(255,255,255,0.2)' }} />
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* PROGRESS BAR — bottom */}
+        <div
+          className="absolute left-0 right-0"
+          style={{ bottom: 0, height: 3, background: 'rgba(255,255,255,0.1)', zIndex: 20 }}
+        >
+          <div
+            key={activeSlide}
+            className="h-full progress-animate"
+            style={{
+              background: `linear-gradient(90deg, ${heroSlides[activeSlide].accent}, ${heroSlides[activeSlide].accentSecondary})`,
+            }}
+          />
         </div>
       </section>
 

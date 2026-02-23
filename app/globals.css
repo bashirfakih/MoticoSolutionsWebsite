@@ -200,6 +200,48 @@ body {
   animation: lineReveal 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
+/* Kinetic Typography Animations */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes fadeSlideUp {
+    from {
+      opacity: 0;
+      transform: translateY(40px);
+      filter: blur(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes fadeSlideUp {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+@keyframes slideCounterUp {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progressBar {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+.progress-animate {
+  animation: progressBar 5s linear forwards;
+}
+
 /* Morphing decorative lines animation */
 @keyframes morphLine {
   0%, 100% {
