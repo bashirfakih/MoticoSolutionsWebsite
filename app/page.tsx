@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import {
   BadgeCheck, Zap, Headphones, Package, Users, Globe,
   Clock, Truck, ShieldCheck, Phone, Mail, MapPin,
@@ -10,6 +12,7 @@ import {
 } from 'lucide-react'
 import CountUp from '@/components/ui/CountUp'
 import RevealOnScroll from '@/components/ui/RevealOnScroll'
+import QuoteForm from '@/components/ui/QuoteForm'
 
 /* ─── Hooks ─────────────────────────────────────────────── */
 function useScrolled(threshold = 60) {
@@ -165,6 +168,7 @@ export default function Home() {
   const [activeFeature, setActiveFeature] = useState(0)
   const [activeSlide, setActiveSlide] = useState(0)
   const [productsMenuOpen, setProductsMenuOpen] = useState(false)
+  const [quoteFormOpen, setQuoteFormOpen] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null)
   const featureRefs = useRef<(HTMLDivElement | null)[]>([])
   const productsMenuRef = useRef<HTMLDivElement>(null)
@@ -493,7 +497,7 @@ export default function Home() {
       >
         <h1 id="hero-heading" className="sr-only">Industrial Excellence Delivered</h1>
 
-        {/* LAYER 1 — Slide backgrounds */}
+        {/* LAYER 1 — Slide backgrounds (Next.js Image for WebP + optimization) */}
         {heroSlides.map((slide, i) => (
           <div
             key={i}
@@ -504,11 +508,14 @@ export default function Home() {
               transition: 'opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
+            <Image
               src={slide.image}
               alt={slide.tag}
-              className="w-full h-full object-cover"
+              fill
+              sizes="100vw"
+              priority={i === 0}
+              quality={85}
+              className="object-cover"
               style={{
                 transform: activeSlide === i ? 'scale(1.06)' : 'scale(1.0)',
                 transition: 'transform 6s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -554,16 +561,16 @@ export default function Home() {
               </span>
             </div>
 
-            {/* HEADLINE — 3 lines, staggered */}
-            <div className="mb-6">
+            {/* HEADLINE — 3 lines, staggered (mobile-optimized) */}
+            <div className="mb-4 sm:mb-6">
               {heroSlides[activeSlide].headline.map((line, idx) => (
                 <div key={idx} style={{ overflow: 'hidden' }}>
                   <div
                     style={{
-                      fontSize: 'clamp(52px, 7vw, 96px)',
+                      fontSize: 'clamp(32px, 10vw, 96px)',
                       fontWeight: 900,
-                      lineHeight: 0.92,
-                      letterSpacing: '-0.03em',
+                      lineHeight: 0.95,
+                      letterSpacing: '-0.02em',
                       color: idx === 1 ? heroSlides[activeSlide].accent : 'white',
                       animation: `fadeSlideUp 0.7s ease ${100 + idx * 100}ms both`,
                     }}
@@ -576,7 +583,7 @@ export default function Home() {
 
             {/* TAGLINE TEXT */}
             <p
-              className="text-lg max-w-md leading-relaxed mb-6"
+              className="text-sm sm:text-lg max-w-md leading-relaxed mb-4 sm:mb-6"
               style={{
                 color: 'rgba(255,255,255,0.6)',
                 animation: 'fadeSlideUp 0.7s ease 450ms both',
@@ -1032,10 +1039,11 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map(({ id, title, icon: Icon, color, bg }, i) => (
               <RevealOnScroll key={id} delay={i * 80}>
-                <div
-                  className={`product-card product-card-${i} group relative h-72 cursor-pointer`}
-                  style={{ animationFillMode: 'both' }}
-                >
+                <Link href={`/products/${id}`} className="block">
+                  <div
+                    className={`product-card product-card-${i} group relative h-72 cursor-pointer`}
+                    style={{ animationFillMode: 'both' }}
+                  >
                   {/* Background Image */}
                   <div
                     className="card-bg"
@@ -1127,17 +1135,18 @@ export default function Home() {
                       >
                         <ArrowRight className="w-5 h-5 text-white" />
                       </div>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Hover Glow Ring */}
-                  <div
-                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700"
-                    style={{
-                      boxShadow: `inset 0 0 80px ${color}30, 0 0 40px ${color}20`,
-                    }}
-                  />
-                </div>
+                    {/* Hover Glow Ring */}
+                    <div
+                      className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700"
+                      style={{
+                        boxShadow: `inset 0 0 80px ${color}30, 0 0 40px ${color}20`,
+                      }}
+                    />
+                  </div>
+                </Link>
               </RevealOnScroll>
             ))}
           </div>
@@ -1359,9 +1368,9 @@ export default function Home() {
           </RevealOnScroll>
           <RevealOnScroll delay={200}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
-              <a
-                href="mailto:info@moticosolutions.com"
-                className="btn-shimmer inline-flex items-center justify-center gap-2 px-10 py-5 rounded-full text-white font-bold text-lg active:scale-95 transition-all"
+              <button
+                onClick={() => setQuoteFormOpen(true)}
+                className="btn-shimmer inline-flex items-center justify-center gap-2 px-10 py-5 rounded-full text-white font-bold text-lg active:scale-95 transition-all cursor-pointer"
                 style={{
                   background: '#bb0c15',
                   boxShadow: '0 0 60px rgba(220,38,38,0.5)',
@@ -1374,7 +1383,7 @@ export default function Home() {
                 }
               >
                 Request Quote <ArrowRight className="w-5 h-5" />
-              </a>
+              </button>
               <a
                 href="tel:+9613741565"
                 className="inline-flex items-center justify-center gap-2 px-10 py-5 rounded-full font-semibold text-lg active:scale-95 transition-all"
@@ -1462,6 +1471,135 @@ export default function Home() {
                   </div>
                 ))}
               </div>
+            </div>
+          </RevealOnScroll>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════════
+          KNOWLEDGE BASE / BLOG SECTION
+      ════════════════════════════════════════ */}
+      <section
+        id="resources"
+        className="py-20"
+        style={{ background: '#f8fafc' }}
+        aria-labelledby="resources-heading"
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <RevealOnScroll>
+            <div className="text-center mb-12">
+              <div
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] tracking-[0.12em] uppercase font-semibold mb-4"
+                style={{
+                  background: 'rgba(0,77,139,0.08)',
+                  border: '1px solid rgba(0,77,139,0.15)',
+                  color: '#004D8B',
+                }}
+              >
+                Knowledge Base
+              </div>
+              <h2
+                id="resources-heading"
+                className="font-black mb-4"
+                style={{
+                  fontSize: 'clamp(32px, 5vw, 48px)',
+                  color: '#0a1628',
+                  letterSpacing: '-0.02em',
+                }}
+              >
+                Expert Insights & Guides
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Learn from our 20+ years of industry experience. Tips, guides, and technical resources to help you choose the right abrasives.
+              </p>
+            </div>
+          </RevealOnScroll>
+
+          {/* Blog Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                title: 'How to Choose the Right Grinding Wheel',
+                excerpt: 'A comprehensive guide to selecting grinding wheels based on material, application, and finish requirements.',
+                category: 'Guides',
+                readTime: '5 min read',
+                image: '/slide-1-grinding.png',
+              },
+              {
+                title: 'Ceramic vs Zirconia Abrasives Explained',
+                excerpt: 'Understanding the differences between ceramic and zirconia abrasives and when to use each type.',
+                category: 'Technical',
+                readTime: '7 min read',
+                image: '/slide-5-abrasiv.png',
+              },
+              {
+                title: 'Extending Belt Life: Pro Tips',
+                excerpt: 'Industry secrets to maximize the lifespan of your abrasive belts and reduce operational costs.',
+                category: 'Tips',
+                readTime: '4 min read',
+                image: '/slide-2-belt.png',
+              },
+            ].map((article, i) => (
+              <RevealOnScroll key={article.title} delay={i * 100}>
+                <article
+                  className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  style={{ border: '1px solid rgba(0,0,0,0.05)' }}
+                >
+                  {/* Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    <Image
+                      src={article.image}
+                      alt={article.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div
+                      className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold"
+                      style={{
+                        background: i === 0 ? '#bb0c15' : i === 1 ? '#004D8B' : '#059669',
+                        color: 'white',
+                      }}
+                    >
+                      {article.category}
+                    </div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-6">
+                    <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-[#004D8B] transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                      {article.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-gray-400">{article.readTime}</span>
+                      <span
+                        className="text-sm font-semibold flex items-center gap-1 transition-colors group-hover:text-[#bb0c15]"
+                        style={{ color: '#004D8B' }}
+                      >
+                        Read More <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                      </span>
+                    </div>
+                  </div>
+                </article>
+              </RevealOnScroll>
+            ))}
+          </div>
+
+          {/* View All CTA */}
+          <RevealOnScroll delay={400}>
+            <div className="flex justify-center mt-12">
+              <button
+                className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all hover:scale-105 active:scale-95"
+                style={{
+                  background: '#004D8B',
+                  color: 'white',
+                  boxShadow: '0 4px 15px rgba(0,77,139,0.3)',
+                }}
+              >
+                Browse All Articles <ArrowRight className="w-5 h-5" />
+              </button>
             </div>
           </RevealOnScroll>
         </div>
@@ -1681,11 +1819,7 @@ export default function Home() {
         href="https://wa.me/9613741565?text=Hello%20Motico%20Solutions!%20I%27m%20interested%20in%20your%20industrial%20products."
         target="_blank"
         rel="noopener noreferrer"
-        className="whatsapp-btn fixed z-50 flex items-center gap-3 group"
-        style={{
-          bottom: 100,
-          right: 24,
-        }}
+        className="whatsapp-btn fixed z-50 flex items-center gap-3 group bottom-[140px] md:bottom-[100px] right-4 md:right-6"
         aria-label="Chat on WhatsApp"
       >
         {/* Tooltip */}
@@ -1730,6 +1864,51 @@ export default function Home() {
           </svg>
         </div>
       </a>
+
+      {/* ════════════════════════════════════════
+          STICKY MOBILE CTA BAR
+      ════════════════════════════════════════ */}
+      <div
+        className="fixed bottom-0 left-0 right-0 z-[9999] md:hidden"
+        style={{
+          background: 'rgba(10, 22, 40, 0.98)',
+          backdropFilter: 'blur(12px)',
+          borderTop: '1px solid rgba(255,255,255,0.1)',
+          paddingBottom: 'env(safe-area-inset-bottom)',
+        }}
+      >
+        <div className="flex items-center gap-3 px-4 py-3">
+          {/* Call Button */}
+          <a
+            href="tel:+9613741565"
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-95"
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: '1px solid rgba(255,255,255,0.2)',
+              color: 'white',
+            }}
+          >
+            <Phone className="w-4 h-4" />
+            Call Now
+          </a>
+
+          {/* Get Quote Button */}
+          <button
+            onClick={() => setQuoteFormOpen(true)}
+            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm text-white transition-all active:scale-95"
+            style={{
+              background: '#bb0c15',
+              boxShadow: '0 4px 15px rgba(187,12,21,0.4)',
+            }}
+          >
+            <ArrowRight className="w-4 h-4" />
+            Get Quote
+          </button>
+        </div>
+      </div>
+
+      {/* Quote Form Modal */}
+      <QuoteForm isOpen={quoteFormOpen} onClose={() => setQuoteFormOpen(false)} />
 
     </div>
   )
