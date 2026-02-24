@@ -1135,16 +1135,16 @@ export default function Home() {
                       >
                         <ArrowRight className="w-5 h-5 text-white" />
                       </div>
-                      </div>
                     </div>
+                  </div>
 
-                    {/* Hover Glow Ring */}
-                    <div
-                      className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700"
-                      style={{
-                        boxShadow: `inset 0 0 80px ${color}30, 0 0 40px ${color}20`,
-                      }}
-                    />
+                  {/* Hover Glow Ring */}
+                  <div
+                    className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700"
+                    style={{
+                      boxShadow: `inset 0 0 80px ${color}30, 0 0 40px ${color}20`,
+                    }}
+                  />
                   </div>
                 </Link>
               </RevealOnScroll>
