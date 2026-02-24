@@ -4,10 +4,9 @@ import { useEffect, useRef, useState } from 'react'
 import {
   BadgeCheck, Zap, Headphones, Package, Users, Globe,
   Clock, Truck, ShieldCheck, Phone, Mail, MapPin,
-  Menu, X, ChevronRight, ChevronLeft, ArrowRight, CircleCheck,
+  Menu, X, ChevronRight, ChevronLeft, ChevronDown, ArrowRight, CircleCheck,
   Facebook, Instagram, Linkedin, Youtube,
-  Star, Layers, Scissors, Wrench, Disc, Settings,
-  Smartphone,
+  Star, Layers, Scissors, Wrench, Disc, Settings, Quote,
 } from 'lucide-react'
 import CountUp from '@/components/ui/CountUp'
 import RevealOnScroll from '@/components/ui/RevealOnScroll'
@@ -117,7 +116,7 @@ const heroSlides = [
     image: '/slide-4-brush.png',
     tag: 'WIRE BRUSHES',
     headline: ['Clean.', 'Prepare.', 'Deliver.'],
-    tagline: 'Surface preparation tools trusted by 500+ businesses across MENA.',
+    tagline: 'Surface preparation tools trusted by 300+ businesses across MENA.',
     accent: '#004D8B',
     accentSecondary: '#bb0c15',
   },
@@ -131,6 +130,31 @@ const heroSlides = [
   },
 ]
 
+/* ─── Testimonials ───────────────────────────────────────── */
+const testimonials = [
+  {
+    name: 'Ahmad Khalil',
+    role: 'Production Manager',
+    company: 'Beirut Steel Works',
+    quote: 'Motico Solutions has been our trusted partner for 8 years. Their Hermes belts outlast any competitor by 40%, and the technical support is unmatched.',
+    rating: 5,
+  },
+  {
+    name: 'Hassan Mansour',
+    role: 'Operations Director',
+    company: 'Gulf Metal Industries',
+    quote: 'Switching to Motico cut our abrasive costs by 25% while improving finish quality. Their team understands industrial needs like no other.',
+    rating: 5,
+  },
+  {
+    name: 'Karim El-Masri',
+    role: 'Workshop Owner',
+    company: 'El-Masri Fabrication',
+    quote: 'Fast delivery, premium products, expert advice. Motico is the gold standard for industrial abrasives in Lebanon.',
+    rating: 5,
+  },
+]
+
 /* ═══════════════════════════════════════════════════════════
    MAIN PAGE COMPONENT
 ═══════════════════════════════════════════════════════════ */
@@ -140,8 +164,10 @@ export default function Home() {
   const [mounted, setMounted] = useState(false)
   const [activeFeature, setActiveFeature] = useState(0)
   const [activeSlide, setActiveSlide] = useState(0)
+  const [productsMenuOpen, setProductsMenuOpen] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null)
   const featureRefs = useRef<(HTMLDivElement | null)[]>([])
+  const productsMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => { setMounted(true) }, [])
 
@@ -172,9 +198,9 @@ export default function Home() {
 
   const navLinks = [
     { label: 'Home', href: '#' },
-    { label: 'Products', href: '#products' },
-    { label: 'Abrasive Belts', href: '#abrasive-belts' },
+    { label: 'Products', href: '#products', hasMenu: true },
     { label: 'About Us', href: '#about' },
+    { label: 'Contact', href: '#cta' },
   ]
 
   return (
@@ -261,16 +287,87 @@ export default function Home() {
             {/* Desktop nav links */}
             <div className="hidden md:flex items-center gap-6">
               {navLinks.map(link => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  className="nav-link text-sm font-medium pb-0.5"
-                  style={{ color: '#4b5563' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#004D8B')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}
-                >
-                  {link.label}
-                </a>
+                link.hasMenu ? (
+                  <div
+                    key={link.label}
+                    className="relative"
+                    ref={productsMenuRef}
+                    onMouseEnter={() => setProductsMenuOpen(true)}
+                    onMouseLeave={() => setProductsMenuOpen(false)}
+                  >
+                    <button
+                      className="nav-link text-sm font-medium pb-0.5 flex items-center gap-1"
+                      style={{ color: productsMenuOpen ? '#004D8B' : '#4b5563' }}
+                    >
+                      {link.label}
+                      <ChevronDown
+                        className="w-3.5 h-3.5 transition-transform"
+                        style={{ transform: productsMenuOpen ? 'rotate(180deg)' : 'rotate(0)' }}
+                      />
+                    </button>
+                    {/* Mega Menu */}
+                    <div
+                      className="absolute top-full left-1/2 pt-3 transition-all duration-200"
+                      style={{
+                        transform: 'translateX(-50%)',
+                        opacity: productsMenuOpen ? 1 : 0,
+                        visibility: productsMenuOpen ? 'visible' : 'hidden',
+                        pointerEvents: productsMenuOpen ? 'auto' : 'none',
+                      }}
+                    >
+                      <div
+                        className="rounded-2xl p-6 grid grid-cols-3 gap-3"
+                        style={{
+                          background: 'white',
+                          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                          border: '1px solid #e5e7eb',
+                          width: 520,
+                        }}
+                      >
+                        {categories.slice(0, 9).map(cat => {
+                          const Icon = cat.icon
+                          return (
+                            <a
+                              key={cat.id}
+                              href={`#${cat.id}`}
+                              className="flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-gray-50 group"
+                              onClick={() => setProductsMenuOpen(false)}
+                            >
+                              <div
+                                className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                                style={{ background: cat.color }}
+                              >
+                                <Icon className="w-4 h-4 text-white" />
+                              </div>
+                              <span className="text-sm font-medium text-gray-700 group-hover:text-[#004D8B]">
+                                {cat.title}
+                              </span>
+                            </a>
+                          )
+                        })}
+                        <a
+                          href="#products"
+                          className="col-span-3 mt-2 pt-3 flex items-center justify-center gap-2 text-sm font-semibold transition-colors"
+                          style={{ borderTop: '1px solid #e5e7eb', color: '#bb0c15' }}
+                          onClick={() => setProductsMenuOpen(false)}
+                        >
+                          View All Products <ArrowRight className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className="nav-link text-sm font-medium pb-0.5"
+                    style={{ color: '#4b5563' }}
+                    onMouseEnter={e => (e.currentTarget.style.color = '#004D8B')}
+                    onMouseLeave={e => (e.currentTarget.style.color = '#4b5563')}
+                  >
+                    {link.label}
+                  </a>
+                )
               ))}
 
               {/* Search */}
@@ -294,29 +391,6 @@ export default function Home() {
 
             {/* Right buttons */}
             <div className="hidden md:flex items-center gap-3">
-              {/* App icons - Coming Soon */}
-              <div className="flex items-center gap-1.5 mr-2">
-                <div
-                  className="group relative flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all"
-                  style={{ background: 'rgba(0,69,96,0.08)' }}
-                  title="iOS App Coming Soon"
-                >
-                  <svg className="w-4 h-4" style={{ color: '#004D8B' }} viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                  </svg>
-                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Coming Soon" />
-                </div>
-                <div
-                  className="group relative flex items-center justify-center w-8 h-8 rounded-lg cursor-pointer transition-all"
-                  style={{ background: 'rgba(0,69,96,0.08)' }}
-                  title="Android App Coming Soon"
-                >
-                  <svg className="w-4 h-4" style={{ color: '#004D8B' }} viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
-                  </svg>
-                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-400 animate-pulse" title="Coming Soon" />
-                </div>
-              </div>
               <a
                 href="#"
                 className="text-sm font-medium px-4 py-2 rounded-lg border transition-all active:scale-95"
@@ -339,7 +413,7 @@ export default function Home() {
                 href="#cta"
                 className="btn-shimmer text-sm font-semibold px-5 py-2 rounded-lg text-white active:scale-95 transition-transform"
                 style={{
-                  background: 'linear-gradient(135deg, #bb0c15, #f97316)',
+                  background: '#bb0c15',
                   boxShadow: '0 4px 14px rgba(220,38,38,0.3)',
                 }}
               >
@@ -393,7 +467,7 @@ export default function Home() {
                 href="#cta"
                 onClick={() => setMenuOpen(false)}
                 className="mt-4 text-center font-bold text-white py-4 rounded-xl active:scale-95 transition-transform"
-                style={{ background: 'linear-gradient(135deg, #bb0c15, #f97316)' }}
+                style={{ background: '#bb0c15' }}
               >
                 Get Quote →
               </a>
@@ -459,7 +533,7 @@ export default function Home() {
         />
 
         {/* LAYER 4 — Content */}
-        <div className="relative z-10 max-w-3xl pl-4 sm:pl-6 lg:pl-16">
+        <div className="relative z-10 max-w-3xl pl-6 sm:pl-10 lg:pl-20 overflow-visible">
           {/* Kinetic Typography — re-mounts on slide change */}
           <div key={activeSlide}>
             {/* TAG LINE */}
@@ -490,12 +564,7 @@ export default function Home() {
                       fontWeight: 900,
                       lineHeight: 0.92,
                       letterSpacing: '-0.03em',
-                      color: idx === 1 ? 'transparent' : 'white',
-                      background: idx === 1
-                        ? `linear-gradient(135deg, ${heroSlides[activeSlide].accent}, ${heroSlides[activeSlide].accentSecondary})`
-                        : 'none',
-                      WebkitBackgroundClip: idx === 1 ? 'text' : 'unset',
-                      backgroundClip: idx === 1 ? 'text' : 'unset',
+                      color: idx === 1 ? heroSlides[activeSlide].accent : 'white',
                       animation: `fadeSlideUp 0.7s ease ${100 + idx * 100}ms both`,
                     }}
                   >
@@ -548,9 +617,9 @@ export default function Home() {
             >
               <a
                 href="#products"
-                className="btn-shimmer inline-flex items-center gap-2 px-8 py-4 rounded-full text-white font-bold text-base active:scale-95 transition-all"
+                className="btn-shimmer inline-flex items-center gap-2 px-8 py-5 rounded-full text-white font-bold text-base leading-none active:scale-95 transition-all"
                 style={{
-                  background: `linear-gradient(135deg, ${heroSlides[activeSlide].accent}, ${heroSlides[activeSlide].accentSecondary})`,
+                  background: heroSlides[activeSlide].accent,
                   boxShadow: `0 8px 30px ${heroSlides[activeSlide].accent}66`,
                 }}
               >
@@ -558,10 +627,21 @@ export default function Home() {
               </a>
               <a
                 href="#cta"
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold text-base border-2 text-white active:scale-95 transition-all hover:bg-white/10"
+                className="inline-flex items-center gap-2 px-8 py-5 rounded-full font-semibold text-base leading-none active:scale-95 transition-all"
                 style={{
-                  borderColor: 'rgba(255,255,255,0.3)',
+                  background: 'rgba(255,255,255,0.15)',
+                  backdropFilter: 'blur(8px)',
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  color: 'white',
                   animation: 'fadeSlideUp 0.7s ease 700ms both',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.25)'
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.5)'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.15)'
+                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'
                 }}
               >
                 Request Quote
@@ -572,10 +652,10 @@ export default function Home() {
 
         {/* FLOATING TRUST BADGES */}
         <div
-          className="float-badge hidden lg:flex absolute items-center gap-2 px-4 py-2 rounded-full bg-white shadow-xl"
+          className="float-badge hidden lg:flex absolute items-center gap-2 px-4 py-3 rounded-full bg-white shadow-xl"
           style={{
-            top: '20%',
-            left: '8%',
+            top: '35%',
+            right: '12%',
             zIndex: 20,
             '--rot': '-3deg',
           } as React.CSSProperties}
@@ -586,8 +666,8 @@ export default function Home() {
         <div
           className="float-badge-delayed hidden lg:flex absolute items-center gap-2 px-4 py-2 rounded-full bg-white shadow-xl"
           style={{
-            top: '65%',
-            right: '8%',
+            top: '55%',
+            right: '10%',
             zIndex: 20,
             '--rot': '3deg',
           } as React.CSSProperties}
@@ -596,108 +676,96 @@ export default function Home() {
           <span className="font-semibold text-sm text-gray-800">ISO Certified</span>
         </div>
 
-        {/* SLIDE COUNTER — bottom left */}
-        <div
-          className="absolute hidden md:flex items-baseline gap-2"
-          style={{ bottom: 48, left: 16, zIndex: 20 }}
-        >
-          <div key={activeSlide} style={{ animation: 'slideCounterUp 0.4s ease both' }}>
-            <span className="font-black text-5xl text-white leading-none">
-              {String(activeSlide + 1).padStart(2, '0')}
-            </span>
-          </div>
-          <span className="text-white/30 text-lg mx-1">/</span>
-          <span className="text-white/30 text-2xl font-bold">
-            {String(heroSlides.length).padStart(2, '0')}
-          </span>
-        </div>
 
-        {/* MOBILE SLIDE COUNTER — top right on mobile */}
+        {/* HORIZONTAL PROGRESS DOTS — bottom center */}
         <div
-          className="absolute flex md:hidden items-baseline gap-1"
-          style={{ top: 120, right: 16, zIndex: 20 }}
-        >
-          <span className="font-black text-2xl text-white leading-none">
-            {String(activeSlide + 1).padStart(2, '0')}
-          </span>
-          <span className="text-white/30 text-sm">/</span>
-          <span className="text-white/30 text-lg font-bold">
-            {String(heroSlides.length).padStart(2, '0')}
-          </span>
-        </div>
-
-        {/* VERTICAL PROGRESS DOTS — right side */}
-        <div
-          className="absolute hidden md:flex flex-col gap-3"
-          style={{ right: 32, top: '50%', transform: 'translateY(-50%)', zIndex: 20 }}
+          className="absolute hidden md:flex items-center gap-3 px-4 py-2 rounded-full"
+          style={{
+            bottom: 24,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 20,
+            background: 'rgba(0,0,0,0.25)',
+            backdropFilter: 'blur(4px)',
+          }}
         >
           {heroSlides.map((_, i) => (
             <button
               key={i}
               onClick={() => setActiveSlide(i)}
               aria-label={`Go to slide ${i + 1}`}
-              className="transition-all duration-400"
+              className="transition-all duration-300 hover:scale-110"
               style={{
-                width: 6,
-                height: activeSlide === i ? 40 : 6,
+                width: activeSlide === i ? 28 : 10,
+                height: 10,
                 borderRadius: 99,
-                background: activeSlide === i ? 'white' : 'rgba(255,255,255,0.3)',
-                border: 'none',
+                background: activeSlide === i ? '#bb0c15' : 'rgba(255,255,255,0.5)',
+                border: activeSlide === i ? '2px solid white' : '2px solid transparent',
                 cursor: 'pointer',
                 padding: 0,
+                boxShadow: activeSlide === i ? '0 2px 8px rgba(187,12,21,0.5)' : 'none',
               }}
             />
           ))}
         </div>
 
-        {/* PREV/NEXT ARROWS — bottom right */}
-        <div
-          className="absolute hidden md:flex items-center gap-3"
-          style={{ bottom: 36, right: 60, zIndex: 20 }}
+        {/* PREV/NEXT ARROWS — side positioned */}
+        <button
+          onClick={() => setActiveSlide(prev => (prev - 1 + heroSlides.length) % heroSlides.length)}
+          className="absolute hidden md:flex w-12 h-12 rounded-full items-center justify-center text-white active:scale-95 transition-all hover:bg-white/30"
+          style={{
+            left: 24,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 20,
+          }}
+          aria-label="Previous slide"
         >
-          <button
-            onClick={() => setActiveSlide(prev => (prev - 1 + heroSlides.length) % heroSlides.length)}
-            className="w-12 h-12 rounded-full flex items-center justify-center text-white active:scale-95 transition-all hover:bg-white/15"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255,255,255,0.2)',
-            }}
-            aria-label="Previous slide"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => setActiveSlide(prev => (prev + 1) % heroSlides.length)}
-            className="w-12 h-12 rounded-full flex items-center justify-center text-white active:scale-95 transition-all hover:bg-white/15"
-            style={{
-              background: 'rgba(255,255,255,0.05)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(255,255,255,0.2)',
-            }}
-            aria-label="Next slide"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
-        </div>
+          <ChevronLeft className="w-6 h-6" />
+        </button>
+        <button
+          onClick={() => setActiveSlide(prev => (prev + 1) % heroSlides.length)}
+          className="absolute hidden md:flex w-12 h-12 rounded-full items-center justify-center text-white active:scale-95 transition-all hover:bg-white/30"
+          style={{
+            right: 24,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: 'rgba(255,255,255,0.15)',
+            backdropFilter: 'blur(8px)',
+            zIndex: 20,
+          }}
+          aria-label="Next slide"
+        >
+          <ChevronRight className="w-6 h-6" />
+        </button>
 
         {/* MINI STATS STRIP — bottom center (hidden on mobile) */}
         <div
-          className="absolute hidden lg:flex items-center gap-6"
-          style={{ bottom: 48, left: '50%', transform: 'translateX(-50%)', zIndex: 20 }}
+          className="absolute hidden lg:flex items-center gap-6 px-6 py-3 rounded-full"
+          style={{
+            bottom: 70,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 20,
+            background: 'rgba(0,0,0,0.3)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+          }}
         >
           {[
-            { value: '2,000+', label: 'Products' },
-            { value: '500+', label: 'Clients' },
-            { value: '15+', label: 'Years' },
+            { value: '700+', label: 'Products' },
+            { value: '300+', label: 'Clients' },
+            { value: '20+', label: 'Years' },
           ].map(({ value, label }, i, arr) => (
             <div key={label} className="flex items-center gap-4">
               <div className="text-center">
-                <div className="font-bold text-white text-sm">{value}</div>
-                <div className="text-white/40 text-xs">{label}</div>
+                <div className="font-bold text-white text-base">{value}</div>
+                <div className="text-white/60 text-xs">{label}</div>
               </div>
               {i < arr.length - 1 && (
-                <div className="w-px h-6" style={{ background: 'rgba(255,255,255,0.2)' }} />
+                <div className="w-px h-6" style={{ background: 'rgba(255,255,255,0.3)' }} />
               )}
             </div>
           ))}
@@ -712,7 +780,7 @@ export default function Home() {
             key={activeSlide}
             className="h-full progress-animate"
             style={{
-              background: `linear-gradient(90deg, ${heroSlides[activeSlide].accent}, ${heroSlides[activeSlide].accentSecondary})`,
+              background: heroSlides[activeSlide].accent,
             }}
           />
         </div>
@@ -739,9 +807,9 @@ export default function Home() {
           }}
         />
 
-        <div className="py-16">
+        <div className="py-12">
           {/* Section Header */}
-          <div className="text-center mb-10">
+          <div className="text-center mb-8">
             <div
               className="inline-flex items-center gap-3 px-5 py-2 rounded-full mb-4"
               style={{
@@ -768,7 +836,7 @@ export default function Home() {
               className="text-2xl md:text-3xl font-black"
               style={{ color: '#004D8B', letterSpacing: '-0.02em' }}
             >
-              Trusted by <span className="gradient-text">World-Class</span> Brands
+              Trusted by <span style={{ color: '#bb0c15' }}>World-Class</span> Brands
             </h3>
           </div>
 
@@ -873,7 +941,7 @@ export default function Home() {
       ════════════════════════════════════════ */}
       <section
         style={{ background: 'white' }}
-        className="py-20 relative"
+        className="py-12 relative"
         aria-labelledby="stats-heading"
       >
         <div
@@ -929,12 +997,12 @@ export default function Home() {
       <section
         id="products"
         style={{ background: '#f8fafc' }}
-        className="py-24"
+        className="py-12"
         aria-labelledby="products-heading"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Header */}
-          <RevealOnScroll className="text-center mb-16">
+          <RevealOnScroll className="text-center mb-12">
             <div
               className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] tracking-[0.12em] uppercase font-semibold mb-5"
               style={{
@@ -952,7 +1020,7 @@ export default function Home() {
             >
               Built for Every
               <br />
-              Industrial <span className="gradient-text">Challenge</span>
+              Industrial Challenge
             </h2>
             <p className="text-gray-500 mt-5 max-w-xl mx-auto leading-relaxed">
               From grinding to cutting, polishing to finishing. We stock the full range
@@ -1008,10 +1076,8 @@ export default function Home() {
                       <div
                         className="card-icon w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
                         style={{
-                          background: color === '#bb0c15'
-                            ? 'linear-gradient(135deg, rgba(187,12,21,0.9), rgba(249,115,22,0.8))'
-                            : 'linear-gradient(135deg, rgba(0,69,96,0.9), rgba(0,45,61,0.8))',
-                          boxShadow: `0 8px 32px ${color}40`,
+                          background: 'linear-gradient(135deg, rgba(187,12,21,0.95), rgba(220,38,38,0.85))',
+                          boxShadow: '0 8px 32px rgba(187,12,21,0.4)',
                         }}
                       >
                         <Icon className="w-8 h-8 text-white" />
@@ -1019,8 +1085,8 @@ export default function Home() {
 
                       {/* Title */}
                       <h3
-                        className="card-title font-bold text-xl text-white leading-tight mb-2"
-                        style={{ textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}
+                        className="card-title font-extrabold text-xl text-white leading-tight mb-2"
+                        style={{ textShadow: '0 2px 12px rgba(0,0,0,0.5), 0 1px 3px rgba(0,0,0,0.4)' }}
                       >
                         {title}
                       </h3>
@@ -1037,7 +1103,7 @@ export default function Home() {
                       >
                         <span
                           className="w-1.5 h-1.5 rounded-full"
-                          style={{ background: color }}
+                          style={{ background: '#bb0c15' }}
                         />
                         Industrial Grade
                       </div>
@@ -1083,7 +1149,7 @@ export default function Home() {
                 href="#"
                 className="btn-shimmer group inline-flex items-center gap-3 px-10 py-5 rounded-full text-white font-bold text-lg active:scale-95 transition-all"
                 style={{
-                  background: 'linear-gradient(135deg, #bb0c15, #f97316)',
+                  background: '#bb0c15',
                   boxShadow: '0 12px 40px rgba(220,38,38,0.35)',
                 }}
                 onMouseEnter={e => {
@@ -1109,14 +1175,14 @@ export default function Home() {
       <section
         id="about"
         style={{ background: 'white' }}
-        className="py-24 lg:py-32"
+        className="py-12"
         aria-labelledby="why-heading"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
-            {/* LEFT sticky */}
-            <div className="lg:sticky lg:top-28 lg:self-start">
+            {/* LEFT — centered vertically */}
+            <div className="lg:self-center">
               <RevealOnScroll>
                 <div
                   className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] tracking-[0.12em] uppercase font-semibold mb-6"
@@ -1141,7 +1207,7 @@ export default function Home() {
                   <br />
                   Industrial
                   <br />
-                  <span className="gradient-text">Excellence</span>
+                  Excellence
                 </h2>
               </RevealOnScroll>
               <RevealOnScroll delay={200}>
@@ -1194,7 +1260,7 @@ export default function Home() {
                           className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0"
                           style={{
                             background: isEven
-                              ? 'linear-gradient(135deg, #bb0c15, #f97316)'
+                              ? '#bb0c15'
                               : '#004D8B',
                           }}
                         >
@@ -1229,7 +1295,7 @@ export default function Home() {
       ════════════════════════════════════════ */}
       <section
         id="cta"
-        className="relative py-32 overflow-hidden hero-grain"
+        className="relative py-16 overflow-hidden hero-grain"
         style={{ background: '#004D8B' }}
         aria-labelledby="cta-heading"
       >
@@ -1262,13 +1328,15 @@ export default function Home() {
         <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <RevealOnScroll>
             <div
-              className="btn-shimmer inline-flex items-center gap-2 px-5 py-2 rounded-full text-white text-sm font-semibold mb-8"
-              style={{ background: 'linear-gradient(135deg, #bb0c15, #f97316)' }}
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-6"
+              style={{
+                background: 'rgba(187,12,21,0.2)',
+                border: '1px solid rgba(187,12,21,0.3)',
+                color: 'rgba(255,255,255,0.9)',
+              }}
             >
               Get Started Today
             </div>
-          </RevealOnScroll>
-          <RevealOnScroll delay={100}>
             <h2
               id="cta-heading"
               className="font-black mb-5"
@@ -1280,22 +1348,22 @@ export default function Home() {
             >
               <span className="text-white">Ready to Transform</span>
               <br />
-              <span className="gradient-text">Your Operations?</span>
+              <span style={{ color: '#bb0c15' }}>Your Operations?</span>
             </h2>
           </RevealOnScroll>
-          <RevealOnScroll delay={200}>
+          <RevealOnScroll delay={100}>
             <p className="text-lg mb-10 max-w-lg mx-auto leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
               Join 300+ businesses across Lebanon and the Middle East who trust Motico Solutions
               for their industrial abrasive and tooling needs.
             </p>
           </RevealOnScroll>
-          <RevealOnScroll delay={300}>
+          <RevealOnScroll delay={200}>
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-10">
               <a
                 href="mailto:info@moticosolutions.com"
                 className="btn-shimmer inline-flex items-center justify-center gap-2 px-10 py-5 rounded-full text-white font-bold text-lg active:scale-95 transition-all"
                 style={{
-                  background: 'linear-gradient(135deg, #bb0c15, #f97316)',
+                  background: '#bb0c15',
                   boxShadow: '0 0 60px rgba(220,38,38,0.5)',
                 }}
                 onMouseEnter={e =>
@@ -1309,8 +1377,17 @@ export default function Home() {
               </a>
               <a
                 href="tel:+9613741565"
-                className="inline-flex items-center justify-center gap-2 px-10 py-5 rounded-full font-semibold text-lg text-white border-2 active:scale-95 transition-all hover:bg-white/10"
-                style={{ borderColor: 'rgba(255,255,255,0.2)' }}
+                className="inline-flex items-center justify-center gap-2 px-10 py-5 rounded-full font-semibold text-lg active:scale-95 transition-all"
+                style={{
+                  background: 'white',
+                  color: '#004D8B',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = '#f1f5f9'
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'white'
+                }}
               >
                 Contact Sales
               </a>
@@ -1327,49 +1404,63 @@ export default function Home() {
             </div>
           </RevealOnScroll>
 
-          {/* Mobile App Coming Soon */}
+          {/* Testimonials */}
           <RevealOnScroll delay={500}>
-            <div className="mt-14 pt-10" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              <div className="flex items-center justify-center gap-2 mb-4">
-                <Smartphone className="w-5 h-5" style={{ color: '#bb0c15' }} />
-                <span className="text-sm font-semibold text-white">Mobile App</span>
+            <div className="mt-10 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="text-center mb-10">
                 <span
-                  className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide"
-                  style={{ background: 'rgba(220,38,38,0.2)', color: '#bb0c15' }}
+                  className="text-sm font-semibold uppercase tracking-widest"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
                 >
-                  Coming Soon
+                  What Our Clients Say
                 </span>
               </div>
-              <p className="text-xs text-center mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                Order abrasives on the go. Browse products, track orders, and get instant quotes.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                {/* App Store Button */}
-                <div
-                  className="inline-flex items-center gap-3 px-5 py-3 rounded-xl cursor-not-allowed opacity-60"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
-                >
-                  <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-                  </svg>
-                  <div className="text-left">
-                    <div className="text-[10px] uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.5)' }}>Download on the</div>
-                    <div className="text-sm font-semibold text-white -mt-0.5">App Store</div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                {testimonials.map((t, i) => (
+                  <div
+                    key={t.name}
+                    className="rounded-2xl p-6 relative"
+                    style={{
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.1)',
+                      backdropFilter: 'blur(8px)',
+                    }}
+                  >
+                    <Quote
+                      className="absolute top-4 right-4 w-8 h-8"
+                      style={{ color: 'rgba(187,12,21,0.3)' }}
+                    />
+                    <div className="flex gap-1 mb-4">
+                      {[...Array(t.rating)].map((_, j) => (
+                        <Star
+                          key={j}
+                          className="w-4 h-4"
+                          style={{ color: '#f59e0b', fill: '#f59e0b' }}
+                        />
+                      ))}
+                    </div>
+                    <p
+                      className="text-sm leading-relaxed mb-6 text-left"
+                      style={{ color: 'rgba(255,255,255,0.7)' }}
+                    >
+                      "{t.quote}"
+                    </p>
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm"
+                        style={{ background: i % 2 === 0 ? '#bb0c15' : '#004D8B' }}
+                      >
+                        {t.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div>
+                        <div className="font-semibold text-sm text-white">{t.name}</div>
+                        <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                          {t.role}, {t.company}
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                {/* Google Play Button */}
-                <div
-                  className="inline-flex items-center gap-3 px-5 py-3 rounded-xl cursor-not-allowed opacity-60"
-                  style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
-                >
-                  <svg className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/>
-                  </svg>
-                  <div className="text-left">
-                    <div className="text-[10px] uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.5)' }}>Get it on</div>
-                    <div className="text-sm font-semibold text-white -mt-0.5">Google Play</div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </RevealOnScroll>
@@ -1390,29 +1481,33 @@ export default function Home() {
           className="py-10"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
         >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-5">
-            <p className="text-sm" style={{ color: 'rgba(255,255,255,0.7)' }}>
-              Stay in the loop — get product news &amp; exclusive offers.
-            </p>
-            <div className="flex items-center gap-3 w-full sm:w-auto">
-              <input
-                type="email"
-                placeholder="Your email address"
-                className="flex-1 sm:w-72 rounded-xl px-4 py-3 text-sm text-white outline-none transition-all"
-                style={{
-                  background: 'rgba(255,255,255,0.05)',
-                  border: '1px solid rgba(255,255,255,0.1)',
-                  color: 'white',
-                }}
-                onFocus={e => (e.target.style.borderColor = 'rgba(220,38,38,0.5)')}
-                onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
-              />
-              <button
-                className="btn-shimmer px-5 py-3 rounded-xl text-white text-sm font-semibold active:scale-95 transition-transform flex-shrink-0"
-                style={{ background: 'linear-gradient(135deg, #bb0c15, #f97316)' }}
-              >
-                Subscribe →
-              </button>
+          <div className="max-w-2xl mx-auto px-4 sm:px-6">
+            <div className="flex flex-col items-center gap-4">
+              <div className="text-center">
+                <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  Stay in the loop — get product news &amp; exclusive offers
+                </p>
+              </div>
+              <div className="flex items-center gap-3 w-full max-w-md">
+                <input
+                  type="email"
+                  placeholder="Your email address"
+                  className="flex-1 rounded-xl px-4 py-3 text-sm text-white outline-none transition-all"
+                  style={{
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.1)',
+                    color: 'white',
+                  }}
+                  onFocus={e => (e.target.style.borderColor = 'rgba(220,38,38,0.5)')}
+                  onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
+                />
+                <button
+                  className="btn-shimmer px-5 py-3 rounded-xl text-white text-sm font-semibold active:scale-95 transition-transform flex-shrink-0"
+                  style={{ background: '#bb0c15' }}
+                >
+                  Subscribe →
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -1532,9 +1627,26 @@ export default function Home() {
           style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              © 2026 Motico Solutions. All rights reserved.
-            </span>
+            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                © 2026 Motico Solutions. All rights reserved.
+              </span>
+              <span className="hidden sm:inline text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>•</span>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                Developed by{' '}
+                <a
+                  href="https://dbfnexus.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transition-colors"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#bb0c15')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.5)')}
+                >
+                  DBF Nexus
+                </a>
+              </span>
+            </div>
             <div className="flex items-center gap-4">
               {['Privacy Policy', 'Terms', 'Cookies'].map((item, i) => (
                 <a
@@ -1571,7 +1683,7 @@ export default function Home() {
         rel="noopener noreferrer"
         className="whatsapp-btn fixed z-50 flex items-center gap-3 group"
         style={{
-          bottom: 24,
+          bottom: 100,
           right: 24,
         }}
         aria-label="Chat on WhatsApp"

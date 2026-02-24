@@ -26,7 +26,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={inter.className}>
         <ScrollProgress />
-        <CustomCursor />
+        {/* CustomCursor disabled - causes floating red dot visual artifact */}
+        {/* <CustomCursor /> */}
         {children}
       </body>
     </html>

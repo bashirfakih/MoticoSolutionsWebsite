@@ -18,14 +18,17 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
   background: #f1f5f9;
 }
 ::-webkit-scrollbar-thumb {
-  background: #bb0c15;
-  border-radius: 3px;
+  background: #94a3b8;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }
 
 /* Grain texture overlay */
@@ -166,12 +169,9 @@ body {
   transform: scaleX(1);
 }
 
-/* Gradient text utility */
+/* Accent text utility */
 .gradient-text {
-  background: linear-gradient(135deg, #bb0c15, #f97316);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #bb0c15;
 }
 
 /* Subtle pulsing ring on active dot */
@@ -380,9 +380,7 @@ body {
 
 .product-card:hover::before {
   opacity: 1;
-  background: linear-gradient(135deg, #bb0c15, #f97316, #bb0c15);
-  background-size: 200% 200%;
-  animation: borderDance 2s ease infinite;
+  background: #bb0c15;
 }
 
 .product-card:hover {
@@ -407,14 +405,14 @@ body {
   filter: grayscale(0%) brightness(0.95);
 }
 
-/* Glassmorphism overlay - bottom-heavy gradient for text readability */
+/* Glassmorphism overlay - gradient for text readability */
 .product-card .card-glass {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     to bottom,
-    rgba(0, 45, 61, 0.3) 0%,
-    rgba(0, 45, 61, 0.5) 40%,
+    rgba(0, 45, 61, 0.45) 0%,
+    rgba(0, 45, 61, 0.55) 40%,
     rgba(0, 45, 61, 0.85) 100%
   );
   backdrop-filter: blur(1px);
