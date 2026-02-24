@@ -5,9 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
-  ArrowLeft, CheckCircle, ChevronLeft, ChevronRight, Phone, MessageCircle,
-  Layers, Settings, Gauge, Zap, Shield, Award, Package, ArrowRight,
-  FileText, Download, Star,
+  ArrowLeft, CheckCircle, ChevronLeft, ChevronRight,
+  MessageCircle, Download, ArrowRight, Layers,
 } from 'lucide-react'
 
 // ═══════════════════════════════════════════════════════════════
@@ -20,13 +19,10 @@ const products: Record<string, {
   longDescription: string
   images: string[]
   features: string[]
-  specs: { label: string; value: string }[]
-  materials: { name: string; rating: 'excellent' | 'good' | 'suitable' }[]
-  grits: string[]
-  dimensions: { width: string; length: string }[]
   technicalData: { label: string; value: string }[]
   applications: string[]
   brands: string[]
+  datasheetUrl?: string
   relatedProducts: { slug: string; title: string; image: string }[]
 }> = {
   'ceramic-grain': {
@@ -43,37 +39,17 @@ const products: Record<string, {
       'Precision-coated for uniform scratch pattern',
       'Heavy-duty polyester backing',
     ],
-    specs: [
+    technicalData: [
       { label: 'Grain Type', value: 'Precision-Shaped Ceramic' },
       { label: 'Backing', value: 'Heavy-Duty Polyester Cloth' },
-      { label: 'Bond', value: 'Resin over Resin' },
+      { label: 'Bond System', value: 'Resin over Resin' },
       { label: 'Coating', value: 'Closed Coat' },
-      { label: 'Flexibility', value: 'Y-Weight (Stiff)' },
-      { label: 'Color', value: 'Blue/Purple' },
-    ],
-    materials: [
-      { name: 'Hardened Steel', rating: 'excellent' },
-      { name: 'Stainless Steel', rating: 'excellent' },
-      { name: 'Titanium', rating: 'excellent' },
-      { name: 'Inconel / Superalloys', rating: 'excellent' },
-      { name: 'Carbon Steel', rating: 'good' },
-      { name: 'Tool Steel', rating: 'good' },
-      { name: 'Cast Iron', rating: 'suitable' },
-    ],
-    grits: ['P24', 'P36', 'P40', 'P60', 'P80', 'P120'],
-    dimensions: [
-      { width: '50mm', length: '2000mm' },
-      { width: '75mm', length: '2000mm' },
-      { width: '100mm', length: '2000mm' },
-      { width: '150mm', length: '2000mm' },
-      { width: 'Custom', length: 'Custom' },
-    ],
-    technicalData: [
       { label: 'Recommended Speed', value: '20-35 m/s' },
       { label: 'Maximum Speed', value: '45 m/s' },
       { label: 'Operating Pressure', value: 'High (40-80 N)' },
       { label: 'Heat Resistance', value: 'Excellent' },
-      { label: 'Storage', value: '15-25°C, 40-65% RH' },
+      { label: 'Available Grits', value: 'P24, P36, P40, P60, P80, P120' },
+      { label: 'Storage Conditions', value: '15-25°C, 40-65% RH' },
       { label: 'Shelf Life', value: '3 years' },
     ],
     applications: [
@@ -84,6 +60,7 @@ const products: Record<string, {
       'Aerospace component finishing',
     ],
     brands: ['Hermes', '3M Cubitron II', 'Norton Blaze'],
+    datasheetUrl: '/datasheets/ceramic-grain-belts.pdf',
     relatedProducts: [
       { slug: 'zirconia-alumina', title: 'Zirconia Alumina Belts', image: '/slide-2-belt.png' },
       { slug: 'compact-grain', title: 'Compact Grain Belts', image: '/slide-3-disc.png' },
@@ -103,36 +80,17 @@ const products: Record<string, {
       'Durable cloth backing',
       'Anti-static treatment available',
     ],
-    specs: [
+    technicalData: [
       { label: 'Grain Type', value: 'Zirconia Alumina' },
       { label: 'Backing', value: 'Polyester/Cotton Blend' },
-      { label: 'Bond', value: 'Resin over Resin' },
+      { label: 'Bond System', value: 'Resin over Resin' },
       { label: 'Coating', value: 'Closed Coat' },
-      { label: 'Flexibility', value: 'X-Weight (Medium)' },
-      { label: 'Color', value: 'Blue' },
-    ],
-    materials: [
-      { name: 'Stainless Steel', rating: 'excellent' },
-      { name: 'Carbon Steel', rating: 'excellent' },
-      { name: 'Aluminum', rating: 'good' },
-      { name: 'Mild Steel', rating: 'excellent' },
-      { name: 'Cast Iron', rating: 'good' },
-      { name: 'Brass/Copper', rating: 'suitable' },
-    ],
-    grits: ['P24', 'P36', 'P40', 'P60', 'P80', 'P100', 'P120'],
-    dimensions: [
-      { width: '25mm', length: '762mm' },
-      { width: '50mm', length: '2000mm' },
-      { width: '75mm', length: '2000mm' },
-      { width: '100mm', length: '2000mm' },
-      { width: '150mm', length: '2000mm' },
-    ],
-    technicalData: [
       { label: 'Recommended Speed', value: '18-30 m/s' },
       { label: 'Maximum Speed', value: '40 m/s' },
       { label: 'Operating Pressure', value: 'Medium-High (30-60 N)' },
       { label: 'Heat Resistance', value: 'Very Good' },
-      { label: 'Storage', value: '15-25°C, 40-65% RH' },
+      { label: 'Available Grits', value: 'P24, P36, P40, P60, P80, P100, P120' },
+      { label: 'Storage Conditions', value: '15-25°C, 40-65% RH' },
       { label: 'Shelf Life', value: '3 years' },
     ],
     applications: [
@@ -143,6 +101,7 @@ const products: Record<string, {
       'Surface preparation',
     ],
     brands: ['Hermes', 'VSM', 'Klingspor'],
+    datasheetUrl: '/datasheets/zirconia-alumina-belts.pdf',
     relatedProducts: [
       { slug: 'ceramic-grain', title: 'Ceramic Grain Belts', image: '/slide-1-grinding.png' },
       { slug: 'aluminum-oxide', title: 'Aluminum Oxide Belts', image: '/slide-5-abrasiv.png' },
@@ -162,36 +121,17 @@ const products: Record<string, {
       'Paper or cloth backing',
       'Excellent for fine finishing',
     ],
-    specs: [
+    technicalData: [
       { label: 'Grain Type', value: 'Aluminum Oxide' },
       { label: 'Backing', value: 'Paper / Cloth Options' },
-      { label: 'Bond', value: 'Resin' },
+      { label: 'Bond System', value: 'Resin' },
       { label: 'Coating', value: 'Open / Closed Coat' },
-      { label: 'Flexibility', value: 'J-Weight to Y-Weight' },
-      { label: 'Color', value: 'Brown/Tan' },
-    ],
-    materials: [
-      { name: 'Wood', rating: 'excellent' },
-      { name: 'Carbon Steel', rating: 'excellent' },
-      { name: 'Aluminum', rating: 'good' },
-      { name: 'Plastics', rating: 'excellent' },
-      { name: 'Composites', rating: 'good' },
-      { name: 'Soft Metals', rating: 'excellent' },
-    ],
-    grits: ['P60', 'P80', 'P100', 'P120', 'P150', 'P180', 'P220', 'P320', 'P400'],
-    dimensions: [
-      { width: '25mm', length: '762mm' },
-      { width: '50mm', length: '1500mm' },
-      { width: '75mm', length: '2000mm' },
-      { width: '100mm', length: '2000mm' },
-      { width: '150mm', length: '2500mm' },
-    ],
-    technicalData: [
       { label: 'Recommended Speed', value: '15-25 m/s' },
       { label: 'Maximum Speed', value: '35 m/s' },
       { label: 'Operating Pressure', value: 'Low-Medium (15-40 N)' },
       { label: 'Heat Resistance', value: 'Good' },
-      { label: 'Storage', value: '15-25°C, 40-65% RH' },
+      { label: 'Available Grits', value: 'P60 - P400' },
+      { label: 'Storage Conditions', value: '15-25°C, 40-65% RH' },
       { label: 'Shelf Life', value: '2 years' },
     ],
     applications: [
@@ -202,6 +142,7 @@ const products: Record<string, {
       'Light deburring',
     ],
     brands: ['Hermes', '3M', 'Mirka'],
+    datasheetUrl: '/datasheets/aluminum-oxide-belts.pdf',
     relatedProducts: [
       { slug: 'surface-conditioning', title: 'Surface Conditioning Belts', image: '/slide-4-brush.png' },
       { slug: 'film-backed', title: 'Film-Backed Belts', image: '/product-abrasive-belts.png' },
@@ -221,34 +162,17 @@ const products: Record<string, {
       'Ideal for automated systems',
       'Premium backing materials',
     ],
-    specs: [
+    technicalData: [
       { label: 'Grain Type', value: 'Compact Grain (Multi-Layer)' },
       { label: 'Backing', value: 'Heavy Polyester' },
-      { label: 'Bond', value: 'Special Resin System' },
+      { label: 'Bond System', value: 'Special Resin System' },
       { label: 'Coating', value: 'Compact Structure' },
-      { label: 'Flexibility', value: 'Y-Weight (Stiff)' },
-      { label: 'Color', value: 'Dark Blue/Grey' },
-    ],
-    materials: [
-      { name: 'Stainless Steel', rating: 'excellent' },
-      { name: 'Carbon Steel', rating: 'excellent' },
-      { name: 'Aluminum', rating: 'good' },
-      { name: 'Titanium', rating: 'good' },
-      { name: 'Hardened Steel', rating: 'good' },
-    ],
-    grits: ['P60', 'P80', 'P120', 'P180', 'P240'],
-    dimensions: [
-      { width: '50mm', length: '2000mm' },
-      { width: '75mm', length: '2000mm' },
-      { width: '100mm', length: '2000mm' },
-      { width: '150mm', length: '2500mm' },
-    ],
-    technicalData: [
       { label: 'Recommended Speed', value: '20-30 m/s' },
       { label: 'Maximum Speed', value: '40 m/s' },
       { label: 'Operating Pressure', value: 'Medium (25-50 N)' },
       { label: 'Heat Resistance', value: 'Very Good' },
-      { label: 'Storage', value: '15-25°C, 40-65% RH' },
+      { label: 'Available Grits', value: 'P60, P80, P120, P180, P240' },
+      { label: 'Storage Conditions', value: '15-25°C, 40-65% RH' },
       { label: 'Shelf Life', value: '3 years' },
     ],
     applications: [
@@ -258,6 +182,7 @@ const products: Record<string, {
       'Cost-per-part optimization',
     ],
     brands: ['Hermes', '3M Trizact', 'VSM Compactgrain'],
+    datasheetUrl: '/datasheets/compact-grain-belts.pdf',
     relatedProducts: [
       { slug: 'ceramic-grain', title: 'Ceramic Grain Belts', image: '/slide-1-grinding.png' },
       { slug: 'zirconia-alumina', title: 'Zirconia Alumina Belts', image: '/slide-2-belt.png' },
@@ -277,33 +202,17 @@ const products: Record<string, {
       'Excellent for blending operations',
       'Available in multiple grades',
     ],
-    specs: [
+    technicalData: [
       { label: 'Construction', value: 'Non-Woven Synthetic' },
-      { label: 'Backing', value: 'Integrated' },
-      { label: 'Abrasive', value: 'Silicon Carbide / Aluminum Oxide' },
+      { label: 'Abrasive Type', value: 'Silicon Carbide / Aluminum Oxide' },
       { label: 'Density', value: 'Medium to High' },
       { label: 'Flexibility', value: 'Very High' },
-      { label: 'Color', value: 'Maroon / Grey / Blue' },
-    ],
-    materials: [
-      { name: 'Stainless Steel', rating: 'excellent' },
-      { name: 'Aluminum', rating: 'excellent' },
-      { name: 'Brass/Copper', rating: 'excellent' },
-      { name: 'Plastics', rating: 'good' },
-      { name: 'Carbon Steel', rating: 'good' },
-    ],
-    grits: ['Very Fine', 'Fine', 'Medium', 'Coarse'],
-    dimensions: [
-      { width: '50mm', length: '2000mm' },
-      { width: '75mm', length: '2000mm' },
-      { width: '100mm', length: '2000mm' },
-    ],
-    technicalData: [
       { label: 'Recommended Speed', value: '10-20 m/s' },
       { label: 'Maximum Speed', value: '25 m/s' },
       { label: 'Operating Pressure', value: 'Low (10-25 N)' },
       { label: 'Heat Resistance', value: 'Moderate' },
-      { label: 'Storage', value: '15-25°C, 40-65% RH' },
+      { label: 'Available Grades', value: 'Very Fine, Fine, Medium, Coarse' },
+      { label: 'Storage Conditions', value: '15-25°C, 40-65% RH' },
       { label: 'Shelf Life', value: '2 years' },
     ],
     applications: [
@@ -314,6 +223,7 @@ const products: Record<string, {
       'Pre-polish preparation',
     ],
     brands: ['3M Scotch-Brite', 'Hermes', 'Norton Bear-Tex'],
+    datasheetUrl: '/datasheets/surface-conditioning-belts.pdf',
     relatedProducts: [
       { slug: 'aluminum-oxide', title: 'Aluminum Oxide Belts', image: '/slide-5-abrasiv.png' },
       { slug: 'film-backed', title: 'Film-Backed Belts', image: '/product-abrasive-belts.png' },
@@ -333,32 +243,16 @@ const products: Record<string, {
       'Ideal for superfinishing',
       'Low Ra value capability',
     ],
-    specs: [
+    technicalData: [
       { label: 'Grain Type', value: 'Micro-Graded Aluminum Oxide' },
       { label: 'Backing', value: 'Polyester Film (3 mil)' },
-      { label: 'Bond', value: 'Resin' },
+      { label: 'Bond System', value: 'Resin' },
       { label: 'Coating', value: 'Precision Electrostatic' },
-      { label: 'Flexibility', value: 'High' },
-      { label: 'Color', value: 'Light Grey / Tan' },
-    ],
-    materials: [
-      { name: 'Hardened Steel', rating: 'excellent' },
-      { name: 'Stainless Steel', rating: 'excellent' },
-      { name: 'Chrome Plating', rating: 'excellent' },
-      { name: 'Glass', rating: 'good' },
-      { name: 'Plastics', rating: 'good' },
-    ],
-    grits: ['P400', 'P600', 'P800', 'P1000', 'P1200', 'P1500', 'P2000', '3µm', '1µm'],
-    dimensions: [
-      { width: '25mm', length: '762mm' },
-      { width: '50mm', length: '1500mm' },
-      { width: '75mm', length: '2000mm' },
-    ],
-    technicalData: [
       { label: 'Recommended Speed', value: '10-18 m/s' },
       { label: 'Maximum Speed', value: '25 m/s' },
       { label: 'Operating Pressure', value: 'Very Low (5-15 N)' },
       { label: 'Heat Resistance', value: 'Moderate' },
+      { label: 'Available Grits', value: 'P400 - P2000, 3µm, 1µm' },
       { label: 'Achievable Ra', value: '< 0.1 µm' },
       { label: 'Shelf Life', value: '2 years' },
     ],
@@ -370,6 +264,7 @@ const products: Record<string, {
       'Optical component preparation',
     ],
     brands: ['3M', 'Hermes', 'Mirka'],
+    datasheetUrl: '/datasheets/film-backed-belts.pdf',
     relatedProducts: [
       { slug: 'aluminum-oxide', title: 'Aluminum Oxide Belts', image: '/slide-5-abrasiv.png' },
       { slug: 'surface-conditioning', title: 'Surface Conditioning Belts', image: '/slide-4-brush.png' },
@@ -385,10 +280,6 @@ const defaultProduct = {
   longDescription: 'Contact us for detailed product specifications.',
   images: ['/product-abrasive-belts.png'],
   features: ['Premium quality', 'Industrial grade'],
-  specs: [{ label: 'Type', value: 'Abrasive Belt' }],
-  materials: [{ name: 'Various', rating: 'good' as const }],
-  grits: ['Various'],
-  dimensions: [{ width: 'Custom', length: 'Custom' }],
   technicalData: [{ label: 'Contact us', value: 'for specifications' }],
   applications: ['Contact us for applications'],
   brands: ['Multiple brands available'],
@@ -401,30 +292,29 @@ export default function BeltProductPage() {
   const product = products[slug] || { ...defaultProduct, title: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }
 
   const [activeImage, setActiveImage] = useState(0)
-  const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'technical'>('description')
 
   const nextImage = () => setActiveImage((prev) => (prev + 1) % product.images.length)
   const prevImage = () => setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length)
 
   return (
-    <div className="min-h-screen" style={{ background: '#f8fafc' }}>
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <header
         className="sticky top-0 z-50"
         style={{
-          background: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(0,0,0,0.08)',
+          background: 'rgba(255,255,255,0.98)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(0,0,0,0.06)',
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
           <Link
             href="/products/abrasive-belts"
-            className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-[#bb0c15]"
+            className="flex items-center gap-2 text-sm font-medium transition-all hover:gap-3"
             style={{ color: '#004D8B' }}
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Abrasive Belts
+            Back to Collection
           </Link>
           <Link href="/">
             <Image
@@ -438,27 +328,14 @@ export default function BeltProductPage() {
         </div>
       </header>
 
-      {/* Breadcrumb */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-        <nav className="flex items-center gap-2 text-sm text-gray-500 flex-wrap">
-          <Link href="/" className="hover:text-[#004D8B] transition-colors">Home</Link>
-          <ChevronRight className="w-4 h-4" />
-          <Link href="/#products" className="hover:text-[#004D8B] transition-colors">Products</Link>
-          <ChevronRight className="w-4 h-4" />
-          <Link href="/products/abrasive-belts" className="hover:text-[#004D8B] transition-colors">Abrasive Belts</Link>
-          <ChevronRight className="w-4 h-4" />
-          <span className="text-gray-900 font-medium">{product.title}</span>
-        </nav>
-      </div>
-
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 pb-20">
-        {/* Product Header */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        {/* Product Hero */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 mb-16 lg:mb-24">
           {/* Image Gallery */}
-          <div>
+          <div className="space-y-4">
             {/* Main Image */}
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-white shadow-lg mb-4">
+            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
               <Image
                 src={product.images[activeImage]}
                 alt={product.title}
@@ -471,28 +348,36 @@ export default function BeltProductPage() {
                 <>
                   <button
                     onClick={prevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 shadow-xl flex items-center justify-center hover:scale-110 transition-transform"
                   >
-                    <ChevronLeft className="w-5 h-5 text-gray-700" />
+                    <ChevronLeft className="w-6 h-6 text-gray-800" />
                   </button>
                   <button
                     onClick={nextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center hover:bg-white transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 shadow-xl flex items-center justify-center hover:scale-110 transition-transform"
                   >
-                    <ChevronRight className="w-5 h-5 text-gray-700" />
+                    <ChevronRight className="w-6 h-6 text-gray-800" />
                   </button>
                 </>
+              )}
+              {/* Image Counter */}
+              {product.images.length > 1 && (
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 rounded-full bg-black/60 text-white text-sm font-medium">
+                  {activeImage + 1} / {product.images.length}
+                </div>
               )}
             </div>
             {/* Thumbnails */}
             {product.images.length > 1 && (
-              <div className="flex gap-3">
+              <div className="flex gap-3 justify-center">
                 {product.images.map((img, i) => (
                   <button
                     key={i}
                     onClick={() => setActiveImage(i)}
-                    className={`relative w-20 h-20 rounded-lg overflow-hidden transition-all ${
-                      activeImage === i ? 'ring-2 ring-[#bb0c15]' : 'opacity-60 hover:opacity-100'
+                    className={`relative w-20 h-20 rounded-xl overflow-hidden transition-all ${
+                      activeImage === i
+                        ? 'ring-2 ring-[#bb0c15] ring-offset-2'
+                        : 'opacity-50 hover:opacity-100'
                     }`}
                   >
                     <Image src={img} alt="" fill className="object-cover" />
@@ -503,43 +388,37 @@ export default function BeltProductPage() {
           </div>
 
           {/* Product Info */}
-          <div>
+          <div className="flex flex-col justify-center">
             {/* Badge */}
             <div
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4"
-              style={{ background: 'rgba(187,12,21,0.1)', color: '#bb0c15' }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold mb-6 w-fit"
+              style={{ background: 'linear-gradient(135deg, #bb0c15, #d42a32)', color: 'white' }}
             >
-              <Layers className="w-3.5 h-3.5" />
+              <Layers className="w-4 h-4" />
               {product.subtitle}
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
+            <h1
+              className="text-4xl sm:text-5xl font-black text-gray-900 mb-6"
+              style={{ letterSpacing: '-0.02em', lineHeight: 1.1 }}
+            >
               {product.title}
             </h1>
 
-            <p className="text-lg text-gray-600 leading-relaxed mb-6">
+            <p className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-8">
               {product.longDescription}
             </p>
 
-            {/* Quick Features */}
-            <div className="grid grid-cols-2 gap-3 mb-8">
-              {product.features.slice(0, 4).map((feature, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-gray-700">{feature}</span>
-                </div>
-              ))}
-            </div>
-
             {/* Brands */}
             <div className="mb-8">
-              <span className="text-sm font-medium text-gray-500 block mb-2">Available from:</span>
+              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 block mb-3">
+                Available Brands
+              </span>
               <div className="flex flex-wrap gap-2">
                 {product.brands.map(brand => (
                   <span
                     key={brand}
-                    className="px-3 py-1.5 rounded-full text-sm font-medium"
-                    style={{ background: '#004D8B', color: 'white' }}
+                    className="px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-700"
                   >
                     {brand}
                   </span>
@@ -548,237 +427,179 @@ export default function BeltProductPage() {
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3">
+            <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href={`https://wa.me/9613741565?text=Hello!%20I'm%20interested%20in%20${encodeURIComponent(product.title)}.`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style={{ background: '#25D366' }}
+                className="flex-1 flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-white text-lg transition-all hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                style={{ background: '#25D366', boxShadow: '0 10px 40px rgba(37,211,102,0.3)' }}
               >
-                <MessageCircle className="w-5 h-5" />
-                WhatsApp Inquiry
+                <MessageCircle className="w-6 h-6" />
+                Request Quote
               </a>
-              <a
-                href="tel:+9613741565"
-                className="flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-semibold transition-all hover:scale-[1.02] active:scale-[0.98]"
-                style={{
-                  background: 'white',
-                  border: '2px solid #004D8B',
-                  color: '#004D8B',
-                }}
-              >
-                <Phone className="w-5 h-5" />
-                Call Us
-              </a>
+              {product.datasheetUrl && (
+                <a
+                  href={product.datasheetUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-3 px-8 py-4 rounded-2xl font-bold text-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  style={{
+                    background: 'white',
+                    border: '2px solid #e5e7eb',
+                    color: '#374151',
+                  }}
+                >
+                  <Download className="w-6 h-6" />
+                  Datasheet
+                </a>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="mb-8">
-          <div className="flex gap-1 p-1 rounded-xl bg-gray-100 w-fit">
-            {[
-              { id: 'description', label: 'Description', icon: FileText },
-              { id: 'specs', label: 'Specifications', icon: Settings },
-              { id: 'technical', label: 'Technical Data', icon: Gauge },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-          <div className="lg:col-span-2">
-            {activeTab === 'description' && (
-              <div className="bg-white rounded-2xl p-8 shadow-sm">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Product Features</h2>
-                <ul className="space-y-4">
-                  {product.features.map((feature, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <CheckCircle className="w-4 h-4 text-emerald-600" />
-                      </div>
-                      <span className="text-gray-700">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <h2 className="text-xl font-bold text-gray-900 mt-10 mb-6">Applications</h2>
-                <ul className="space-y-3">
-                  {product.applications.map((app, i) => (
-                    <li key={i} className="flex items-center gap-3 text-gray-700">
-                      <ArrowRight className="w-4 h-4 text-[#bb0c15]" />
-                      {app}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {activeTab === 'specs' && (
-              <div className="bg-white rounded-2xl p-8 shadow-sm">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Product Specifications</h2>
-                <div className="divide-y divide-gray-100">
-                  {product.specs.map(({ label, value }) => (
-                    <div key={label} className="flex justify-between py-4">
-                      <span className="text-gray-500">{label}</span>
-                      <span className="font-medium text-gray-900">{value}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <h2 className="text-xl font-bold text-gray-900 mt-10 mb-6">Available Grits</h2>
-                <div className="flex flex-wrap gap-2">
-                  {product.grits.map(grit => (
-                    <span
-                      key={grit}
-                      className="px-3 py-1.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-700"
-                    >
-                      {grit}
-                    </span>
-                  ))}
-                </div>
-
-                <h2 className="text-xl font-bold text-gray-900 mt-10 mb-6">Available Dimensions</h2>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-gray-50">
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700 rounded-l-lg">Width</th>
-                        <th className="px-4 py-3 text-left font-semibold text-gray-700 rounded-r-lg">Length</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {product.dimensions.map((dim, i) => (
-                        <tr key={i}>
-                          <td className="px-4 py-3 text-gray-600">{dim.width}</td>
-                          <td className="px-4 py-3 text-gray-600">{dim.length}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'technical' && (
-              <div className="bg-white rounded-2xl p-8 shadow-sm">
-                <h2 className="text-xl font-bold text-gray-900 mb-6">Technical Data</h2>
-                <div className="divide-y divide-gray-100">
-                  {product.technicalData.map(({ label, value }) => (
-                    <div key={label} className="flex justify-between py-4">
-                      <span className="text-gray-500">{label}</span>
-                      <span className="font-medium text-gray-900">{value}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Compatible Materials */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-[#004D8B]" />
-                Compatible Materials
-              </h3>
-              <div className="space-y-3">
-                {product.materials.map(({ name, rating }) => (
-                  <div key={name} className="flex items-center justify-between">
-                    <span className="text-sm text-gray-700">{name}</span>
-                    <div className="flex gap-1">
-                      {[1, 2, 3].map(i => (
-                        <div
-                          key={i}
-                          className="w-2 h-2 rounded-full"
-                          style={{
-                            background:
-                              rating === 'excellent' ? '#10b981' :
-                              rating === 'good' && i <= 2 ? '#10b981' :
-                              rating === 'suitable' && i <= 1 ? '#10b981' : '#e5e7eb',
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 pt-4 border-t border-gray-100 flex gap-4 text-xs text-gray-500">
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" /> Excellent
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="w-2 h-2 rounded-full bg-gray-200" /> Good
-                </span>
-              </div>
-            </div>
-
-            {/* Quick Contact */}
-            <div
-              className="rounded-2xl p-6"
-              style={{ background: '#004D8B' }}
+        {/* Description & Technical Data Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-16 lg:mb-24">
+          {/* Description */}
+          <div>
+            <h2
+              className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8"
+              style={{ letterSpacing: '-0.01em' }}
             >
-              <h3 className="font-bold text-white mb-2">Need Technical Help?</h3>
-              <p className="text-sm text-white/70 mb-4">
-                Our experts can help you select the right belt for your application.
-              </p>
+              Key Features
+            </h2>
+            <div className="space-y-4">
+              {product.features.map((feature, i) => (
+                <div
+                  key={i}
+                  className="flex items-start gap-4 p-4 rounded-2xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                >
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}
+                  >
+                    <CheckCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-gray-700 font-medium pt-1">{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Applications */}
+            <h2
+              className="text-2xl sm:text-3xl font-bold text-gray-900 mt-12 mb-8"
+              style={{ letterSpacing: '-0.01em' }}
+            >
+              Applications
+            </h2>
+            <div className="space-y-3">
+              {product.applications.map((app, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-3 text-gray-700"
+                >
+                  <ArrowRight className="w-5 h-5 text-[#bb0c15] flex-shrink-0" />
+                  <span className="font-medium">{app}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Technical Data */}
+          <div>
+            <div className="flex items-center justify-between mb-8">
+              <h2
+                className="text-2xl sm:text-3xl font-bold text-gray-900"
+                style={{ letterSpacing: '-0.01em' }}
+              >
+                Technical Data
+              </h2>
+              {product.datasheetUrl && (
+                <a
+                  href={product.datasheetUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm font-semibold text-[#004D8B] hover:underline"
+                >
+                  <Download className="w-4 h-4" />
+                  Download PDF
+                </a>
+              )}
+            </div>
+
+            <div
+              className="rounded-3xl overflow-hidden"
+              style={{ background: 'linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%)' }}
+            >
+              {product.technicalData.map(({ label, value }, i) => (
+                <div
+                  key={label}
+                  className={`flex justify-between items-center px-6 py-4 ${
+                    i !== product.technicalData.length - 1 ? 'border-b border-gray-200' : ''
+                  }`}
+                >
+                  <span className="text-gray-500 font-medium">{label}</span>
+                  <span className="font-semibold text-gray-900 text-right">{value}</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Download Datasheet CTA */}
+            {product.datasheetUrl && (
               <a
-                href="https://wa.me/9613741565"
+                href={product.datasheetUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 w-full py-3 rounded-xl font-semibold text-white transition-all hover:scale-[1.02]"
-                style={{ background: '#25D366' }}
+                className="flex items-center justify-center gap-3 w-full mt-6 px-8 py-5 rounded-2xl font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98]"
+                style={{
+                  background: 'linear-gradient(135deg, #004D8B, #0066b3)',
+                  boxShadow: '0 10px 40px rgba(0,77,139,0.25)'
+                }}
               >
-                <MessageCircle className="w-5 h-5" />
-                Chat with Expert
+                <Download className="w-5 h-5" />
+                Download Full Datasheet (PDF)
               </a>
-            </div>
+            )}
           </div>
         </div>
 
         {/* Related Products */}
         {product.relatedProducts.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Products</h2>
+            <h2
+              className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8"
+              style={{ letterSpacing: '-0.01em' }}
+            >
+              Related Products
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {product.relatedProducts.map(related => (
                 <Link
                   key={related.slug}
                   href={`/products/abrasive-belts/${related.slug}`}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all"
+                  className="group relative rounded-3xl overflow-hidden bg-gray-100 aspect-[4/3]"
                 >
-                  <div className="relative h-48">
-                    <Image
-                      src={related.image}
-                      alt={related.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-5">
-                    <h3 className="font-bold text-gray-900 group-hover:text-[#004D8B] transition-colors">
-                      {related.title}
-                    </h3>
-                    <span className="text-sm text-[#bb0c15] font-medium flex items-center gap-1 mt-2">
-                      View Details <ArrowRight className="w-4 h-4" />
-                    </span>
+                  <Image
+                    src={related.image}
+                    alt={related.title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div
+                    className="absolute inset-0 flex items-end p-6"
+                    style={{
+                      background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%)'
+                    }}
+                  >
+                    <div>
+                      <h3 className="font-bold text-xl text-white mb-2">
+                        {related.title}
+                      </h3>
+                      <span className="inline-flex items-center gap-2 text-sm font-semibold text-white/80 group-hover:text-white transition-colors">
+                        View Product
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                      </span>
+                    </div>
                   </div>
                 </Link>
               ))}
