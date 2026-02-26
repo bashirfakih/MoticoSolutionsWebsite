@@ -89,7 +89,7 @@ export default function AboutPage() {
           borderBottom: '1px solid rgba(0,0,0,0.08)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-28 flex items-center justify-between">
           <Link
             href="/"
             className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-[#bb0c15]"
@@ -98,13 +98,13 @@ export default function AboutPage() {
             <ArrowLeft className="w-4 h-4" />
             Back to Home
           </Link>
-          <Link href="/">
+          <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-4">
             <Image
               src="/logo-motico-solutions.png"
               alt="Motico Solutions"
               width={200}
               height={60}
-              className="h-16 w-auto"
+              className="h-24 w-auto"
             />
           </Link>
         </div>

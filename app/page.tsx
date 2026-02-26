@@ -293,7 +293,7 @@ export default function Home() {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
             {/* Logo */}
-            <a href="#" className="flex-shrink-0">
+            <a href="#" className="flex-shrink-0 mt-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-motico-solutions.png"
@@ -345,9 +345,9 @@ export default function Home() {
                         {categories.slice(0, 9).map(cat => {
                           const Icon = cat.icon
                           return (
-                            <a
+                            <Link
                               key={cat.id}
-                              href={`#${cat.id}`}
+                              href={`/products/${cat.id}`}
                               className="flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-gray-50 group"
                               onClick={() => setProductsMenuOpen(false)}
                             >
@@ -360,7 +360,7 @@ export default function Home() {
                               <span className="text-sm font-medium text-gray-700 group-hover:text-[#004D8B]">
                                 {cat.title}
                               </span>
-                            </a>
+                            </Link>
                           )
                         })}
                         <a
@@ -454,11 +454,11 @@ export default function Home() {
         {/* Mobile full-screen menu */}
         {menuOpen && (
           <div
-            className="md:hidden fixed inset-0 z-40 flex flex-col"
+            className="md:hidden fixed inset-0 z-40 flex flex-col overflow-y-auto"
             style={{ background: 'white', top: '104px' }}
           >
             <div className="flex flex-col p-6 gap-2">
-              {navLinks.map((link, i) => (
+              {navLinks.filter(link => !link.hasMenu).map((link, i) => (
                 <a
                   key={link.label}
                   href={link.href}
@@ -473,6 +473,41 @@ export default function Home() {
                   {link.label}
                 </a>
               ))}
+
+              {/* Products Section */}
+              <div className="py-3 border-b" style={{ borderColor: '#f1f5f9' }}>
+                <span className="text-xl font-semibold" style={{ color: '#004D8B' }}>Products</span>
+                <div className="grid grid-cols-2 gap-2 mt-3">
+                  {categories.slice(0, 6).map(cat => {
+                    const Icon = cat.icon
+                    return (
+                      <Link
+                        key={cat.id}
+                        href={`/products/${cat.id}`}
+                        onClick={() => setMenuOpen(false)}
+                        className="flex items-center gap-2 p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
+                      >
+                        <div
+                          className="w-8 h-8 rounded-md flex items-center justify-center flex-shrink-0"
+                          style={{ background: cat.color }}
+                        >
+                          <Icon className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-xs font-medium text-gray-700 line-clamp-2">{cat.title}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+                <Link
+                  href="/#products"
+                  onClick={() => setMenuOpen(false)}
+                  className="block mt-3 text-sm font-semibold text-center"
+                  style={{ color: '#bb0c15' }}
+                >
+                  View All Products →
+                </Link>
+              </div>
+
               <a
                 href="#"
                 className="text-xl font-semibold py-3 border-b"

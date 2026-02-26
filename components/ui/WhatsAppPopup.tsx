@@ -15,10 +15,10 @@ export default function WhatsAppPopup() {
       return
     }
 
-    // Show popup after 12 seconds
+    // Show popup after 3 seconds
     const timer = setTimeout(() => {
       setVisible(true)
-    }, 12000)
+    }, 3000)
 
     return () => clearTimeout(timer)
   }, [])
@@ -37,7 +37,7 @@ export default function WhatsAppPopup() {
 
   return (
     <div
-      className="fixed z-[9998] bottom-[200px] md:bottom-[170px] right-4 md:right-6"
+      className="fixed bottom-6 right-6 z-40 max-w-[260px]"
       style={{
         animation: 'popupSlideIn 0.4s ease-out',
       }}

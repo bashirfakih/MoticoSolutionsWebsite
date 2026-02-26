@@ -582,3 +582,17 @@ body {
     transform: translateY(-8px);
   }
 }
+
+/* Testimonial Marquee Animation */
+@keyframes testimonialScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.testimonial-marquee:hover {
+  animation-play-state: paused;
+}
