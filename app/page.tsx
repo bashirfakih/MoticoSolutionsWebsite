@@ -36,7 +36,7 @@ const categories = [
   { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/product-cutting-discs.png' },
   { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B', bg: '/product-points-burrs.png' },
   { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15', bg: '/product-hand-finishing-products.png' },
-  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004D8B', bg: 'product-polish-care-products.png' },
+  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004D8B', bg: '/product-polish-care-products.png' },
   { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/product-welding.png' },
   { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004D8B', bg: '/product-accessories.png' },
 ]
