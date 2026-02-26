@@ -5,6 +5,7 @@ import ScrollProgress from '@/components/ui/ScrollProgress'
 import CustomCursor from '@/components/ui/CustomCursor'
 import CookieConsent from '@/components/ui/CookieConsent'
 import WhatsAppPopup from '@/components/ui/WhatsAppPopup'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {children}
         <WhatsAppPopup />
         <CookieConsent />
+        <SpeedInsights />
       </body>
     </html>
   )
