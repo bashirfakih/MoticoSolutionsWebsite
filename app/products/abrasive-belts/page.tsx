@@ -23,7 +23,7 @@ const products = [
     name: 'Ceramic Grain Belts',
     category: 'Stock Removal',
     description: 'Self-sharpening ceramic grains for aggressive stock removal on hardened steels and exotic alloys.',
-    image: '/slide-1-grinding.png',
+    image: '/slide-1.png',
     badge: 'Best Seller',
   },
   {
@@ -39,7 +39,7 @@ const products = [
     name: 'Aluminum Oxide Belts',
     category: 'Finishing',
     description: 'Consistent scratch patterns for fine finishing and surface preparation.',
-    image: '/slide-5-abrasiv.png',
+    image: '/slide-5.png',
     badge: null,
   },
   {
@@ -55,7 +55,7 @@ const products = [
     name: 'Surface Conditioning Belts',
     category: 'Surface Conditioning',
     description: 'Perfect for deburring, blending, and creating uniform surface textures.',
-    image: '/slide-4-brush.png',
+    image: '/slide-4.png',
     badge: null,
   },
   {

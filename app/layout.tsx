@@ -4,7 +4,6 @@ import './globals.css'
 import ScrollProgress from '@/components/ui/ScrollProgress'
 import CustomCursor from '@/components/ui/CustomCursor'
 import CookieConsent from '@/components/ui/CookieConsent'
-import WhatsAppPopup from '@/components/ui/WhatsAppPopup'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -32,7 +31,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* CustomCursor disabled - causes floating red dot visual artifact */}
         {/* <CustomCursor /> */}
         {children}
-        <WhatsAppPopup />
         <CookieConsent />
         <SpeedInsights />
       </body>
