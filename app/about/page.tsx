@@ -1125,9 +1125,9 @@ export default function AboutPage() {
 
         {/* Main grid */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
             {/* Col 1 — Brand */}
-            <div className="col-span-2 md:col-span-1">
+            <div className="col-span-2 md:col-span-3 lg:col-span-1">
               <img src="/logo-moticosolutions-white.png" alt="Motico Solutions" className="h-8 w-auto object-contain mb-4" />
               <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 Premium industrial abrasives &amp; tools distributor. Serving MENA since 2004.
@@ -1177,19 +1177,32 @@ export default function AboutPage() {
               {
                 heading: 'Products',
                 links: [
-                  { label: 'Grinding Wheels', href: '/products/grinding-sleeves' },
                   { label: 'Abrasive Belts', href: '/products/abrasive-belts' },
+                  { label: 'Air & Power Tools', href: '/products/air-power-tools' },
+                  { label: 'Belt & Disc Sanders', href: '/products/belt-disc-sanders' },
+                  { label: 'Stationary Machines', href: '/products/stationary-machines' },
+                  { label: 'Grinding Sleeves', href: '/products/grinding-sleeves' },
+                  { label: 'Abrasive Discs', href: '/products/abrasive-discs' },
+                ],
+              },
+              {
+                heading: 'More Products',
+                links: [
                   { label: 'Cutting Discs', href: '/products/cutting-discs' },
-                  { label: 'Flap Discs', href: '/products/abrasive-discs' },
-                  { label: 'Power Tools', href: '/products/air-power-tools' },
+                  { label: 'Mounted Points', href: '/products/mounted-points' },
+                  { label: 'Hand Finishing', href: '/products/hand-finishing' },
+                  { label: 'Polish & Care', href: '/products/polish-care' },
+                  { label: 'Welding', href: '/products/welding' },
+                  { label: 'Accessories', href: '/products/accessories' },
                 ],
               },
               {
                 heading: 'Company',
                 links: [
                   { label: 'About Us', href: '/about' },
-                  { label: 'Our History', href: '/about#history' },
                   { label: 'Blog', href: '/blog' },
+                  { label: 'Our History', href: '/about' },
+                  { label: 'Contact Us', href: '/#cta' },
                 ],
               },
               {
@@ -1198,12 +1211,6 @@ export default function AboutPage() {
                   { label: 'FAQ', href: '/faq' },
                   { label: 'Shipping Policy', href: '/shipping' },
                   { label: 'Returns', href: '/returns' },
-                  { label: 'Contact Us', href: '/#cta' },
-                ],
-              },
-              {
-                heading: 'Legal',
-                links: [
                   { label: 'Privacy Policy', href: '/privacy' },
                   { label: 'Terms of Service', href: '/terms' },
                   { label: 'Cookie Policy', href: '/cookies' },
