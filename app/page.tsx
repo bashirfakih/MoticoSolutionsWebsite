@@ -8,7 +8,7 @@ import {
   Clock, Truck, ShieldCheck, Phone, Mail, MapPin,
   Menu, X, ChevronRight, ChevronLeft, ChevronDown, ArrowRight, CircleCheck,
   Facebook, Instagram, Linkedin, Youtube,
-  Star, Layers, Scissors, Wrench, Disc, Settings, Quote,
+  Star, Layers, Scissors, Wrench, Disc, Settings, Quote, Smartphone,
 } from 'lucide-react'
 import CountUp from '@/components/ui/CountUp'
 import RevealOnScroll from '@/components/ui/RevealOnScroll'
@@ -141,6 +141,9 @@ const testimonials = [
     company: 'Beirut Steel Works',
     quote: 'Motico Solutions has been our trusted partner for 8 years. Their Hermes belts outlast any competitor by 40%, and the technical support is unmatched.',
     rating: 5,
+    emoji: '🏭',
+    gradient: 'from-blue-500 to-cyan-500',
+    shadow: 'shadow-blue-500/40',
   },
   {
     name: 'Hassan Mansour',
@@ -148,6 +151,9 @@ const testimonials = [
     company: 'Gulf Metal Industries',
     quote: 'Switching to Motico cut our abrasive costs by 25% while improving finish quality. Their team understands industrial needs like no other.',
     rating: 5,
+    emoji: '⚙️',
+    gradient: 'from-cyan-500 to-teal-500',
+    shadow: 'shadow-cyan-500/40',
   },
   {
     name: 'Karim El-Masri',
@@ -155,6 +161,9 @@ const testimonials = [
     company: 'El-Masri Fabrication',
     quote: 'Fast delivery, premium products, expert advice. Motico is the gold standard for industrial abrasives in Lebanon.',
     rating: 5,
+    emoji: '🔧',
+    gradient: 'from-teal-500 to-emerald-500',
+    shadow: 'shadow-teal-500/40',
   },
   {
     name: 'Nabil Haddad',
@@ -162,6 +171,9 @@ const testimonials = [
     company: 'Arabian Manufacturing Co.',
     quote: 'We have been working with Motico for over 5 years. Their product quality and consistent supply chain have made them indispensable to our operations.',
     rating: 5,
+    emoji: '🛠️',
+    gradient: 'from-emerald-500 to-green-500',
+    shadow: 'shadow-emerald-500/40',
   },
   {
     name: 'Omar Farouk',
@@ -169,6 +181,9 @@ const testimonials = [
     company: 'West Africa Metals Ltd.',
     quote: 'Excellent range of products and competitive pricing. The team goes above and beyond to ensure we get exactly what we need for our projects.',
     rating: 5,
+    emoji: '📦',
+    gradient: 'from-green-500 to-lime-500',
+    shadow: 'shadow-green-500/40',
   },
 ]
 
@@ -183,6 +198,8 @@ export default function Home() {
   const [activeSlide, setActiveSlide] = useState(0)
   const [productsMenuOpen, setProductsMenuOpen] = useState(false)
   const [quoteFormOpen, setQuoteFormOpen] = useState(false)
+  const [activeTestimonial, setActiveTestimonial] = useState(0)
+  const [testimonialHovered, setTestimonialHovered] = useState(false)
   const heroRef = useRef<HTMLDivElement>(null)
   const featureRefs = useRef<(HTMLDivElement | null)[]>([])
   const productsMenuRef = useRef<HTMLDivElement>(null)
@@ -198,6 +215,15 @@ export default function Home() {
     }, 5000)
     return () => clearInterval(timer)
   }, [isPaused])
+
+  /* Auto-advance testimonial carousel */
+  useEffect(() => {
+    if (testimonialHovered) return
+    const timer = setInterval(() => {
+      setActiveTestimonial(prev => (prev + 1) % testimonials.length)
+    }, 3000)
+    return () => clearInterval(timer)
+  }, [testimonialHovered])
 
   /* Feature scroll spy */
   useEffect(() => {
@@ -1447,86 +1473,121 @@ export default function Home() {
             </div>
           </RevealOnScroll>
 
-          {/* Testimonials — Moving Cards */}
+          {/* Testimonials — 3D Rotating Carousel */}
           <RevealOnScroll delay={500}>
             <div className="mt-10 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-              <div className="text-center mb-10">
-                <span
-                  className="text-sm font-semibold uppercase tracking-widest"
-                  style={{ color: 'rgba(255,255,255,0.5)' }}
-                >
-                  What Our Clients Say
-                </span>
+              {/* Section Header */}
+              <div className="text-center mb-8">
+                <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">
+                  What Our <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Clients</span> Say
+                </h3>
+                <p className="text-gray-400 text-sm">Trusted by industry leaders across the Middle East</p>
               </div>
 
-              {/* Marquee Container */}
-              <div className="relative overflow-hidden">
-                {/* Fade edges */}
-                <div
-                  className="absolute left-0 top-0 bottom-0 w-20 z-10 pointer-events-none"
-                  style={{ background: 'linear-gradient(to right, #004D8B, transparent)' }}
-                />
-                <div
-                  className="absolute right-0 top-0 bottom-0 w-20 z-10 pointer-events-none"
-                  style={{ background: 'linear-gradient(to left, #004D8B, transparent)' }}
-                />
+              {/* 3D Carousel Container */}
+              <div
+                className="relative h-[420px] flex items-center justify-center overflow-hidden"
+                onMouseEnter={() => setTestimonialHovered(true)}
+                onMouseLeave={() => setTestimonialHovered(false)}
+              >
+                {testimonials.map((t, index) => {
+                  // Calculate offset from active card
+                  const offset = index - activeTestimonial
+                  // Handle wrapping for infinite loop feel
+                  const wrappedOffset = offset > testimonials.length / 2
+                    ? offset - testimonials.length
+                    : offset < -testimonials.length / 2
+                    ? offset + testimonials.length
+                    : offset
 
-                {/* Moving cards track */}
-                <div
-                  className="flex gap-6 testimonial-marquee"
-                  style={{
-                    width: 'fit-content',
-                    animation: 'testimonialScroll 40s linear infinite',
-                  }}
-                >
-                  {/* Duplicate testimonials for seamless loop */}
-                  {[...testimonials, ...testimonials].map((t, i) => (
+                  // Calculate 3D transforms based on offset
+                  const isCenter = wrappedOffset === 0
+                  const isVisible = Math.abs(wrappedOffset) <= 2
+
+                  // Position calculations
+                  const xOffset = wrappedOffset * 200
+                  const rotateY = wrappedOffset * 15
+                  const scale = isCenter ? 1 : 0.8
+                  const opacity = isCenter ? 1 : Math.abs(wrappedOffset) === 1 ? 0.7 : Math.abs(wrappedOffset) === 2 ? 0.4 : 0
+                  const zIndex = isCenter ? 10 : 5 - Math.abs(wrappedOffset)
+
+                  return (
                     <div
-                      key={`${t.name}-${i}`}
-                      className="rounded-2xl p-6 relative flex-shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+                      key={t.name}
+                      onClick={() => setActiveTestimonial(index)}
+                      className={`absolute w-72 h-96 cursor-pointer transition-all duration-500 ease-out ${!isCenter ? 'hover:opacity-80' : ''}`}
                       style={{
-                        width: 340,
-                        background: 'rgba(255,255,255,0.05)',
-                        border: '1px solid rgba(255,255,255,0.1)',
-                        backdropFilter: 'blur(8px)',
+                        transform: `translateX(${xOffset}px) rotateY(${rotateY}deg) scale(${scale})`,
+                        opacity: isVisible ? opacity : 0,
+                        zIndex,
+                        transformStyle: 'preserve-3d',
+                        perspective: '1000px',
                       }}
                     >
-                      <Quote
-                        className="absolute top-4 right-4 w-8 h-8"
-                        style={{ color: 'rgba(187,12,21,0.3)' }}
-                      />
-                      <div className="flex gap-1 mb-4">
-                        {[...Array(t.rating)].map((_, j) => (
-                          <Star
-                            key={j}
-                            className="w-4 h-4"
-                            style={{ color: '#f59e0b', fill: '#f59e0b' }}
-                          />
-                        ))}
-                      </div>
-                      <p
-                        className="text-sm leading-relaxed mb-6 text-left"
-                        style={{ color: 'rgba(255,255,255,0.7)' }}
-                      >
-                        &quot;{t.quote}&quot;
-                      </p>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm"
-                          style={{ background: i % 2 === 0 ? '#bb0c15' : '#004D8B' }}
-                        >
-                          {t.name.split(' ').map(n => n[0]).join('')}
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm text-white">{t.name}</div>
-                          <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                            {t.role}, {t.company}
+                      {/* Card with gradient border */}
+                      <div className={`w-full h-full p-[2px] rounded-3xl bg-gradient-to-br ${t.gradient} ${t.shadow} shadow-xl`}>
+                        <div className="w-full h-full bg-slate-900/95 backdrop-blur-xl rounded-3xl flex flex-col items-center justify-center p-6 text-center">
+                          {/* Emoji */}
+                          <span className="text-5xl mb-4">{t.emoji}</span>
+
+                          {/* Name */}
+                          <h4 className="text-xl font-bold text-white mb-2">{t.name}</h4>
+
+                          {/* Stars */}
+                          <div className="flex gap-0.5 mb-3">
+                            {[...Array(t.rating)].map((_, j) => (
+                              <svg
+                                key={j}
+                                className="w-5 h-5"
+                                viewBox="0 0 24 24"
+                                fill="url(#starGradient)"
+                              >
+                                <defs>
+                                  <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stopColor="#fbbf24" />
+                                    <stop offset="100%" stopColor="#f59e0b" />
+                                  </linearGradient>
+                                </defs>
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                              </svg>
+                            ))}
                           </div>
+
+                          {/* Role & Company */}
+                          <p className="text-gray-400 text-xs mb-4">{t.role}, {t.company}</p>
+
+                          {/* Quote (shortened for card) */}
+                          <p className="text-gray-300 text-sm leading-relaxed line-clamp-3">
+                            &quot;{t.quote.slice(0, 100)}...&quot;
+                          </p>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  )
+                })}
+              </div>
+
+              {/* Active card full quote */}
+              <div className="text-center max-w-2xl mx-auto mb-6 px-4">
+                <p className="text-gray-400 text-sm leading-relaxed">
+                  &quot;{testimonials[activeTestimonial].quote}&quot;
+                </p>
+              </div>
+
+              {/* Dot Indicators */}
+              <div className="flex justify-center gap-2">
+                {testimonials.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveTestimonial(index)}
+                    className={`h-2 rounded-full transition-all duration-300 ${
+                      index === activeTestimonial
+                        ? 'w-8 bg-gradient-to-r from-cyan-500 to-blue-500'
+                        : 'w-2 bg-white/20 hover:bg-white/40'
+                    }`}
+                    aria-label={`Go to testimonial ${index + 1}`}
+                  />
+                ))}
               </div>
             </div>
           </RevealOnScroll>
@@ -1728,7 +1789,7 @@ export default function Home() {
                   className="flex items-center gap-2.5 text-xs transition-colors hover:text-white"
                   style={{ color: 'rgba(255,255,255,0.5)' }}
                 >
-                  <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
+                  <Smartphone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
                   +961 3 741 565
                 </a>
                 <a
@@ -1838,7 +1899,7 @@ export default function Home() {
               <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
                 Developed by{' '}
                 <a
-                  href="https://dbfnexus.com"
+                  href="https://dbf-nexus.com"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="transition-colors"
