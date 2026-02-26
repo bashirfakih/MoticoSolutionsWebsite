@@ -1244,7 +1244,7 @@ export default function Home() {
               <RevealOnScroll>
                 <div className="relative rounded-2xl overflow-hidden mb-8 aspect-[4/3]">
                   <Image
-                    src="/slide-1-grinding.png"
+                    src="/slide-1.png"
                     alt="Industrial Excellence"
                     fill
                     className="object-cover"
@@ -1641,14 +1641,14 @@ export default function Home() {
                 excerpt: 'A comprehensive guide to selecting grinding wheels based on material, application, and finish requirements.',
                 category: 'Guides',
                 readTime: '5 min read',
-                image: '/slide-1-grinding.png',
+                image: '/slide-1.png',
               },
               {
                 title: 'Ceramic vs Zirconia Abrasives Explained',
                 excerpt: 'Understanding the differences between ceramic and zirconia abrasives and when to use each type.',
                 category: 'Technical',
                 readTime: '7 min read',
-                image: '/slide-5-abrasiv.png',
+                image: '/slide-5.png',
               },
               {
                 title: 'Extending Belt Life: Pro Tips',
