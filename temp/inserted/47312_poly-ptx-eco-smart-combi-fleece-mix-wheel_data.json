@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "orderNumber": "47312",
+    "slug": "poly-ptx-eco-smart-combi-fleece-mix-wheel",
+    "sourceUrl": "https://www.eisenblaetter.de/en/grinding-sleeves-wheels/189/poly-ptx-eco-smart-combi-fleece-mix-wheel?c=59",
+    "extractedAt": "2026-02-26T15:55:52.524Z"
+  },
+  "title": "POLY-PTX Eco Smart combi-fleece mix wheel",
+  "description": "Metal application: Matting, satin finishing, removal of light scratches, rust, oxide etc.\nWood application: Smoothing the surface, removing old paint, dirt etc.\n\nFeatures:\n- High-quality nylon fleece with versatile high-grade corundum abrasive fabric for even use over the entire service life\n- Higher material removal in less time than pure fleece wheels without intermediate layers of grinding flaps\n- Ideal speed: 1,000–2,000 min⁻¹\n- Maximum speed: 5,000 min⁻¹\n- Eco Smart holder for vibration-free work and 100% concentricity\n- Price advantage compared to normal tool holders (no costs for inner core, inner sleeves or cast resin)",
+  "specifications": {
+    "orderNumber": "47312",
+    "idealSpeed": "1,000–2,000 min⁻¹",
+    "maxSpeed": "5,000 min⁻¹",
+    "mount": "Eco Smart holder",
+    "material": "Nylon fleece with corundum abrasive fabric",
+    "productType": "Combi-fleece mix wheel",
+    "applications": [
+      "Metal",
+      "Wood"
+    ]
+  },
+  "images": [
+    {
+      "url": "https://www.eisenblaetter.de/media/image/57/8e/2c/POLY-PTXEcoSmartKombivliesMixRad105x100mmZBPd5HEuNIpQu_600x600.jpg",
+      "filename": "47312_poly-ptx-eco-smart-combi-fleece-mix-wheel_img_01_product-view.jpg",
+      "description": "Main product view"
+    }
+  ]
+}

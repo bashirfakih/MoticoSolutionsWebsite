@@ -1,0 +1,35 @@
+{
+  "meta": {
+    "orderNumber": "40019",
+    "slug": "poly-ptx-cotton-and-mirror-finish-polishing-rings",
+    "sourceUrl": "https://www.eisenblaetter.de/en/grinding-sleeves-wheels/195/poly-ptx-cotton-and-mirror-finish-polishing-rings",
+    "extractedAt": "2026-02-26T15:53:39.429Z"
+  },
+  "title": "POLY-PTX cotton and mirror finish polishing rings",
+  "description": "High-quality polishing rings (buffing discs) for high-gloss polishing with polishing pastes and creams on flat and uneven surfaces without scratches and streaks.\nThe cotton rings (impregnated) are ideal for the main polishing of non-ferrous metals such as aluminum and brass; the mirror finish rings medium (impregnated) and soft for stainless steel and the final mirror finish of non-ferrous metals.\n\nFeatures:\n- Material: cotton (impregnated) and, in the case of mirror finish rings, technical nonwoven\n- Open folding without additional seams for ideal adaptation to the shape of the workpiece\n- Dimensions: 100 x 10 mm\n- Ideal speed: 1,000–3,000 min⁻¹\n- Maximum speed: 5,000 min⁻¹\n- 8 pieces required for a full assembly of a 100 mm spline shaft",
+  "specifications": {
+    "orderNumber": "40019",
+    "dimensions": "100 x 10 mm",
+    "idealSpeed": "1,000–3,000 min⁻¹",
+    "maxSpeed": "5,000 min⁻¹",
+    "piecesPerShaft": 8,
+    "productType": "Polishing rings"
+  },
+  "images": [
+    {
+      "url": "https://www.eisenblaetter.de/media/image/61/2f/84/POLY-PTXBaumwollPolierringe100x10mm_600x600.jpg",
+      "filename": "40019_poly-ptx-cotton-and-mirror-finish-polishing-rings_img_01_product-view.jpg",
+      "description": "Main product view"
+    },
+    {
+      "url": "https://www.eisenblaetter.de/media/image/e4/0a/78/8BaumwollPolierringesindidealfr100mmKeilwelle_600x600.jpg",
+      "filename": "40019_poly-ptx-cotton-and-mirror-finish-polishing-rings_img_02_assembly-on-shaft.jpg",
+      "description": "8 rings assembled on 100mm spline shaft"
+    },
+    {
+      "url": "https://www.eisenblaetter.de/media/image/1e/44/d7/PerfekterSpiegelglanzaufRiffelblechen_600x600.jpg",
+      "filename": "40019_poly-ptx-cotton-and-mirror-finish-polishing-rings_img_03_mirror-finish-result.jpg",
+      "description": "Mirror finish result on checker plate"
+    }
+  ]
+}

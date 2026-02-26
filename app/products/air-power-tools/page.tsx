@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { ArrowLeft, Phone, MessageCircle } from 'lucide-react'
 
 // Filter Categories
-const categories = ["All", "Linear Grinders", "Belt Grinders", "Angle Grinders", "Power Files", "Multifunctional"]
+const categories = ["All", "Linear Grinders", "Belt Grinders", "Angle Grinders", "Polishers", "Power Files", "Multifunctional"]
 
 // Badge color mapping
 const badgeColorMap: Record<string, string> = {
@@ -65,6 +65,39 @@ const products = [
     description: 'Compact angle grinder with 1,100W variable speed. Smallest handle circumference in its class for fatigue-free grinding.',
     image: '/varilex-wsf-1100-compact-angle-grinder_01.jpg',
     badge: null,
+  },
+  // DCA Power Tools
+  {
+    slug: 'dca-asn100',
+    name: 'DCA ASN100 Sander Polisher',
+    category: 'Polishers',
+    description: '1400W sander polisher with adjustable speed and electronic constant speed control for consistent performance under load.',
+    image: '/dca-asn100_01.jpg',
+    badge: null,
+  },
+  {
+    slug: 'dca-ass150',
+    name: 'DCA ASS150 Stone Polisher',
+    category: 'Polishers',
+    description: '1020W stone polisher with adjustable speed, constant speed control, and water flow control for wet polishing applications.',
+    image: '/dca-ass150_01.jpg',
+    badge: null,
+  },
+  {
+    slug: 'dca-asm18-115',
+    name: 'DCA ASM18-115 Angle Grinder',
+    category: 'Angle Grinders',
+    description: 'Ultra-slim 860W angle grinder with only 178mm grip circumference. Powerful motor delivers 11800/min for optimum performance.',
+    image: '/dca-asm18-115_01.png',
+    badge: null,
+  },
+  {
+    slug: 'dca-asm04-125',
+    name: 'DCA ASM04-125 Angle Grinder',
+    category: 'Angle Grinders',
+    description: '1020W high power angle grinder with adjustable speed, constant output power under load, spindle lock, and slide switch.',
+    image: '/dca-asm04-125_01.png',
+    badge: 'Popular',
   },
 ]
 
