@@ -1,13 +1,41 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
-  ArrowLeft, ArrowRight, Phone, MessageCircle, Mail,
+  ArrowRight, Phone, MessageCircle, Mail, MapPin,
   Target, Shield, Users, Award, Sparkles, Factory,
-  Calendar, TrendingUp, Wrench, CheckCircle,
+  Calendar, TrendingUp, Wrench, CheckCircle, Smartphone,
+  Menu, X, ChevronDown, Layers, Settings, Package, Disc, Scissors, Star,
+  Facebook, Instagram, Linkedin, Youtube, Globe,
 } from 'lucide-react'
 import RevealOnScroll from '@/components/ui/RevealOnScroll'
+
+/* ─── Hooks ─────────────────────────────────────────────── */
+function useScrolled(threshold = 60) {
+  const [scrolled, setScrolled] = useState(false)
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > threshold)
+    handleScroll()
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [threshold])
+  return scrolled
+}
+
+/* ─── Product Categories Data ───────────────────────────── */
+const categories = [
+  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15' },
+  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B' },
+  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15' },
+  { id: 'stationary-machines', title: 'Stationary Machines', icon: Package, color: '#004D8B' },
+  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15' },
+  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004D8B' },
+  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15' },
+  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B' },
+  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15' },
+]
 
 /* ─── Timeline Data ───────────────────────────────────────── */
 const milestones = [
@@ -78,36 +106,209 @@ const services = [
 ]
 
 export default function AboutPage() {
+  const scrolled = useScrolled(60)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [productsMenuOpen, setProductsMenuOpen] = useState(false)
+
+  const navLinks = [
+    { label: 'Home', href: '/' },
+    { label: 'Products', href: '/products', hasMenu: true },
+    { label: 'About Us', href: '/about' },
+    { label: 'Contact', href: '/#cta' },
+  ]
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header
-        className="sticky top-0 z-50"
-        style={{
-          background: 'rgba(255,255,255,0.95)',
-          backdropFilter: 'blur(12px)',
-          borderBottom: '1px solid rgba(0,0,0,0.08)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-28 flex items-center justify-between">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm font-medium transition-colors hover:text-[#bb0c15]"
-            style={{ color: '#004D8B' }}
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-          <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-4">
-            <Image
-              src="/logo-motico-solutions.png"
-              alt="Motico Solutions"
-              width={200}
-              height={60}
-              className="h-24 w-auto"
-            />
-          </Link>
+      <header className="sticky top-0 z-50">
+        {/* Top bar */}
+        <div style={{ background: '#004D8B' }} className="py-2">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+            <div className="flex items-center gap-5">
+              <a href="tel:+9613741565" className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors">
+                <Phone className="w-3.5 h-3.5 text-white/40" />
+                +961 3 741 565
+              </a>
+              <a href="mailto:info@moticosolutions.com" className="hidden sm:flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors">
+                <Mail className="w-3.5 h-3.5 text-white/40" />
+                info@moticosolutions.com
+              </a>
+            </div>
+            <div className="flex items-center gap-2">
+              {[
+                { Icon: Facebook, label: 'Facebook' },
+                { Icon: Instagram, label: 'Instagram' },
+                { Icon: Linkedin, label: 'LinkedIn' },
+                { Icon: Youtube, label: 'YouTube' },
+              ].map(({ Icon, label }) => (
+                <a
+                  key={label}
+                  href="#"
+                  aria-label={label}
+                  className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
+                  style={{ background: 'rgba(255,255,255,0.08)' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = '#bb0c15')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+                >
+                  <Icon className="w-3.5 h-3.5 text-white" />
+                </a>
+              ))}
+              <span className="text-white/20 text-xs ml-1">|</span>
+              <span className="text-xs text-white/40 flex items-center gap-1 ml-1">
+                <Globe className="w-3 h-3" /> EN
+              </span>
+            </div>
+          </div>
         </div>
+
+        {/* Main navbar */}
+        <nav
+          style={{
+            background: scrolled ? 'rgba(255,255,255,0.97)' : 'white',
+            backdropFilter: scrolled ? 'blur(16px)' : 'none',
+            boxShadow: scrolled ? '0 1px 20px rgba(0,0,0,0.08)' : '0 1px 0 #f1f5f9',
+            transition: 'all 0.3s ease',
+          }}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
+            {/* Logo */}
+            <Link href="/" className="flex-shrink-0 mt-4">
+              <img src="/logo-motico-solutions.png" alt="Motico Solutions" className="h-24 w-auto object-contain" />
+            </Link>
+
+            {/* Desktop nav links */}
+            <div className="hidden md:flex items-center gap-6">
+              {navLinks.map(link => (
+                link.hasMenu ? (
+                  <div
+                    key={link.label}
+                    className="relative"
+                    onMouseEnter={() => setProductsMenuOpen(true)}
+                    onMouseLeave={() => setProductsMenuOpen(false)}
+                  >
+                    <button
+                      className="nav-link text-sm font-medium pb-0.5 flex items-center gap-1"
+                      style={{ color: productsMenuOpen ? '#004D8B' : '#4b5563' }}
+                    >
+                      {link.label}
+                      <ChevronDown
+                        className="w-3.5 h-3.5 transition-transform"
+                        style={{ transform: productsMenuOpen ? 'rotate(180deg)' : 'rotate(0)' }}
+                      />
+                    </button>
+                    {/* Mega Menu */}
+                    <div
+                      className="absolute top-full left-1/2 pt-3 transition-all duration-200"
+                      style={{
+                        transform: 'translateX(-50%)',
+                        opacity: productsMenuOpen ? 1 : 0,
+                        visibility: productsMenuOpen ? 'visible' : 'hidden',
+                        pointerEvents: productsMenuOpen ? 'auto' : 'none',
+                      }}
+                    >
+                      <div
+                        className="rounded-2xl p-6 grid grid-cols-3 gap-3"
+                        style={{
+                          background: 'white',
+                          boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
+                          border: '1px solid #e5e7eb',
+                          width: 520,
+                        }}
+                      >
+                        {categories.map(cat => {
+                          const Icon = cat.icon
+                          return (
+                            <Link
+                              key={cat.id}
+                              href={`/products/${cat.id}`}
+                              className="flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-gray-50 group"
+                              onClick={() => setProductsMenuOpen(false)}
+                            >
+                              <div
+                                className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                                style={{ background: cat.color }}
+                              >
+                                <Icon className="w-4 h-4 text-white" />
+                              </div>
+                              <span className="text-sm font-medium text-gray-700 group-hover:text-[#004D8B]">
+                                {cat.title}
+                              </span>
+                            </Link>
+                          )
+                        })}
+                        <Link
+                          href="/products"
+                          className="col-span-3 mt-2 pt-3 flex items-center justify-center gap-2 text-sm font-semibold transition-colors"
+                          style={{ borderTop: '1px solid #e5e7eb', color: '#bb0c15' }}
+                          onClick={() => setProductsMenuOpen(false)}
+                        >
+                          View All Products <ArrowRight className="w-4 h-4" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    className="nav-link text-sm font-medium pb-0.5"
+                    style={{ color: link.href === '/about' ? '#004D8B' : '#4b5563' }}
+                  >
+                    {link.label}
+                  </Link>
+                )
+              ))}
+            </div>
+
+            {/* Right buttons */}
+            <div className="hidden md:flex items-center gap-3">
+              <a
+                href="/#cta"
+                className="btn-shimmer text-sm font-semibold px-5 py-2 rounded-lg text-white active:scale-95 transition-transform"
+                style={{ background: '#bb0c15', boxShadow: '0 4px 14px rgba(220,38,38,0.3)' }}
+              >
+                Get Quote
+              </a>
+            </div>
+
+            {/* Mobile hamburger */}
+            <button
+              className="md:hidden p-2 rounded-lg"
+              style={{ color: '#004D8B' }}
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Toggle menu"
+            >
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </nav>
+
+        {/* Mobile menu */}
+        {menuOpen && (
+          <div className="md:hidden fixed inset-0 z-40 flex flex-col overflow-y-auto" style={{ background: 'white', top: '104px' }}>
+            <div className="flex flex-col p-6 gap-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className="text-xl font-semibold py-3 border-b"
+                  style={{ color: '#004D8B', borderColor: '#f1f5f9' }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+              <a
+                href="/#cta"
+                onClick={() => setMenuOpen(false)}
+                className="mt-4 text-center py-3 rounded-lg text-white font-semibold"
+                style={{ background: '#bb0c15' }}
+              >
+                Get Quote
+              </a>
+            </div>
+          </div>
+        )}
       </header>
 
       {/* Hero Section */}
@@ -916,17 +1117,147 @@ export default function AboutPage() {
       </section>
 
       {/* Footer */}
-      <footer
-        className="py-8 text-center"
-        style={{ background: '#080e1a', borderTop: '1px solid rgba(255,255,255,0.08)' }}
-      >
-        <Link
-          href="/"
-          className="text-sm transition-colors hover:text-[#bb0c15]"
-          style={{ color: 'rgba(255,255,255,0.4)' }}
-        >
-          ← Return to Motico Solutions
-        </Link>
+      <footer style={{ background: '#080e1a' }} aria-labelledby="footer-heading">
+        <h2 id="footer-heading" className="sr-only">Footer</h2>
+
+        {/* Top gradient border */}
+        <div style={{ height: 1, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)' }} />
+
+        {/* Main grid */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
+            {/* Col 1 — Brand */}
+            <div className="col-span-2 md:col-span-1">
+              <img src="/logo-moticosolutions-white.png" alt="Motico Solutions" className="h-8 w-auto object-contain mb-4" />
+              <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                Premium industrial abrasives &amp; tools distributor. Serving MENA since 2004.
+              </p>
+              <div className="flex flex-col gap-3 mb-6">
+                <a href="tel:+9613741565" className="flex items-center gap-2.5 text-xs transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <Smartphone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
+                  +961 3 741 565
+                </a>
+                <a href="tel:+9611558174" className="flex items-center gap-2.5 text-xs transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
+                  +961 1 558 174
+                </a>
+                <a href="mailto:info@moticosolutions.com" className="flex items-center gap-2.5 text-xs transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
+                  info@moticosolutions.com
+                </a>
+                <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
+                  Beirut, Lebanon
+                </div>
+              </div>
+              <div className="flex gap-2">
+                {[
+                  { Icon: Facebook, label: 'Facebook' },
+                  { Icon: Instagram, label: 'Instagram' },
+                  { Icon: Linkedin, label: 'LinkedIn' },
+                  { Icon: Youtube, label: 'YouTube' },
+                ].map(({ Icon, label }) => (
+                  <a
+                    key={label}
+                    href="#"
+                    aria-label={label}
+                    className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
+                    style={{ background: 'rgba(255,255,255,0.08)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = '#bb0c15')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
+                  >
+                    <Icon className="w-4 h-4 text-white" />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            {/* Footer columns */}
+            {[
+              {
+                heading: 'Products',
+                links: [
+                  { label: 'Grinding Wheels', href: '/products/grinding-sleeves' },
+                  { label: 'Abrasive Belts', href: '/products/abrasive-belts' },
+                  { label: 'Cutting Discs', href: '/products/cutting-discs' },
+                  { label: 'Flap Discs', href: '/products/abrasive-discs' },
+                  { label: 'Power Tools', href: '/products/air-power-tools' },
+                ],
+              },
+              {
+                heading: 'Company',
+                links: [
+                  { label: 'About Us', href: '/about' },
+                  { label: 'Our History', href: '/about#history' },
+                  { label: 'Blog', href: '/blog' },
+                ],
+              },
+              {
+                heading: 'Support',
+                links: [
+                  { label: 'FAQ', href: '/faq' },
+                  { label: 'Shipping Policy', href: '/shipping' },
+                  { label: 'Returns', href: '/returns' },
+                  { label: 'Contact Us', href: '/#cta' },
+                ],
+              },
+              {
+                heading: 'Legal',
+                links: [
+                  { label: 'Privacy Policy', href: '/privacy' },
+                  { label: 'Terms of Service', href: '/terms' },
+                  { label: 'Cookie Policy', href: '/cookies' },
+                ],
+              },
+            ].map(col => (
+              <div key={col.heading}>
+                <h3 className="text-sm font-semibold uppercase tracking-wider mb-5 pl-3" style={{ color: 'white', borderLeft: '2px solid #bb0c15' }}>
+                  {col.heading}
+                </h3>
+                <ul className="flex flex-col gap-2.5">
+                  {col.links.map(link => (
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="text-sm transition-colors"
+                        style={{ color: 'rgba(255,255,255,0.4)' }}
+                        onMouseEnter={e => (e.currentTarget.style.color = 'white')}
+                        onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="py-6" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                © 2026 Motico Solutions. All rights reserved.
+              </span>
+              <span className="hidden sm:inline text-xs" style={{ color: 'rgba(255,255,255,0.2)' }}>•</span>
+              <span className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                Developed by{' '}
+                <a href="https://dbf-nexus.com" target="_blank" rel="noopener noreferrer" className="transition-colors hover:text-[#bb0c15]" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                  DBF Nexus
+                </a>
+              </span>
+            </div>
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-xs transition-colors active:scale-95 hover:text-white"
+              style={{ color: 'rgba(255,255,255,0.3)' }}
+            >
+              Back to top ↑
+            </button>
+          </div>
+        </div>
       </footer>
     </div>
   )

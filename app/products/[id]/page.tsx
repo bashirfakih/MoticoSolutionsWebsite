@@ -58,11 +58,11 @@ const categoryData: Record<string, {
       { slug: 'disc-sander-300', name: '300mm Disc Sander', category: 'Disc Sanders', description: 'Heavy-duty disc sander for flat surface finishing.', image: '/product-belt-disc-sander.png', badge: 'Premium' },
     ],
   },
-  'stationery-machines': {
-    title: 'Stationery Machines',
-    heroTitle: 'Stationery',
+  'stationary-machines': {
+    title: 'Stationary Machines',
+    heroTitle: 'Stationary',
     heroAccent: 'Machines',
-    heroDescription: 'Industrial stationery grinding, polishing and finishing machines.',
+    heroDescription: 'Industrial stationary grinding, polishing and finishing machines.',
     heroImage: '/product-stationery-machines.png',
     categories: ['All', 'Grinders', 'Polishers', 'Multi-Purpose'],
     products: [

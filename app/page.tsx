@@ -30,7 +30,7 @@ const categories = [
   { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/product-abrasive-belts.png' },
   { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B', bg: '/product-air-power-tools.png' },
   { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/product-belt-disc-sander.png' },
-  { id: 'stationery-machines', title: 'Stationery Machines', icon: Package, color: '#004D8B', bg: '/product-stationery-machines.png' },
+  { id: 'stationary-machines', title: 'Stationary Machines', icon: Package, color: '#004D8B', bg: '/product-stationery-machines.png' },
   { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/product-grinding-sleeve-wheels.png' },
   { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004D8B', bg: '/product-abrasive-discs.png' },
   { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/product-cutting-discs.png' },
@@ -241,8 +241,8 @@ export default function Home() {
   }, [])
 
   const navLinks = [
-    { label: 'Home', href: '#' },
-    { label: 'Products', href: '#products', hasMenu: true },
+    { label: 'Home', href: '/' },
+    { label: 'Products', href: '/products', hasMenu: true },
     { label: 'About Us', href: '/about' },
     { label: 'Contact', href: '#cta' },
   ]
@@ -319,14 +319,14 @@ export default function Home() {
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
             {/* Logo */}
-            <a href="#" className="flex-shrink-0 mt-4">
+            <Link href="/" className="flex-shrink-0 mt-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/logo-motico-solutions.png"
                 alt="Motico Solutions"
                 className="h-24 w-auto object-contain"
               />
-            </a>
+            </Link>
 
             {/* Desktop nav links */}
             <div className="hidden md:flex items-center gap-6">
@@ -389,14 +389,14 @@ export default function Home() {
                             </Link>
                           )
                         })}
-                        <a
-                          href="#products"
+                        <Link
+                          href="/products"
                           className="col-span-3 mt-2 pt-3 flex items-center justify-center gap-2 text-sm font-semibold transition-colors"
                           style={{ borderTop: '1px solid #e5e7eb', color: '#bb0c15' }}
                           onClick={() => setProductsMenuOpen(false)}
                         >
                           View All Products <ArrowRight className="w-4 h-4" />
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -559,6 +559,7 @@ export default function Home() {
           HERO SECTION — Full Viewport Cinematic Slider
       ════════════════════════════════════════ */}
       <section
+        id="main-content"
         ref={heroRef}
         className="relative flex items-center overflow-hidden"
         style={{
@@ -1202,8 +1203,8 @@ export default function Home() {
           {/* Browse All Products CTA */}
           <RevealOnScroll delay={600}>
             <div className="flex justify-center mt-14">
-              <a
-                href="#"
+              <Link
+                href="/products"
                 className="btn-shimmer group inline-flex items-center gap-3 px-10 py-5 rounded-full text-white font-bold text-lg active:scale-95 transition-all"
                 style={{
                   background: '#bb0c15',
@@ -1220,7 +1221,7 @@ export default function Home() {
               >
                 View All 700+ Products
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </a>
+              </Link>
             </div>
           </RevealOnScroll>
         </div>
@@ -1288,13 +1289,13 @@ export default function Home() {
               </RevealOnScroll>
 
               <RevealOnScroll delay={300}>
-                <a
-                  href="#"
+                <Link
+                  href="/about"
                   className="inline-flex items-center gap-2 font-semibold text-sm transition-all hover:gap-3"
                   style={{ color: '#bb0c15' }}
                 >
                   Learn More About Us <ArrowRight className="w-4 h-4" />
-                </a>
+                </Link>
               </RevealOnScroll>
             </div>
 
@@ -1638,6 +1639,7 @@ export default function Home() {
             {[
               {
                 title: 'How to Choose the Right Grinding Wheel',
+                slug: 'how-to-choose-grinding-wheel',
                 excerpt: 'A comprehensive guide to selecting grinding wheels based on material, application, and finish requirements.',
                 category: 'Guides',
                 readTime: '5 min read',
@@ -1645,6 +1647,7 @@ export default function Home() {
               },
               {
                 title: 'Ceramic vs Zirconia Abrasives Explained',
+                slug: 'ceramic-vs-zirconia',
                 excerpt: 'Understanding the differences between ceramic and zirconia abrasives and when to use each type.',
                 category: 'Technical',
                 readTime: '7 min read',
@@ -1652,6 +1655,7 @@ export default function Home() {
               },
               {
                 title: 'Extending Belt Life: Pro Tips',
+                slug: 'extending-belt-life',
                 excerpt: 'Industry secrets to maximize the lifespan of your abrasive belts and reduce operational costs.',
                 category: 'Tips',
                 readTime: '4 min read',
@@ -1659,48 +1663,50 @@ export default function Home() {
               },
             ].map((article, i) => (
               <RevealOnScroll key={article.title} delay={i * 100}>
-                <article
-                  className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
-                  style={{ border: '1px solid rgba(0,0,0,0.05)' }}
-                >
-                  {/* Image */}
-                  <div className="relative h-48 overflow-hidden">
-                    <Image
-                      src={article.image}
-                      alt={article.title}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <div
-                      className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold"
-                      style={{
-                        background: i === 0 ? '#bb0c15' : i === 1 ? '#004D8B' : '#059669',
-                        color: 'white',
-                      }}
-                    >
-                      {article.category}
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="p-6">
-                    <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-[#004D8B] transition-colors">
-                      {article.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                      {article.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs text-gray-400">{article.readTime}</span>
-                      <span
-                        className="text-sm font-semibold flex items-center gap-1 transition-colors group-hover:text-[#bb0c15]"
-                        style={{ color: '#004D8B' }}
+                <Link href={`/blog/${article.slug}`}>
+                  <article
+                    className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+                    style={{ border: '1px solid rgba(0,0,0,0.05)' }}
+                  >
+                    {/* Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <Image
+                        src={article.image}
+                        alt={article.title}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      />
+                      <div
+                        className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold"
+                        style={{
+                          background: i === 0 ? '#bb0c15' : i === 1 ? '#004D8B' : '#059669',
+                          color: 'white',
+                        }}
                       >
-                        Read More <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                      </span>
+                        {article.category}
+                      </div>
                     </div>
-                  </div>
-                </article>
+
+                    {/* Content */}
+                    <div className="p-6">
+                      <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-[#004D8B] transition-colors">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                        {article.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-400">{article.readTime}</span>
+                        <span
+                          className="text-sm font-semibold flex items-center gap-1 transition-colors group-hover:text-[#bb0c15]"
+                          style={{ color: '#004D8B' }}
+                        >
+                          Read More <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                        </span>
+                      </div>
+                    </div>
+                  </article>
+                </Link>
               </RevealOnScroll>
             ))}
           </div>
@@ -1708,7 +1714,8 @@ export default function Home() {
           {/* View All CTA */}
           <RevealOnScroll delay={400}>
             <div className="flex justify-center mt-12">
-              <button
+              <Link
+                href="/blog"
                 className="inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all hover:scale-105 active:scale-95"
                 style={{
                   background: '#004D8B',
@@ -1717,7 +1724,7 @@ export default function Home() {
                 }}
               >
                 Browse All Articles <ArrowRight className="w-5 h-5" />
-              </button>
+              </Link>
             </div>
           </RevealOnScroll>
         </div>
@@ -1840,19 +1847,43 @@ export default function Home() {
             {[
               {
                 heading: 'Products',
-                links: ['Grinding Wheels', 'Abrasive Belts', 'Cutting Discs', 'Flap Discs', 'Power Tools', 'Specialty Items'],
+                links: [
+                  { label: 'Grinding Wheels', href: '/products/grinding-sleeves' },
+                  { label: 'Abrasive Belts', href: '/products/abrasive-belts' },
+                  { label: 'Cutting Discs', href: '/products/cutting-discs' },
+                  { label: 'Flap Discs', href: '/products/abrasive-discs' },
+                  { label: 'Power Tools', href: '/products/air-power-tools' },
+                  { label: 'Specialty Items', href: '/products/accessories' },
+                ],
               },
               {
                 heading: 'Company',
-                links: ['About Us', 'Our History', 'Careers', 'Press', 'Partners'],
+                links: [
+                  { label: 'About Us', href: '/about' },
+                  { label: 'Our History', href: '/about#history' },
+                  { label: 'Careers', href: '/about#careers' },
+                  { label: 'Press', href: '/about#press' },
+                  { label: 'Partners', href: '/about#partners' },
+                ],
               },
               {
                 heading: 'Support',
-                links: ['FAQ', 'Shipping Policy', 'Returns', 'Technical Support', 'Track Order'],
+                links: [
+                  { label: 'FAQ', href: '/faq' },
+                  { label: 'Shipping Policy', href: '/shipping' },
+                  { label: 'Returns', href: '/returns' },
+                  { label: 'Technical Support', href: '/#cta' },
+                  { label: 'Track Order', href: '/#cta' },
+                ],
               },
               {
                 heading: 'Connect',
-                links: ['Contact Us', 'Get a Quote', 'Distributor Portal', 'Newsletter'],
+                links: [
+                  { label: 'Contact Us', href: '/#cta' },
+                  { label: 'Get a Quote', href: '/#cta' },
+                  { label: 'Distributor Portal', href: '/#cta' },
+                  { label: 'Newsletter', href: '/#cta' },
+                ],
               },
             ].map(col => (
               <div key={col.heading}>
@@ -1867,16 +1898,16 @@ export default function Home() {
                 </h3>
                 <ul className="flex flex-col gap-2.5">
                   {col.links.map(link => (
-                    <li key={link}>
-                      <a
-                        href="#"
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
                         className="text-sm transition-colors"
                         style={{ color: 'rgba(255,255,255,0.4)' }}
                         onMouseEnter={e => (e.currentTarget.style.color = 'white')}
                         onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.4)')}
                       >
-                        {link}
-                      </a>
+                        {link.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -1912,17 +1943,21 @@ export default function Home() {
               </span>
             </div>
             <div className="flex items-center gap-4">
-              {['Privacy Policy', 'Terms', 'Cookies'].map((item, i) => (
-                <a
-                  key={item}
-                  href="#"
+              {[
+                { label: 'Privacy Policy', href: '/privacy' },
+                { label: 'Terms', href: '/terms' },
+                { label: 'Cookies', href: '/cookies' },
+              ].map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
                   className="text-xs transition-colors"
                   style={{ color: 'rgba(255,255,255,0.3)' }}
                   onMouseEnter={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
                   onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.3)')}
                 >
-                  {item}
-                </a>
+                  {item.label}
+                </Link>
               ))}
             </div>
             <button
