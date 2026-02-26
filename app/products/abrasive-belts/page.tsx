@@ -4,8 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
-  ArrowLeft, ArrowRight, Phone, MessageCircle,
-  Layers, Settings, Gauge, Zap, Sparkles, Award,
+  ArrowLeft, ArrowRight, Phone, MessageCircle, Layers,
 } from 'lucide-react'
 
 // Product Gallery Data
@@ -66,26 +65,6 @@ const products = [
   },
 ]
 
-const features = [
-  { icon: Sparkles, title: 'Superior Grain Technology', desc: 'Engineered abrasive grains for faster cutting and longer life' },
-  { icon: Award, title: 'Premium Brands', desc: 'Exclusive distributor for Hermes, 3M, and Eisenblätter' },
-  { icon: Gauge, title: 'All Grit Ranges', desc: 'P24 coarse to P1200 ultra-fine for any finish requirement' },
-  { icon: Zap, title: 'Heat Resistant', desc: 'Advanced backing materials prevent warping under load' },
-]
-
-const specs = {
-  grits: ['P24', 'P36', 'P40', 'P60', 'P80', 'P100', 'P120', 'P150', 'P180', 'P220', 'P320', 'P400', 'P600', 'P800', 'P1000', 'P1200'],
-  widths: ['10mm', '25mm', '50mm', '75mm', '100mm', '150mm', '200mm', '300mm', 'Custom'],
-  lengths: ['330mm', '457mm', '610mm', '915mm', '1000mm', '1500mm', '2000mm', '2500mm', '3000mm', 'Custom'],
-  materials: ['Steel', 'Stainless Steel', 'Aluminum', 'Titanium', 'Inconel', 'Wood', 'Composites', 'Glass', 'Plastics'],
-}
-
-const brands = [
-  { name: 'Hermes', logo: '/logo-hermes.png' },
-  { name: '3M', logo: '/logo-3m.png' },
-  { name: 'Eisenblätter', logo: '/logo-eisenblaetter.png' },
-]
-
 export default function AbrasiveBeltsPage() {
   const [hoveredCard, setHoveredCard] = useState<number | null>(null)
 
@@ -111,11 +90,11 @@ export default function AbrasiveBeltsPage() {
           </Link>
           <Link href="/">
             <Image
-              src="/logo-moticosolutions.png"
+              src="/logo-motico-solutions.png"
               alt="Motico Solutions"
-              width={120}
-              height={40}
-              className="h-8 w-auto"
+              width={200}
+              height={60}
+              className="h-16 w-auto"
             />
           </Link>
         </div>
@@ -190,48 +169,26 @@ export default function AbrasiveBeltsPage() {
         </div>
       </section>
 
-      {/* Features Bar */}
-      <section
-        className="py-12 border-b"
-        style={{
-          background: 'white',
-          borderColor: 'rgba(0,0,0,0.08)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {features.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="text-center">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4"
-                  style={{
-                    background: 'linear-gradient(135deg, rgba(187,12,21,0.1), rgba(187,12,21,0.05))',
-                    border: '1px solid rgba(187,12,21,0.15)',
-                  }}
-                >
-                  <Icon className="w-6 h-6 text-[#bb0c15]" />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-1">{title}</h3>
-                <p className="text-sm text-gray-500">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Product Gallery */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           {/* Section Header */}
           <div className="text-center mb-16">
             <h2
-              className="font-black text-gray-900 mb-4"
-              style={{ fontSize: 'clamp(32px, 5vw, 48px)', letterSpacing: '-0.02em' }}
+              className="font-black mb-4"
+              style={{
+                fontSize: 'clamp(32px, 5vw, 48px)',
+                letterSpacing: '-0.02em',
+                background: 'linear-gradient(135deg, #004D8B 0%, #0066b3 50%, #bb0c15 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+              }}
             >
-              Product Range
+              Abrasive Belts
             </h2>
             <p className="text-lg max-w-2xl mx-auto text-gray-500">
-              Click on any product to view detailed specifications, compatible materials, and technical data.
+              Click on any product to view detailed specifications and technical data.
             </p>
           </div>
 
@@ -326,161 +283,6 @@ export default function AbrasiveBeltsPage() {
                   }}
                 />
               </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Specifications */}
-      <section
-        className="py-20"
-        style={{
-          background: '#f8fafc',
-        }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2
-              className="font-black text-gray-900 mb-4"
-              style={{ fontSize: 'clamp(28px, 4vw, 40px)', letterSpacing: '-0.02em' }}
-            >
-              Available Specifications
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Grit Sizes */}
-            <div
-              className="rounded-2xl p-6 bg-white"
-              style={{
-                border: '1px solid rgba(0,0,0,0.08)',
-              }}
-            >
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#bb0c15]" />
-                Grit Sizes
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {specs.grits.map(grit => (
-                  <span
-                    key={grit}
-                    className="px-2 py-1 rounded text-xs font-medium"
-                    style={{
-                      background: '#f1f5f9',
-                      color: '#475569',
-                    }}
-                  >
-                    {grit}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Widths */}
-            <div
-              className="rounded-2xl p-6 bg-white"
-              style={{
-                border: '1px solid rgba(0,0,0,0.08)',
-              }}
-            >
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Settings className="w-5 h-5 text-[#004D8B]" />
-                Belt Widths
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {specs.widths.map(w => (
-                  <span
-                    key={w}
-                    className="px-2 py-1 rounded text-xs font-medium"
-                    style={{
-                      background: '#f1f5f9',
-                      color: '#475569',
-                    }}
-                  >
-                    {w}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Lengths */}
-            <div
-              className="rounded-2xl p-6 bg-white"
-              style={{
-                border: '1px solid rgba(0,0,0,0.08)',
-              }}
-            >
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Gauge className="w-5 h-5 text-[#bb0c15]" />
-                Belt Lengths
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {specs.lengths.map(l => (
-                  <span
-                    key={l}
-                    className="px-2 py-1 rounded text-xs font-medium"
-                    style={{
-                      background: '#f1f5f9',
-                      color: '#475569',
-                    }}
-                  >
-                    {l}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* Materials */}
-            <div
-              className="rounded-2xl p-6 bg-white"
-              style={{
-                border: '1px solid rgba(0,0,0,0.08)',
-              }}
-            >
-              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <Layers className="w-5 h-5 text-[#004D8B]" />
-                Compatible Materials
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {specs.materials.map(m => (
-                  <span
-                    key={m}
-                    className="px-2 py-1 rounded text-xs font-medium"
-                    style={{
-                      background: '#f1f5f9',
-                      color: '#475569',
-                    }}
-                  >
-                    {m}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Brands */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <span className="text-sm font-semibold uppercase tracking-widest text-gray-400">
-              Official Distributor
-            </span>
-          </div>
-          <div className="flex justify-center items-center gap-12 flex-wrap">
-            {brands.map(brand => (
-              <div
-                key={brand.name}
-                className="w-32 h-16 relative opacity-70 hover:opacity-100 transition-opacity"
-              >
-                <Image
-                  src={brand.logo}
-                  alt={brand.name}
-                  fill
-                  className="object-contain"
-                />
-              </div>
             ))}
           </div>
         </div>

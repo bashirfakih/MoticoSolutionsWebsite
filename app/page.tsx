@@ -30,14 +30,14 @@ const categories = [
   { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/product-abrasive-belts.png' },
   { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B', bg: '/product-air-power-tools.png' },
   { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/product-belt-disc-sander.png' },
-  { id: 'stationery-machines', title: 'Stationery Machines', icon: Package, color: '#004D8B', bg: '/slide-3-disc.png' },
-  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/slide-1-grinding.png' },
+  { id: 'stationery-machines', title: 'Stationery Machines', icon: Package, color: '#004D8B', bg: '/product-stationery-machines.png' },
+  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/product-grinding-sleeve-wheels.png' },
   { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004D8B', bg: '/product-abrasive-discs.png' },
   { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/product-cutting-discs.png' },
-  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B', bg: '/slide-5-abrasiv.png' },
-  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15', bg: '/slide-2-belt.png' },
-  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004D8B', bg: '/slide-4-brush.png' },
-  { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/slide-1-grinding.png' },
+  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B', bg: '/product-points-burrs.png' },
+  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15', bg: '/product-hand-finishing-products.png' },
+  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004D8B', bg: 'product-polish-care-products.png' },
+  { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/product-welding.png' },
   { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004D8B', bg: '/product-accessories.png' },
 ]
 
@@ -92,18 +92,18 @@ const brands = [
 /* ─── Hero Slides ───────────────────────────────────────── */
 const heroSlides = [
   {
-    image: '/slide-1-grinding.png',
+    image: '/slide-1.png',
     tag: 'GRINDING SOLUTIONS',
-    headline: ['Precision', 'That Cuts', 'Through Steel.'],
-    tagline: 'Industrial grinding wheels & cutting discs for every metal surface.',
+    headline: ['The first hand-held', ' linear grinder'],
+    tagline: 'The All-in-One Solution for Flat Surface Finishing on Stainless steel.',
     accent: '#bb0c15',
     accentSecondary: '#004D8B',
   },
   {
     image: '/slide-2-belt.png',
     tag: 'ABRASIVE BELTS',
-    headline: ['Surface', 'Finishing,', 'Perfected.'],
-    tagline: 'High-performance sanding belts in all grits, widths and lengths.',
+    headline: ['Premium Wood', 'Abrasives'],
+    tagline: 'Custom-converted wide belts tailored to your specific machinery and wood finishing requirements.',
     accent: '#004D8B',
     accentSecondary: '#bb0c15',
   },
@@ -116,18 +116,18 @@ const heroSlides = [
     accentSecondary: '#004D8B',
   },
   {
-    image: '/slide-4-brush.png',
+    image: '/slide-4.png',
     tag: 'WIRE BRUSHES',
-    headline: ['Clean.', 'Prepare.', 'Deliver.'],
-    tagline: 'Surface preparation tools trusted by 300+ businesses across MENA.',
+    headline: ['Surface', 'Finishing', 'Perfected'],
+    tagline: 'High-performance sanding belts in all grits, widths and lengths.',
     accent: '#004D8B',
     accentSecondary: '#bb0c15',
   },
   {
-    image: '/slide-5-abrasiv.png',
+    image: '/slide-5.png',
     tag: 'SPECIALTY ABRASIVES',
-    headline: ['Ceramic.', 'Zirconia.', 'Excellence.'],
-    tagline: 'Advanced abrasive solutions for the most demanding applications.',
+    headline: ['Industrial Wire Solutions'],
+    tagline: 'High-performance wire wheels and brushes engineered for heavy-duty deburring, rust removal, and professional metal finishing',
     accent: '#bb0c15',
     accentSecondary: '#004D8B',
   },
@@ -154,6 +154,20 @@ const testimonials = [
     role: 'Workshop Owner',
     company: 'El-Masri Fabrication',
     quote: 'Fast delivery, premium products, expert advice. Motico is the gold standard for industrial abrasives in Lebanon.',
+    rating: 5,
+  },
+  {
+    name: 'Nabil Haddad',
+    role: 'Maintenance Supervisor',
+    company: 'Arabian Manufacturing Co.',
+    quote: 'We have been working with Motico for over 5 years. Their product quality and consistent supply chain have made them indispensable to our operations.',
+    rating: 5,
+  },
+  {
+    name: 'Omar Farouk',
+    role: 'Procurement Manager',
+    company: 'West Africa Metals Ltd.',
+    quote: 'Excellent range of products and competitive pricing. The team goes above and beyond to ensure we get exactly what we need for our projects.',
     rating: 5,
   },
 ]
@@ -203,7 +217,7 @@ export default function Home() {
   const navLinks = [
     { label: 'Home', href: '#' },
     { label: 'Products', href: '#products', hasMenu: true },
-    { label: 'About Us', href: '#about' },
+    { label: 'About Us', href: '/about' },
     { label: 'Contact', href: '#cta' },
   ]
 
@@ -282,9 +296,9 @@ export default function Home() {
             <a href="#" className="flex-shrink-0">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/logo-moticosolutions.png"
+                src="/logo-motico-solutions.png"
                 alt="Motico Solutions"
-                className="h-11 w-auto object-contain"
+                className="h-24 w-auto object-contain"
               />
             </a>
 
@@ -517,7 +531,7 @@ export default function Home() {
               quality={85}
               className="object-cover"
               style={{
-                transform: activeSlide === i ? 'scale(1.06)' : 'scale(1.0)',
+                transform: activeSlide === i ? 'scale(1.04)' : 'scale(1.0)',
                 transition: 'transform 6s cubic-bezier(0.4, 0, 0.2, 1)',
               }}
             />
@@ -656,33 +670,6 @@ export default function Home() {
             </div>
           </div>
         </div>
-
-        {/* FLOATING TRUST BADGES */}
-        <div
-          className="float-badge hidden lg:flex absolute items-center gap-2 px-4 py-3 rounded-full bg-white shadow-xl"
-          style={{
-            top: '35%',
-            right: '12%',
-            zIndex: 20,
-            '--rot': '-3deg',
-          } as React.CSSProperties}
-        >
-          <Truck className="w-5 h-5 text-emerald-500" />
-          <span className="font-semibold text-sm text-gray-800">Free Shipping 24-48h</span>
-        </div>
-        <div
-          className="float-badge-delayed hidden lg:flex absolute items-center gap-2 px-4 py-2 rounded-full bg-white shadow-xl"
-          style={{
-            top: '55%',
-            right: '10%',
-            zIndex: 20,
-            '--rot': '3deg',
-          } as React.CSSProperties}
-        >
-          <ShieldCheck className="w-5 h-5 text-blue-500" />
-          <span className="font-semibold text-sm text-gray-800">ISO Certified</span>
-        </div>
-
 
         {/* HORIZONTAL PROGRESS DOTS — bottom center */}
         <div
@@ -1190,9 +1177,27 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
-            {/* LEFT — centered vertically */}
-            <div className="lg:self-center">
+            {/* LEFT — with image and text */}
+            <div className="lg:self-start">
+              {/* Image above text */}
               <RevealOnScroll>
+                <div className="relative rounded-2xl overflow-hidden mb-8 aspect-[4/3]">
+                  <Image
+                    src="/slide-1-grinding.png"
+                    alt="Industrial Excellence"
+                    fill
+                    className="object-cover"
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: 'linear-gradient(to top, rgba(0,77,139,0.3) 0%, transparent 50%)',
+                    }}
+                  />
+                </div>
+              </RevealOnScroll>
+
+              <RevealOnScroll delay={100}>
                 <div
                   className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] tracking-[0.12em] uppercase font-semibold mb-6"
                   style={{
@@ -1204,19 +1209,13 @@ export default function Home() {
                   Why Motico
                 </div>
               </RevealOnScroll>
-              <RevealOnScroll delay={100}>
+              <RevealOnScroll delay={150}>
                 <h2
                   id="why-heading"
                   className="font-black leading-none mb-6"
-                  style={{ fontSize: 'clamp(40px, 4vw, 56px)', color: '#004D8B', letterSpacing: '-0.02em' }}
+                  style={{ fontSize: 'clamp(36px, 3.5vw, 48px)', color: '#004D8B', letterSpacing: '-0.02em' }}
                 >
-                  Your Trusted
-                  <br />
-                  Partner in
-                  <br />
-                  Industrial
-                  <br />
-                  Excellence
+                  Your Trusted Partner in Industrial Excellence
                 </h2>
               </RevealOnScroll>
               <RevealOnScroll delay={200}>
@@ -1413,7 +1412,7 @@ export default function Home() {
             </div>
           </RevealOnScroll>
 
-          {/* Testimonials */}
+          {/* Testimonials — Moving Cards */}
           <RevealOnScroll delay={500}>
             <div className="mt-10 pt-8" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
               <div className="text-center mb-10">
@@ -1424,52 +1423,75 @@ export default function Home() {
                   What Our Clients Say
                 </span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                {testimonials.map((t, i) => (
-                  <div
-                    key={t.name}
-                    className="rounded-2xl p-6 relative"
-                    style={{
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      backdropFilter: 'blur(8px)',
-                    }}
-                  >
-                    <Quote
-                      className="absolute top-4 right-4 w-8 h-8"
-                      style={{ color: 'rgba(187,12,21,0.3)' }}
-                    />
-                    <div className="flex gap-1 mb-4">
-                      {[...Array(t.rating)].map((_, j) => (
-                        <Star
-                          key={j}
-                          className="w-4 h-4"
-                          style={{ color: '#f59e0b', fill: '#f59e0b' }}
-                        />
-                      ))}
-                    </div>
-                    <p
-                      className="text-sm leading-relaxed mb-6 text-left"
-                      style={{ color: 'rgba(255,255,255,0.7)' }}
+
+              {/* Marquee Container */}
+              <div className="relative overflow-hidden">
+                {/* Fade edges */}
+                <div
+                  className="absolute left-0 top-0 bottom-0 w-20 z-10 pointer-events-none"
+                  style={{ background: 'linear-gradient(to right, #004D8B, transparent)' }}
+                />
+                <div
+                  className="absolute right-0 top-0 bottom-0 w-20 z-10 pointer-events-none"
+                  style={{ background: 'linear-gradient(to left, #004D8B, transparent)' }}
+                />
+
+                {/* Moving cards track */}
+                <div
+                  className="flex gap-6 testimonial-marquee"
+                  style={{
+                    width: 'fit-content',
+                    animation: 'testimonialScroll 40s linear infinite',
+                  }}
+                >
+                  {/* Duplicate testimonials for seamless loop */}
+                  {[...testimonials, ...testimonials].map((t, i) => (
+                    <div
+                      key={`${t.name}-${i}`}
+                      className="rounded-2xl p-6 relative flex-shrink-0 transition-transform duration-300 hover:scale-[1.02]"
+                      style={{
+                        width: 340,
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        backdropFilter: 'blur(8px)',
+                      }}
                     >
-                      "{t.quote}"
-                    </p>
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm"
-                        style={{ background: i % 2 === 0 ? '#bb0c15' : '#004D8B' }}
-                      >
-                        {t.name.split(' ').map(n => n[0]).join('')}
+                      <Quote
+                        className="absolute top-4 right-4 w-8 h-8"
+                        style={{ color: 'rgba(187,12,21,0.3)' }}
+                      />
+                      <div className="flex gap-1 mb-4">
+                        {[...Array(t.rating)].map((_, j) => (
+                          <Star
+                            key={j}
+                            className="w-4 h-4"
+                            style={{ color: '#f59e0b', fill: '#f59e0b' }}
+                          />
+                        ))}
                       </div>
-                      <div>
-                        <div className="font-semibold text-sm text-white">{t.name}</div>
-                        <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                          {t.role}, {t.company}
+                      <p
+                        className="text-sm leading-relaxed mb-6 text-left"
+                        style={{ color: 'rgba(255,255,255,0.7)' }}
+                      >
+                        &quot;{t.quote}&quot;
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm"
+                          style={{ background: i % 2 === 0 ? '#bb0c15' : '#004D8B' }}
+                        >
+                          {t.name.split(' ').map(n => n[0]).join('')}
+                        </div>
+                        <div>
+                          <div className="font-semibold text-sm text-white">{t.name}</div>
+                          <div className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                            {t.role}, {t.company}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </RevealOnScroll>
@@ -1673,6 +1695,14 @@ export default function Home() {
                 >
                   <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
                   +961 3 741 565
+                </a>
+                <a
+                  href="tel:+9611558174"
+                  className="flex items-center gap-2.5 text-xs transition-colors hover:text-white"
+                  style={{ color: 'rgba(255,255,255,0.5)' }}
+                >
+                  <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
+                  +961 1 558 174
                 </a>
                 <a
                   href="mailto:info@moticosolutions.com"

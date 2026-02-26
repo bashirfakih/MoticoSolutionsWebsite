@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import {
   ArrowLeft, CheckCircle, ChevronLeft, ChevronRight,
-  MessageCircle, Download, ArrowRight, Layers,
+  MessageCircle, Download, ArrowRight, Layers, X, ZoomIn,
 } from 'lucide-react'
 
 // ═══════════════════════════════════════════════════════════════
@@ -292,6 +292,7 @@ export default function BeltProductPage() {
   const product = products[slug] || { ...defaultProduct, title: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }
 
   const [activeImage, setActiveImage] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   const nextImage = () => setActiveImage((prev) => (prev + 1) % product.images.length)
   const prevImage = () => setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length)
@@ -318,11 +319,11 @@ export default function BeltProductPage() {
           </Link>
           <Link href="/">
             <Image
-              src="/logo-moticosolutions.png"
+              src="/logo-motico-solutions.png"
               alt="Motico Solutions"
-              width={120}
-              height={40}
-              className="h-8 w-auto"
+              width={200}
+              height={60}
+              className="h-16 w-auto"
             />
           </Link>
         </div>
@@ -335,25 +336,32 @@ export default function BeltProductPage() {
           {/* Image Gallery */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100">
+            <div
+              className="relative aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-gray-50 to-gray-100 cursor-pointer group"
+              onClick={() => setLightboxOpen(true)}
+            >
               <Image
                 src={product.images[activeImage]}
                 alt={product.title}
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
                 priority
               />
+              {/* Zoom Indicator */}
+              <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                <ZoomIn className="w-5 h-5 text-gray-700" />
+              </div>
               {/* Navigation Arrows */}
               {product.images.length > 1 && (
                 <>
                   <button
-                    onClick={prevImage}
+                    onClick={(e) => { e.stopPropagation(); prevImage(); }}
                     className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 shadow-xl flex items-center justify-center hover:scale-110 transition-transform"
                   >
                     <ChevronLeft className="w-6 h-6 text-gray-800" />
                   </button>
                   <button
-                    onClick={nextImage}
+                    onClick={(e) => { e.stopPropagation(); nextImage(); }}
                     className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/95 shadow-xl flex items-center justify-center hover:scale-110 transition-transform"
                   >
                     <ChevronRight className="w-6 h-6 text-gray-800" />
@@ -408,23 +416,6 @@ export default function BeltProductPage() {
             <p className="text-lg sm:text-xl text-gray-600 leading-relaxed mb-8">
               {product.longDescription}
             </p>
-
-            {/* Brands */}
-            <div className="mb-8">
-              <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 block mb-3">
-                Available Brands
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {product.brands.map(brand => (
-                  <span
-                    key={brand}
-                    className="px-4 py-2 rounded-full text-sm font-semibold bg-gray-100 text-gray-700"
-                  >
-                    {brand}
-                  </span>
-                ))}
-              </div>
-            </div>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
@@ -485,24 +476,6 @@ export default function BeltProductPage() {
               ))}
             </div>
 
-            {/* Applications */}
-            <h2
-              className="text-2xl sm:text-3xl font-bold text-gray-900 mt-12 mb-8"
-              style={{ letterSpacing: '-0.01em' }}
-            >
-              Applications
-            </h2>
-            <div className="space-y-3">
-              {product.applications.map((app, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 text-gray-700"
-                >
-                  <ArrowRight className="w-5 h-5 text-[#bb0c15] flex-shrink-0" />
-                  <span className="font-medium">{app}</span>
-                </div>
-              ))}
-            </div>
           </div>
 
           {/* Technical Data */}
@@ -617,6 +590,81 @@ export default function BeltProductPage() {
           ← Back to Abrasive Belts Collection
         </Link>
       </footer>
+
+      {/* Image Lightbox Modal */}
+      {lightboxOpen && (
+        <div
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.95)' }}
+          onClick={() => setLightboxOpen(false)}
+        >
+          {/* Close Button */}
+          <button
+            onClick={() => setLightboxOpen(false)}
+            className="absolute top-6 right-6 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+          >
+            <X className="w-6 h-6 text-white" />
+          </button>
+
+          {/* Image Container */}
+          <div
+            className="relative w-full max-w-5xl aspect-[4/3]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={product.images[activeImage]}
+              alt={product.title}
+              fill
+              className="object-contain"
+              priority
+            />
+
+            {/* Navigation Arrows */}
+            {product.images.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                >
+                  <ChevronLeft className="w-8 h-8 text-white" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-14 h-14 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                >
+                  <ChevronRight className="w-8 h-8 text-white" />
+                </button>
+              </>
+            )}
+
+            {/* Image Counter */}
+            {product.images.length > 1 && (
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-black/60 text-white font-medium">
+                {activeImage + 1} / {product.images.length}
+              </div>
+            )}
+          </div>
+
+          {/* Thumbnails */}
+          {product.images.length > 1 && (
+            <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-3">
+              {product.images.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={(e) => { e.stopPropagation(); setActiveImage(i); }}
+                  className={`relative w-16 h-16 rounded-lg overflow-hidden transition-all ${
+                    activeImage === i
+                      ? 'ring-2 ring-white ring-offset-2 ring-offset-black/50'
+                      : 'opacity-50 hover:opacity-100'
+                  }`}
+                >
+                  <Image src={img} alt="" fill className="object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
