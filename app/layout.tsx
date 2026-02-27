@@ -6,6 +6,8 @@ import CookieConsent from '@/components/ui/CookieConsent'
 import BackToTop from '@/components/ui/BackToTop'
 import NavigationProgress from '@/components/ui/NavigationProgress'
 import { ThemeProvider } from '@/components/ui/ThemeProvider'
+import { AuthProvider } from '@/lib/auth/AuthContext'
+import { ToastProvider } from '@/components/ui/Toast'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Suspense } from 'react'
 
@@ -200,23 +202,27 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`${inter.className} bg-white dark:bg-[#0f172a] text-gray-900 dark:text-gray-100 transition-colors`}>
-        <ThemeProvider>
-          {/* Skip to content link for accessibility */}
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#004D8B] focus:text-white focus:rounded-lg focus:font-semibold"
-          >
-            Skip to main content
-          </a>
-          <Suspense fallback={null}>
-            <NavigationProgress />
-          </Suspense>
-          <ScrollProgress />
-          {children}
-          <CookieConsent />
-          <BackToTop />
-          <SpeedInsights />
-        </ThemeProvider>
+        <AuthProvider>
+          <ToastProvider>
+            <ThemeProvider>
+              {/* Skip to content link for accessibility */}
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-[#004D8B] focus:text-white focus:rounded-lg focus:font-semibold"
+              >
+                Skip to main content
+              </a>
+              <Suspense fallback={null}>
+                <NavigationProgress />
+              </Suspense>
+              <ScrollProgress />
+              {children}
+              <CookieConsent />
+              <BackToTop />
+              <SpeedInsights />
+            </ThemeProvider>
+          </ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   )
