@@ -13,10 +13,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ProductImage from '@/components/ui/ProductImage';
 import DataTable, { Column } from '@/components/admin/DataTable';
-import { StockIndicator } from '@/components/admin/StockBadge';
+import InlineStockEditor from '@/components/admin/InlineStockEditor';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
 import { STOCK_STATUS, StockStatus } from '@/lib/data/types';
+import { pluralize } from '@/lib/utils/formatting';
 
 // Types for API responses
 interface Product {
@@ -108,7 +109,8 @@ export default function AdminProductsPage() {
   const [actionMenuId, setActionMenuId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
-  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [isBulkActioning, setIsBulkActioning] = useState(false);
+  const [showBulkMenu, setShowBulkMenu] = useState(false);
 
   // Load data
   const loadData = useCallback(async () => {
@@ -196,6 +198,89 @@ export default function AdminProductsPage() {
     setFilters({});
     setSearch('');
     setPage(1);
+  };
+
+  // Update stock quantity (inline editing)
+  const handleUpdateStock = async (productId: string, newQuantity: number) => {
+    try {
+      const response = await fetch(`/api/products/${productId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stockQuantity: newQuantity }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update stock');
+      }
+
+      // Update local state
+      setProducts(prev => prev.map(p =>
+        p.id === productId ? { ...p, stockQuantity: newQuantity } : p
+      ));
+
+      toast.success('Stock updated');
+    } catch {
+      toast.error('Failed to update stock');
+      throw new Error('Failed to update stock');
+    }
+  };
+
+  // Bulk publish
+  const handleBulkPublish = async () => {
+    setShowBulkMenu(false);
+    setIsBulkActioning(true);
+    try {
+      const updatePromises = Array.from(selectedIds).map(id =>
+        fetch(`/api/products/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isPublished: true }),
+        })
+      );
+
+      const results = await Promise.allSettled(updatePromises);
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+
+      // Update local state
+      setProducts(prev => prev.map(p =>
+        selectedIds.has(p.id) ? { ...p, isPublished: true } : p
+      ));
+
+      toast.success(`${pluralize(successCount, 'product')} published`);
+      setSelectedIds(new Set());
+    } catch {
+      toast.error('Failed to publish products');
+    }
+    setIsBulkActioning(false);
+  };
+
+  // Bulk unpublish
+  const handleBulkUnpublish = async () => {
+    setShowBulkMenu(false);
+    setIsBulkActioning(true);
+    try {
+      const updatePromises = Array.from(selectedIds).map(id =>
+        fetch(`/api/products/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isPublished: false }),
+        })
+      );
+
+      const results = await Promise.allSettled(updatePromises);
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+
+      // Update local state
+      setProducts(prev => prev.map(p =>
+        selectedIds.has(p.id) ? { ...p, isPublished: false } : p
+      ));
+
+      toast.success(`${pluralize(successCount, 'product')} unpublished`);
+      setSelectedIds(new Set());
+    } catch {
+      toast.error('Failed to unpublish products');
+    }
+    setIsBulkActioning(false);
   };
 
   // Toggle publish status
@@ -328,7 +413,7 @@ export default function AdminProductsPage() {
 
   // Bulk delete
   const handleBulkDelete = async () => {
-    setIsBulkDeleting(true);
+    setIsBulkActioning(true);
     try {
       const deletePromises = Array.from(selectedIds).map(id =>
         fetch(`/api/products/${id}`, { method: 'DELETE' })
@@ -337,14 +422,14 @@ export default function AdminProductsPage() {
       const results = await Promise.allSettled(deletePromises);
       const successCount = results.filter(r => r.status === 'fulfilled').length;
 
-      toast.success(`${successCount} products deleted`);
+      toast.success(`${pluralize(successCount, 'product')} deleted`);
       setProducts(prev => prev.filter(p => !selectedIds.has(p.id)));
       setTotal(prev => prev - successCount);
       setSelectedIds(new Set());
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete products');
     }
-    setIsBulkDeleting(false);
+    setIsBulkActioning(false);
     setDeleteDialogOpen(false);
   };
 
@@ -418,9 +503,11 @@ export default function AdminProductsPage() {
       sortable: true,
       align: 'center',
       render: (product) => (
-        <StockIndicator
+        <InlineStockEditor
+          productId={product.id}
           quantity={product.stockQuantity}
           minLevel={product.minStockLevel}
+          onSave={handleUpdateStock}
         />
       ),
     },
@@ -541,7 +628,7 @@ export default function AdminProductsPage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Products</h1>
           <p className="text-gray-500 mt-1">
-            Manage your product catalog ({total} products)
+            Manage your product catalog ({pluralize(total, 'product')})
           </p>
         </div>
         <div className="flex gap-3">
@@ -699,7 +786,7 @@ export default function AdminProductsPage() {
       {selectedIds.size > 0 && (
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between">
           <span className="text-sm text-blue-800">
-            {selectedIds.size} product{selectedIds.size > 1 ? 's' : ''} selected
+            {pluralize(selectedIds.size, 'product')} selected
           </span>
           <div className="flex gap-2">
             <button
@@ -708,15 +795,57 @@ export default function AdminProductsPage() {
             >
               Clear selection
             </button>
-            <button
-              onClick={() => {
-                setProductToDelete(null);
-                setDeleteDialogOpen(true);
-              }}
-              className="px-3 py-1.5 text-sm text-red-600 bg-white border border-red-200 rounded hover:bg-red-50 transition-colors"
-            >
-              Delete selected
-            </button>
+
+            {/* Bulk Actions Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowBulkMenu(!showBulkMenu)}
+                disabled={isBulkActioning}
+                className="px-3 py-1.5 text-sm text-[#004D8B] bg-white border border-[#004D8B] rounded hover:bg-blue-50 transition-colors inline-flex items-center gap-1 disabled:opacity-50"
+              >
+                {isBulkActioning ? 'Processing...' : 'Bulk Actions'}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {showBulkMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowBulkMenu(false)}
+                  />
+                  <div className="absolute right-0 top-full mt-1 z-20 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-1">
+                    <button
+                      onClick={handleBulkPublish}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <Eye className="w-4 h-4" />
+                      Publish
+                    </button>
+                    <button
+                      onClick={handleBulkUnpublish}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <EyeOff className="w-4 h-4" />
+                      Unpublish
+                    </button>
+                    <hr className="my-1 border-gray-100" />
+                    <button
+                      onClick={() => {
+                        setShowBulkMenu(false);
+                        setProductToDelete(null);
+                        setDeleteDialogOpen(true);
+                      }}
+                      className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Delete
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -761,7 +890,7 @@ export default function AdminProductsPage() {
         }
         confirmText="Delete"
         variant="danger"
-        isLoading={isBulkDeleting}
+        isLoading={isBulkActioning}
       />
     </div>
   );

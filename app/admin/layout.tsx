@@ -16,6 +16,7 @@ import { usePathname } from 'next/navigation';
 import { AdminRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/lib/auth/AuthContext';
 import GlobalSearch from '@/components/admin/GlobalSearch';
+import CommandPalette from '@/components/admin/CommandPalette';
 import {
   LayoutDashboard,
   Users,
@@ -343,6 +344,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
+      {/* Command Palette */}
+      <CommandPalette />
+
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} badgeCounts={badgeCounts} />
 

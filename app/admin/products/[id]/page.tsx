@@ -15,6 +15,7 @@ import ImageUploader from '@/components/admin/ImageUploader';
 import { StockIndicator } from '@/components/admin/StockBadge';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
+import { useUnsavedChanges } from '@/lib/hooks/useUnsavedChanges';
 // Using API routes instead of localStorage services
 import {
   ProductImage,
@@ -120,6 +121,17 @@ export default function AdminProductEditPage() {
 
   // Dialog state
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  // Unsaved changes warning
+  const {
+    showDialog: showUnsavedDialog,
+    confirmLeave,
+    cancelLeave,
+    safeNavigate,
+  } = useUnsavedChanges({
+    hasChanges: hasUnsavedChanges,
+    message: 'You have unsaved changes. Are you sure you want to leave this page?',
+  });
 
   // Active tab
   const [activeTab, setActiveTab] = useState<'general' | 'media' | 'pricing' | 'inventory' | 'seo'>('general');
@@ -358,7 +370,7 @@ export default function AdminProductEditPage() {
 
         const product = await response.json();
         toast.success('Product created');
-        router.push(`/admin/products/${product.id}`);
+        safeNavigate(`/admin/products/${product.id}`);
       } else {
         const response = await fetch(`/api/products/${productId}`, {
           method: 'PATCH',
@@ -394,7 +406,7 @@ export default function AdminProductEditPage() {
       }
 
       toast.success('Product deleted');
-      router.push('/admin/products');
+      safeNavigate('/admin/products');
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : 'Failed to delete product');
     }
@@ -413,7 +425,7 @@ export default function AdminProductEditPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="max-w-5xl mx-auto pb-24">
       {/* Header */}
       <div className="mb-6">
         <Link
@@ -429,38 +441,12 @@ export default function AdminProductEditPage() {
             {isNew ? 'Add Product' : 'Edit Product'}
           </h1>
 
-          <div className="flex items-center gap-3">
-            {!isNew && (
-              <button
-                onClick={() => setShowDeleteDialog(true)}
-                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                Delete
-              </button>
-            )}
-            <button
-              onClick={() => handleSave(false)}
-              disabled={isSaving}
-              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-            >
-              {isSaving ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Save className="w-4 h-4" />
-              )}
-              Save Draft
-            </button>
-            <button
-              onClick={() => handleSave(true)}
-              disabled={isSaving}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003a6a] transition-colors disabled:opacity-50"
-            >
-              {isSaving ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : null}
-              {formData.isPublished ? 'Save & Publish' : 'Publish'}
-            </button>
-          </div>
+          {hasUnsavedChanges && (
+            <span className="text-sm text-amber-600 flex items-center gap-1">
+              <AlertTriangle className="w-4 h-4" />
+              Unsaved changes
+            </span>
+          )}
         </div>
       </div>
 
@@ -991,6 +977,51 @@ export default function AdminProductEditPage() {
         )}
       </div>
 
+      {/* Sticky Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-40">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {hasUnsavedChanges && (
+              <span className="text-sm text-amber-600 flex items-center gap-1">
+                <AlertTriangle className="w-4 h-4" />
+                Unsaved changes
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3">
+            {!isNew && (
+              <button
+                onClick={() => setShowDeleteDialog(true)}
+                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+              >
+                Delete
+              </button>
+            )}
+            <button
+              onClick={() => handleSave(false)}
+              disabled={isSaving}
+              className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 bg-white"
+            >
+              {isSaving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Save className="w-4 h-4" />
+              )}
+              Save Draft
+            </button>
+            <button
+              onClick={() => handleSave(true)}
+              disabled={isSaving}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003a6a] transition-colors disabled:opacity-50"
+            >
+              {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+              {formData.isPublished ? 'Save & Publish' : 'Publish'}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Delete Confirmation Dialog */}
       <ConfirmDialog
         isOpen={showDeleteDialog}
@@ -1000,6 +1031,18 @@ export default function AdminProductEditPage() {
         message={`Are you sure you want to delete "${formData.name}"? This action cannot be undone.`}
         confirmText="Delete"
         variant="danger"
+      />
+
+      {/* Unsaved Changes Dialog */}
+      <ConfirmDialog
+        isOpen={showUnsavedDialog}
+        onClose={cancelLeave}
+        onConfirm={confirmLeave}
+        title="Unsaved Changes"
+        message="You have unsaved changes. Are you sure you want to leave this page? Your changes will be lost."
+        confirmText="Leave Page"
+        cancelText="Stay"
+        variant="warning"
       />
     </div>
   );

@@ -13,6 +13,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { getDashboardStats, DashboardStats } from '@/lib/api/dashboardApi';
+import Sparkline from '@/components/admin/Sparkline';
 import {
   ShoppingCart,
   Users,
@@ -26,7 +27,10 @@ import {
   Plus,
   Mail,
   Loader2,
+  Clock,
+  MessageSquare,
 } from 'lucide-react';
+import { pluralize } from '@/lib/utils/formatting';
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -326,6 +330,109 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {/* Actionable Widgets */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Pending Orders Widget */}
+        <Link
+          href="/admin/orders?status=pending"
+          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-yellow-200 dark:hover:border-yellow-800 transition-all group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            {(data.orders.byStatus?.pending || 0) > 0 && (
+              <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-xs font-bold rounded-full">
+                Needs Attention
+              </span>
+            )}
+          </div>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-yellow-600 transition-colors">
+            {data.orders.byStatus?.pending || 0}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+            Pending Orders
+            <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </p>
+        </Link>
+
+        {/* Low Stock Widget */}
+        <Link
+          href="/admin/products?stockStatus=low_stock"
+          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-red-200 dark:hover:border-red-800 transition-all group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <Package className="w-5 h-5 text-red-600 dark:text-red-400" />
+            </div>
+            {data.alerts.lowStockProducts > 0 && (
+              <span className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-full">
+                Restock
+              </span>
+            )}
+          </div>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-red-600 transition-colors">
+            {data.alerts.lowStockProducts}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+            Low Stock Items
+            <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </p>
+        </Link>
+
+        {/* Unread Messages Widget */}
+        <Link
+          href="/admin/messages?status=unread"
+          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <MessageSquare className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            {data.alerts.unreadMessages > 0 && (
+              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-xs font-bold rounded-full">
+                New
+              </span>
+            )}
+          </div>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">
+            {data.alerts.unreadMessages}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+            Unread Messages
+            <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </p>
+        </Link>
+
+        {/* 7-Day Revenue Sparkline Widget */}
+        <Link
+          href="/admin/analytics"
+          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-green-200 dark:hover:border-green-800 transition-all group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
+            </div>
+            <div className="flex-1 ml-3">
+              <Sparkline
+                data={[100, 120, 90, 150, 130, 180, 200]}
+                width={80}
+                height={28}
+                strokeColor="#16a34a"
+                fillColor="rgba(22, 163, 74, 0.1)"
+              />
+            </div>
+          </div>
+          <p className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-green-600 transition-colors">
+            {formatCurrency(data.overview.totalRevenue)}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+            7-Day Revenue
+            <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </p>
+        </Link>
+      </div>
+
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => (
@@ -437,7 +544,7 @@ export default function AdminDashboard() {
               <div>
                 <p className="font-semibold text-gray-900 dark:text-white">Catalog</p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {data.overview.totalBrands} brands, {data.overview.totalCategories} categories
+                  {pluralize(data.overview.totalBrands, 'brand')}, {pluralize(data.overview.totalCategories, 'category', 'categories')}
                 </p>
               </div>
             </div>
