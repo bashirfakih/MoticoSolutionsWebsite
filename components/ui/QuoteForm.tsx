@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { X, Send, CheckCircle, Loader2 } from 'lucide-react'
 
 interface QuoteFormProps {
@@ -39,6 +39,25 @@ export default function QuoteForm({ isOpen, onClose, productName }: QuoteFormPro
     urgency: 'standard',
     message: '',
   })
+
+  // Handle Escape key to close modal
+  const handleEscape = useCallback((e: KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      onClose()
+    }
+  }, [onClose])
+
+  useEffect(() => {
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape)
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden'
+    }
+    return () => {
+      document.removeEventListener('keydown', handleEscape)
+      document.body.style.overflow = ''
+    }
+  }, [isOpen, handleEscape])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

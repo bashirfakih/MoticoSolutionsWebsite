@@ -24,6 +24,14 @@ function useScrolled(threshold = 60) {
   return scrolled
 }
 
+/* ─── Social Links ───────────────────────────────────────── */
+const socialLinks = {
+  facebook: 'https://facebook.com/moticosolutions',
+  instagram: 'https://instagram.com/moticosolutions',
+  linkedin: 'https://linkedin.com/company/motico-solutions',
+  youtube: 'https://youtube.com/@moticosolutions',
+}
+
 /* ─── Product Categories Data ───────────────────────────── */
 const categories = [
   { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15' },
@@ -136,14 +144,16 @@ export default function AboutPage() {
             </div>
             <div className="flex items-center gap-2">
               {[
-                { Icon: Facebook, label: 'Facebook' },
-                { Icon: Instagram, label: 'Instagram' },
-                { Icon: Linkedin, label: 'LinkedIn' },
-                { Icon: Youtube, label: 'YouTube' },
-              ].map(({ Icon, label }) => (
+                { Icon: Facebook, label: 'Facebook', href: socialLinks.facebook },
+                { Icon: Instagram, label: 'Instagram', href: socialLinks.instagram },
+                { Icon: Linkedin, label: 'LinkedIn', href: socialLinks.linkedin },
+                { Icon: Youtube, label: 'YouTube', href: socialLinks.youtube },
+              ].map(({ Icon, label, href }) => (
                 <a
                   key={label}
-                  href="#"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
                   style={{ background: 'rgba(255,255,255,0.08)' }}
@@ -154,7 +164,7 @@ export default function AboutPage() {
                 </a>
               ))}
               <span className="text-white/20 text-xs ml-1">|</span>
-              <span className="text-xs text-white/40 flex items-center gap-1 ml-1">
+              <span className="text-xs text-white/40 flex items-center gap-1 ml-1" title="Language: English">
                 <Globe className="w-3 h-3" /> EN
               </span>
             </div>
@@ -1128,7 +1138,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
             {/* Col 1 — Brand */}
             <div className="col-span-2 md:col-span-3 lg:col-span-1">
-              <img src="/logo-moticosolutions-white.png" alt="Motico Solutions" className="h-8 w-auto object-contain mb-4" />
+              <img src="/logo-moticosolutions-white.png" alt="Motico Solutions" className="h-8 w-auto object-contain mb-4" loading="lazy" />
               <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 Premium industrial abrasives &amp; tools distributor. Serving MENA since 2004.
               </p>
@@ -1152,14 +1162,16 @@ export default function AboutPage() {
               </div>
               <div className="flex gap-2">
                 {[
-                  { Icon: Facebook, label: 'Facebook' },
-                  { Icon: Instagram, label: 'Instagram' },
-                  { Icon: Linkedin, label: 'LinkedIn' },
-                  { Icon: Youtube, label: 'YouTube' },
-                ].map(({ Icon, label }) => (
+                  { Icon: Facebook, label: 'Facebook', href: socialLinks.facebook },
+                  { Icon: Instagram, label: 'Instagram', href: socialLinks.instagram },
+                  { Icon: Linkedin, label: 'LinkedIn', href: socialLinks.linkedin },
+                  { Icon: Youtube, label: 'YouTube', href: socialLinks.youtube },
+                ].map(({ Icon, label, href }) => (
                   <a
                     key={label}
-                    href="#"
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={label}
                     className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
                     style={{ background: 'rgba(255,255,255,0.08)' }}

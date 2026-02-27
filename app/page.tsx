@@ -7,12 +7,24 @@ import {
   BadgeCheck, Zap, Headphones, Package, Users, Globe,
   Clock, Truck, ShieldCheck, Phone, Mail, MapPin,
   Menu, X, ChevronRight, ChevronLeft, ChevronDown, ArrowRight, CircleCheck,
-  Facebook, Instagram, Linkedin, Youtube,
+  Facebook, Instagram, Linkedin, Youtube, MessageCircle,
   Star, Layers, Scissors, Wrench, Disc, Settings, Quote, Smartphone,
 } from 'lucide-react'
 import CountUp from '@/components/ui/CountUp'
 import RevealOnScroll from '@/components/ui/RevealOnScroll'
 import QuoteForm from '@/components/ui/QuoteForm'
+import SearchDropdown from '@/components/ui/SearchDropdown'
+import NewsletterForm from '@/components/ui/NewsletterForm'
+import FloatingActions from '@/components/ui/FloatingActions'
+import ThemeToggle from '@/components/ui/ThemeToggle'
+
+/* ─── Social Media Links ─────────────────────────────────── */
+const socialLinks = {
+  facebook: 'https://facebook.com/moticosolutions',
+  instagram: 'https://instagram.com/moticosolutions',
+  linkedin: 'https://linkedin.com/company/motico-solutions',
+  youtube: 'https://youtube.com/@moticosolutions',
+}
 
 /* ─── Hooks ─────────────────────────────────────────────── */
 function useScrolled(threshold = 60) {
@@ -27,18 +39,18 @@ function useScrolled(threshold = 60) {
 
 /* ─── Product Categories Data ───────────────────────────── */
 const categories = [
-  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/product-abrasive-belts.png' },
-  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B', bg: '/product-air-power-tools.png' },
-  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/product-belt-disc-sander.png' },
-  { id: 'stationary-machines', title: 'Stationary Machines', icon: Package, color: '#004D8B', bg: '/product-stationery-machines.png' },
-  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/product-grinding-sleeve-wheels.png' },
-  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004D8B', bg: '/product-abrasive-discs.png' },
-  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/product-cutting-discs.png' },
-  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B', bg: '/product-points-burrs.png' },
-  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15', bg: '/product-hand-finishing-products.png' },
-  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004D8B', bg: '/product-polish-care-products.png' },
-  { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/product-welding.png' },
-  { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004D8B', bg: '/product-accessories.png' },
+  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/product-abrasive-belts.png', brand: 'Hermes', productCount: '150+' },
+  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B', bg: '/product-air-power-tools.png', brand: 'DCA', productCount: '80+' },
+  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/product-belt-disc-sander.png', brand: 'ZAT', productCount: '45+' },
+  { id: 'stationary-machines', title: 'Stationary Machines', icon: Package, color: '#004D8B', bg: '/product-stationery-machines.png', brand: 'Hoffmann', productCount: '30+' },
+  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/product-grinding-sleeve-wheels.png', brand: 'Eisenblätter', productCount: '120+' },
+  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004D8B', bg: '/product-abrasive-discs.png', brand: 'Sandwox', productCount: '90+' },
+  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/product-cutting-discs.png', brand: 'Egeli', productCount: '60+' },
+  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B', bg: '/product-points-burrs.png', brand: 'NS', productCount: '40+' },
+  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15', bg: '/product-hand-finishing-products.png', brand: '3M', productCount: '55+' },
+  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004D8B', bg: '/product-polish-care-products.png', brand: '3M', productCount: '35+' },
+  { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/product-welding.png', brand: 'Sandwox', productCount: '25+' },
+  { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004D8B', bg: '/product-accessories.png', brand: 'Osborn', productCount: '70+' },
 ]
 
 /* ─── Why Motico Features ───────────────────────────────── */
@@ -281,14 +293,16 @@ export default function Home() {
             {/* Social icons + language */}
             <div className="flex items-center gap-2">
               {[
-                { Icon: Facebook, label: 'Facebook' },
-                { Icon: Instagram, label: 'Instagram' },
-                { Icon: Linkedin, label: 'LinkedIn' },
-                { Icon: Youtube, label: 'YouTube' },
-              ].map(({ Icon, label }) => (
+                { Icon: Facebook, label: 'Facebook', href: socialLinks.facebook },
+                { Icon: Instagram, label: 'Instagram', href: socialLinks.instagram },
+                { Icon: Linkedin, label: 'LinkedIn', href: socialLinks.linkedin },
+                { Icon: Youtube, label: 'YouTube', href: socialLinks.youtube },
+              ].map(({ Icon, label, href }) => (
                 <a
                   key={label}
-                  href="#"
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
                   style={{
@@ -301,9 +315,11 @@ export default function Home() {
                 </a>
               ))}
               <span className="text-white/20 text-xs ml-1">|</span>
-              <span className="text-xs text-white/40 flex items-center gap-1 ml-1">
+              <span className="text-xs text-white/40 flex items-center gap-1 ml-1" title="Language: English">
                 <Globe className="w-3 h-3" /> EN
               </span>
+              <span className="text-white/20 text-xs ml-1">|</span>
+              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -415,43 +431,31 @@ export default function Home() {
               ))}
 
               {/* Search */}
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  className="w-44 pl-9 pr-3 py-2 text-sm rounded-lg border border-gray-200 focus:border-[#004D8B] focus:outline-none focus:ring-1 focus:ring-[#004D8B] transition-all"
-                  style={{ background: '#f8fafc' }}
-                />
-                <svg
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
+              <SearchDropdown />
             </div>
 
             {/* Right buttons */}
             <div className="hidden md:flex items-center gap-3">
               <a
-                href="#"
-                className="text-sm font-medium px-4 py-2 rounded-lg border transition-all active:scale-95"
+                href="https://wa.me/9613741565"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium px-4 py-2 rounded-lg border transition-all active:scale-95 flex items-center gap-2"
                 style={{
-                  borderColor: '#e5e7eb',
-                  color: '#4b5563',
+                  borderColor: '#25D366',
+                  color: '#25D366',
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.borderColor = '#bb0c15'
-                  e.currentTarget.style.color = '#bb0c15'
+                  e.currentTarget.style.background = '#25D366'
+                  e.currentTarget.style.color = 'white'
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.borderColor = '#e5e7eb'
-                  e.currentTarget.style.color = '#4b5563'
+                  e.currentTarget.style.background = 'transparent'
+                  e.currentTarget.style.color = '#25D366'
                 }}
               >
-                Login
+                <MessageCircle className="w-4 h-4" />
+                WhatsApp
               </a>
               <a
                 href="#cta"
@@ -535,12 +539,15 @@ export default function Home() {
               </div>
 
               <a
-                href="#"
-                className="text-xl font-semibold py-3 border-b"
-                style={{ color: '#004D8B', borderColor: '#f1f5f9', animation: `lineReveal 0.4s cubic-bezier(0.16,1,0.3,1) ${4 * 60}ms both` }}
+                href="https://wa.me/9613741565"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xl font-semibold py-3 border-b flex items-center gap-2"
+                style={{ color: '#25D366', borderColor: '#f1f5f9', animation: `lineReveal 0.4s cubic-bezier(0.16,1,0.3,1) ${4 * 60}ms both` }}
                 onClick={() => setMenuOpen(false)}
               >
-                Login
+                <MessageCircle className="w-5 h-5" />
+                WhatsApp Us
               </a>
               <a
                 href="#cta"
@@ -561,7 +568,10 @@ export default function Home() {
       <section
         id="main-content"
         ref={heroRef}
-        className="relative flex items-center overflow-hidden"
+        role="region"
+        aria-roledescription="carousel"
+        aria-label="Product highlights slideshow"
+        className="hero-slider relative flex items-center overflow-hidden"
         style={{
           height: '100vh',
           minHeight: 700,
@@ -571,13 +581,11 @@ export default function Home() {
         onMouseLeave={() => setIsPaused(false)}
         aria-labelledby="hero-heading"
       >
-        <h1 id="hero-heading" className="sr-only">Industrial Excellence Delivered</h1>
-
         {/* LAYER 1 — Slide backgrounds (Next.js Image for WebP + optimization) */}
         {heroSlides.map((slide, i) => (
           <div
             key={i}
-            className="absolute inset-0"
+            className="hero-slide-bg absolute inset-0"
             style={{
               zIndex: 0,
               opacity: activeSlide === i ? 1 : 0,
@@ -638,10 +646,11 @@ export default function Home() {
             </div>
 
             {/* HEADLINE — 3 lines, staggered (mobile-optimized) */}
-            <div className="mb-4 sm:mb-6">
+            <h1 id="hero-heading" className="mb-4 sm:mb-6">
               {heroSlides[activeSlide].headline.map((line, idx) => (
-                <div key={idx} style={{ overflow: 'hidden' }}>
-                  <div
+                <span key={idx} className="block" style={{ overflow: 'hidden' }}>
+                  <span
+                    className="block"
                     style={{
                       fontSize: 'clamp(32px, 10vw, 96px)',
                       fontWeight: 900,
@@ -652,10 +661,10 @@ export default function Home() {
                     }}
                   >
                     {line}
-                  </div>
-                </div>
+                  </span>
+                </span>
               ))}
-            </div>
+            </h1>
 
             {/* TAGLINE TEXT */}
             <p
@@ -997,7 +1006,7 @@ export default function Home() {
       ════════════════════════════════════════ */}
       <section
         style={{ background: 'white' }}
-        className="py-12 relative"
+        className="py-16 relative"
         aria-labelledby="stats-heading"
       >
         <div
@@ -1053,7 +1062,7 @@ export default function Home() {
       <section
         id="products"
         style={{ background: '#f8fafc' }}
-        className="py-12"
+        className="py-16"
         aria-labelledby="products-heading"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -1086,7 +1095,7 @@ export default function Home() {
 
           {/* Spectacular Product Cards Grid — 3 columns x 4 rows */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map(({ id, title, icon: Icon, color, bg }, i) => (
+            {categories.map(({ id, title, icon: Icon, color, bg, brand, productCount }, i) => (
               <RevealOnScroll key={id} delay={i * 80}>
                 <Link href={`/products/${id}`} className="block">
                   <div
@@ -1148,31 +1157,42 @@ export default function Home() {
                         {title}
                       </h3>
 
-                      {/* Category Badge */}
-                      <div
-                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider"
-                        style={{
-                          background: 'rgba(255,255,255,0.1)',
-                          backdropFilter: 'blur(8px)',
-                          color: 'rgba(255,255,255,0.8)',
-                          border: '1px solid rgba(255,255,255,0.15)',
-                        }}
-                      >
-                        <span
-                          className="w-1.5 h-1.5 rounded-full"
-                          style={{ background: '#bb0c15' }}
-                        />
-                        Industrial Grade
+                      {/* Brand & Count Badges */}
+                      <div className="flex flex-wrap gap-2">
+                        <div
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider"
+                          style={{
+                            background: 'rgba(255,255,255,0.15)',
+                            backdropFilter: 'blur(8px)',
+                            color: 'white',
+                            border: '1px solid rgba(255,255,255,0.2)',
+                          }}
+                        >
+                          <span
+                            className="w-1.5 h-1.5 rounded-full"
+                            style={{ background: '#bb0c15' }}
+                          />
+                          {brand}
+                        </div>
+                        <div
+                          className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold"
+                          style={{
+                            background: 'rgba(187,12,21,0.3)',
+                            color: 'white',
+                          }}
+                        >
+                          {productCount} products
+                        </div>
                       </div>
                     </div>
 
                     {/* Bottom Section */}
                     <div className="flex items-center justify-between">
                       <span
-                        className="text-sm font-medium"
+                        className="card-explore-text text-sm font-medium transition-colors duration-300"
                         style={{ color: 'rgba(255,255,255,0.6)' }}
                       >
-                        Explore Products
+                        Explore Products →
                       </span>
                       <div
                         className="card-arrow w-10 h-10 rounded-full flex items-center justify-center"
@@ -1233,7 +1253,7 @@ export default function Home() {
       <section
         id="about"
         style={{ background: 'white' }}
-        className="py-12"
+        className="py-16"
         aria-labelledby="why-heading"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -1365,7 +1385,7 @@ export default function Home() {
       ════════════════════════════════════════ */}
       <section
         id="cta"
-        className="relative py-16 overflow-hidden hero-grain"
+        className="relative py-24 overflow-hidden hero-grain"
         style={{ background: '#004D8B' }}
         aria-labelledby="cta-heading"
       >
@@ -1464,7 +1484,7 @@ export default function Home() {
             </div>
           </RevealOnScroll>
           <RevealOnScroll delay={400}>
-            <div className="flex flex-wrap gap-6 justify-center">
+            <div className="flex flex-wrap gap-6 justify-center mb-6">
               {['Free Consultation', 'Competitive Pricing', '24h Response'].map(item => (
                 <div key={item} className="flex items-center gap-2">
                   <CircleCheck className="w-4 h-4 text-emerald-400" />
@@ -1472,6 +1492,17 @@ export default function Home() {
                 </div>
               ))}
             </div>
+            <a
+              href="/catalogs/motico-solutions-catalog-2025.pdf"
+              download
+              className="inline-flex items-center gap-2 text-sm font-medium transition-colors"
+              style={{ color: 'rgba(255,255,255,0.6)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'white')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+            >
+              <Package className="w-4 h-4" />
+              Download Full Product Catalog (PDF)
+            </a>
           </RevealOnScroll>
 
           {/* Testimonials — 3D Rotating Carousel */}
@@ -1487,6 +1518,9 @@ export default function Home() {
 
               {/* 3D Carousel Container */}
               <div
+                role="region"
+                aria-roledescription="carousel"
+                aria-label="Customer testimonials"
                 className="relative h-[420px] flex items-center justify-center overflow-hidden"
                 onMouseEnter={() => setTestimonialHovered(true)}
                 onMouseLeave={() => setTestimonialHovered(false)}
@@ -1600,7 +1634,7 @@ export default function Home() {
       ════════════════════════════════════════ */}
       <section
         id="resources"
-        className="py-20"
+        className="py-16"
         style={{ background: '#f8fafc' }}
         aria-labelledby="resources-heading"
       >
@@ -1743,6 +1777,7 @@ export default function Home() {
         <div
           className="py-10"
           style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+          data-dark-bg
         >
           <div className="max-w-2xl mx-auto px-4 sm:px-6">
             <div className="flex flex-col items-center gap-4">
@@ -1751,26 +1786,7 @@ export default function Home() {
                   Stay in the loop — get product news &amp; exclusive offers
                 </p>
               </div>
-              <div className="flex items-center gap-3 w-full max-w-md">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="flex-1 rounded-xl px-4 py-3 text-sm text-white outline-none transition-all"
-                  style={{
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.1)',
-                    color: 'white',
-                  }}
-                  onFocus={e => (e.target.style.borderColor = 'rgba(220,38,38,0.5)')}
-                  onBlur={e => (e.target.style.borderColor = 'rgba(255,255,255,0.1)')}
-                />
-                <button
-                  className="btn-shimmer px-5 py-3 rounded-xl text-white text-sm font-semibold active:scale-95 transition-transform flex-shrink-0"
-                  style={{ background: '#bb0c15' }}
-                >
-                  Subscribe →
-                </button>
-              </div>
+              <NewsletterForm />
             </div>
           </div>
         </div>
@@ -1823,14 +1839,16 @@ export default function Home() {
               {/* Social icons */}
               <div className="flex gap-2">
                 {[
-                  { Icon: Facebook, label: 'Facebook' },
-                  { Icon: Instagram, label: 'Instagram' },
-                  { Icon: Linkedin, label: 'LinkedIn' },
-                  { Icon: Youtube, label: 'YouTube' },
-                ].map(({ Icon, label }) => (
+                  { Icon: Facebook, label: 'Facebook', href: socialLinks.facebook },
+                  { Icon: Instagram, label: 'Instagram', href: socialLinks.instagram },
+                  { Icon: Linkedin, label: 'LinkedIn', href: socialLinks.linkedin },
+                  { Icon: Youtube, label: 'YouTube', href: socialLinks.youtube },
+                ].map(({ Icon, label, href }) => (
                   <a
                     key={label}
-                    href="#"
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     aria-label={label}
                     className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
                     style={{ background: 'rgba(255,255,255,0.08)' }}
@@ -1976,99 +1994,9 @@ export default function Home() {
       </footer>
 
       {/* ════════════════════════════════════════
-          WHATSAPP FLOATING BUTTON
+          FLOATING ACTION BUTTONS
       ════════════════════════════════════════ */}
-      <a
-        href="https://wa.me/9613741565?text=Hello%20Motico%20Solutions!%20I%27m%20interested%20in%20your%20industrial%20products."
-        target="_blank"
-        rel="noopener noreferrer"
-        className="whatsapp-btn fixed z-50 flex items-center gap-3 group bottom-[140px] md:bottom-[100px] right-4 md:right-6"
-        aria-label="Chat on WhatsApp"
-      >
-        {/* Tooltip */}
-        <div
-          className="hidden md:flex items-center px-4 py-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0"
-          style={{
-            background: 'white',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            color: '#004D8B',
-            fontSize: 13,
-            fontWeight: 600,
-          }}
-        >
-          Chat with us!
-        </div>
-
-        {/* WhatsApp Button */}
-        <div
-          className="relative flex items-center justify-center w-14 h-14 rounded-full transition-all duration-300 group-hover:scale-110"
-          style={{
-            background: '#25D366',
-            boxShadow: '0 4px 20px rgba(37, 211, 102, 0.4)',
-          }}
-        >
-          {/* Pulse ring */}
-          <div
-            className="absolute inset-0 rounded-full animate-ping"
-            style={{
-              background: '#25D366',
-              opacity: 0.3,
-              animationDuration: '2s',
-            }}
-          />
-
-          {/* WhatsApp Icon */}
-          <svg
-            className="w-7 h-7 text-white relative z-10"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-        </div>
-      </a>
-
-      {/* ════════════════════════════════════════
-          STICKY MOBILE CTA BAR
-      ════════════════════════════════════════ */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-[9999] md:hidden"
-        style={{
-          background: 'rgba(10, 22, 40, 0.98)',
-          backdropFilter: 'blur(12px)',
-          borderTop: '1px solid rgba(255,255,255,0.1)',
-          paddingBottom: 'env(safe-area-inset-bottom)',
-        }}
-      >
-        <div className="flex items-center gap-3 px-4 py-3">
-          {/* Call Button */}
-          <a
-            href="tel:+9613741565"
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-sm transition-all active:scale-95"
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              color: 'white',
-            }}
-          >
-            <Phone className="w-4 h-4" />
-            Call Now
-          </a>
-
-          {/* Get Quote Button */}
-          <button
-            onClick={() => setQuoteFormOpen(true)}
-            className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm text-white transition-all active:scale-95"
-            style={{
-              background: '#bb0c15',
-              boxShadow: '0 4px 15px rgba(187,12,21,0.4)',
-            }}
-          >
-            <ArrowRight className="w-4 h-4" />
-            Get Quote
-          </button>
-        </div>
-      </div>
+      <FloatingActions onQuoteClick={() => setQuoteFormOpen(true)} />
 
       {/* Quote Form Modal */}
       <QuoteForm isOpen={quoteFormOpen} onClose={() => setQuoteFormOpen(false)} />
