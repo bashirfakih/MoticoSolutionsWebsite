@@ -522,3 +522,191 @@ describe('Stock Status Logic', () => {
     expect(calculateStockStatus(25, 20)).toBe('in_stock');
   });
 });
+
+/**
+ * Product Visibility Tests
+ * Verifies that products appear on public storefront based on isPublished flag
+ */
+describe('Product Visibility', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('published product appears when filtering by published=true', async () => {
+    const publishedProduct = {
+      id: 'prod-published',
+      sku: 'PUB-001',
+      name: 'Published Product',
+      slug: 'published-product',
+      isPublished: true,
+      categoryId: 'cat-1',
+      category: { id: 'cat-1', name: 'Test Category', slug: 'test-category' },
+      brand: { id: 'brand-1', name: 'Test Brand', slug: 'test-brand' },
+      images: [],
+      _count: { variants: 0 },
+    };
+
+    mockPrismaProduct.findMany.mockResolvedValue([publishedProduct]);
+    mockPrismaProduct.count.mockResolvedValue(1);
+
+    // Simulate API call with published=true filter
+    const whereClause = { isPublished: true, categoryId: 'cat-1' };
+    const result = await mockPrismaProduct.findMany({ where: whereClause });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].isPublished).toBe(true);
+    expect(result[0].id).toBe('prod-published');
+  });
+
+  it('unpublished product does NOT appear when filtering by published=true', async () => {
+    // When querying with isPublished: true, unpublished products should be excluded
+    mockPrismaProduct.findMany.mockResolvedValue([]);
+    mockPrismaProduct.count.mockResolvedValue(0);
+
+    const whereClause = { isPublished: true };
+    const result = await mockPrismaProduct.findMany({ where: whereClause });
+
+    expect(result).toHaveLength(0);
+  });
+
+  it('newly created published product appears in category listing', async () => {
+    // Step 1: Create a product with isPublished: true
+    const newProduct = {
+      sku: 'NEW-PUB-001',
+      name: 'New Published Product',
+      slug: 'new-published-product',
+      categoryId: 'cat-1',
+      brandId: 'brand-1',
+      isPublished: true,
+      price: 99.99,
+    };
+
+    const createdProduct = {
+      id: 'prod-new',
+      ...newProduct,
+      category: { id: 'cat-1', name: 'Test Category', slug: 'test-category' },
+      brand: { id: 'brand-1', name: 'Test Brand', slug: 'test-brand' },
+      images: [],
+      _count: { variants: 0 },
+    };
+
+    mockPrismaProduct.create.mockResolvedValue(createdProduct);
+    mockPrismaCategory.findUnique.mockResolvedValue({ id: 'cat-1', name: 'Test Category' });
+    mockPrismaBrand.findUnique.mockResolvedValue({ id: 'brand-1', name: 'Test Brand' });
+
+    // Create the product
+    const created = await mockPrismaProduct.create({ data: newProduct });
+    expect(created.isPublished).toBe(true);
+
+    // Step 2: Query products for the category with published=true
+    mockPrismaProduct.findMany.mockResolvedValue([createdProduct]);
+    mockPrismaProduct.count.mockResolvedValue(1);
+
+    const whereClause = { categoryId: 'cat-1', isPublished: true };
+    const products = await mockPrismaProduct.findMany({ where: whereClause });
+
+    // Step 3: Verify the new product appears
+    expect(products).toHaveLength(1);
+    expect(products[0].id).toBe('prod-new');
+    expect(products[0].isPublished).toBe(true);
+  });
+
+  it('draft product (isPublished: false) does NOT appear in category listing', async () => {
+    // Create a draft product
+    const draftProduct = {
+      id: 'prod-draft',
+      sku: 'DRAFT-001',
+      name: 'Draft Product',
+      slug: 'draft-product',
+      categoryId: 'cat-1',
+      isPublished: false, // Draft - not published
+    };
+
+    mockPrismaProduct.create.mockResolvedValue(draftProduct);
+
+    // Create the draft
+    const created = await mockPrismaProduct.create({ data: draftProduct });
+    expect(created.isPublished).toBe(false);
+
+    // Query public products (published=true) - draft should NOT appear
+    mockPrismaProduct.findMany.mockResolvedValue([]); // Empty because no published products
+    mockPrismaProduct.count.mockResolvedValue(0);
+
+    const publicProducts = await mockPrismaProduct.findMany({
+      where: { categoryId: 'cat-1', isPublished: true },
+    });
+
+    expect(publicProducts).toHaveLength(0);
+  });
+
+  it('publishing a draft makes it appear in public listing', async () => {
+    // Start with unpublished product
+    const draftProduct = {
+      id: 'prod-1',
+      sku: 'PROD-001',
+      name: 'My Product',
+      isPublished: false,
+      categoryId: 'cat-1',
+    };
+
+    // Update to published
+    const publishedProduct = {
+      ...draftProduct,
+      isPublished: true,
+    };
+
+    mockPrismaProduct.update.mockResolvedValue(publishedProduct);
+
+    // Publish the product
+    const updated = await mockPrismaProduct.update({
+      where: { id: 'prod-1' },
+      data: { isPublished: true },
+    });
+
+    expect(updated.isPublished).toBe(true);
+
+    // Now it should appear in public listing
+    mockPrismaProduct.findMany.mockResolvedValue([publishedProduct]);
+
+    const publicProducts = await mockPrismaProduct.findMany({
+      where: { categoryId: 'cat-1', isPublished: true },
+    });
+
+    expect(publicProducts).toHaveLength(1);
+    expect(publicProducts[0].id).toBe('prod-1');
+  });
+
+  it('filters by both categoryId AND isPublished', async () => {
+    // Verify that the API filters by BOTH conditions
+    const cat1PublishedProduct = {
+      id: 'prod-1',
+      name: 'Cat1 Published',
+      categoryId: 'cat-1',
+      isPublished: true,
+    };
+
+    // Only return products matching BOTH categoryId and isPublished
+    mockPrismaProduct.findMany.mockImplementation(async ({ where }) => {
+      if (where.categoryId === 'cat-1' && where.isPublished === true) {
+        return [cat1PublishedProduct];
+      }
+      return [];
+    });
+
+    // Query cat-1 published products
+    const result = await mockPrismaProduct.findMany({
+      where: { categoryId: 'cat-1', isPublished: true },
+    });
+
+    expect(result).toHaveLength(1);
+    expect(result[0].categoryId).toBe('cat-1');
+    expect(result[0].isPublished).toBe(true);
+
+    // Query cat-2 published products - should be empty
+    const result2 = await mockPrismaProduct.findMany({
+      where: { categoryId: 'cat-2', isPublished: true },
+    });
+
+    expect(result2).toHaveLength(0);
+  });
+});

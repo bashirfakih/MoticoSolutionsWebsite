@@ -124,6 +124,25 @@ export default function AdminProductEditPage() {
   // Active tab
   const [activeTab, setActiveTab] = useState<'general' | 'media' | 'pricing' | 'inventory' | 'seo'>('general');
 
+  // Map fields to their respective tabs for error indicators
+  const fieldToTab: Record<string, typeof activeTab> = {
+    sku: 'general',
+    name: 'general',
+    description: 'general',
+    categoryId: 'general',
+    brandId: 'general',
+    // Future fields can be mapped here
+    price: 'pricing',
+    stockQuantity: 'inventory',
+  };
+
+  // Count errors per tab
+  const getTabErrorCount = (tabId: typeof activeTab): number => {
+    return Object.keys(errors).filter(
+      field => errors[field] && fieldToTab[field] === tabId
+    ).length;
+  };
+
   // Load data
   useEffect(() => {
     async function loadData() {
@@ -305,7 +324,12 @@ export default function AdminProductEditPage() {
         subcategoryId: formData.subcategoryId || null,
         brandId: formData.brandId,
         images: formData.images,
-        specifications: formData.specifications.filter(s => s.key && s.value),
+        specifications: formData.specifications
+          .filter(s => s.label && s.value)
+          .map(s => ({
+            ...s,
+            key: s.key || s.label.toLowerCase().replace(/\s+/g, '_').replace(/[^\w-]/g, ''),
+          })),
         price: formData.price ? parseFloat(formData.price) : null,
         compareAtPrice: formData.compareAtPrice ? parseFloat(formData.compareAtPrice) : null,
         currency: formData.currency,
@@ -449,21 +473,31 @@ export default function AdminProductEditPage() {
             { id: 'pricing', label: 'Pricing', icon: DollarSign },
             { id: 'inventory', label: 'Inventory', icon: Layers },
             { id: 'seo', label: 'SEO', icon: FileText },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as typeof activeTab)}
-              className={`
-                flex items-center gap-2 pb-3 text-sm font-medium border-b-2 transition-colors
-                ${activeTab === tab.id
-                  ? 'border-[#004D8B] text-[#004D8B]'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'}
-              `}
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
-            </button>
-          ))}
+          ].map((tab) => {
+            const errorCount = getTabErrorCount(tab.id as typeof activeTab);
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as typeof activeTab)}
+                className={`
+                  flex items-center gap-2 pb-3 text-sm font-medium border-b-2 transition-colors relative
+                  ${activeTab === tab.id
+                    ? 'border-[#004D8B] text-[#004D8B]'
+                    : errorCount > 0
+                      ? 'border-transparent text-red-600 hover:text-red-700'
+                      : 'border-transparent text-gray-500 hover:text-gray-700'}
+                `}
+              >
+                <tab.icon className={`w-4 h-4 ${errorCount > 0 && activeTab !== tab.id ? 'text-red-500' : ''}`} />
+                {tab.label}
+                {errorCount > 0 && (
+                  <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-red-500 rounded-full">
+                    {errorCount}
+                  </span>
+                )}
+              </button>
+            );
+          })}
         </nav>
       </div>
 
@@ -910,9 +944,12 @@ export default function AdminProductEditPage() {
                 name="metaTitle"
                 value={formData.metaTitle || ''}
                 onChange={handleChange}
-                placeholder={formData.name || 'Product name'}
+                placeholder="Enter meta title..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
               />
+              <p className="mt-1 text-xs text-gray-500">
+                The site name will be appended automatically — do not include it here.
+              </p>
               <p className={`mt-1 text-xs ${(formData.metaTitle?.length || 0) > 60 ? 'text-red-500' : 'text-gray-500'}`}>
                 {formData.metaTitle?.length || 0}/60 characters
               </p>
@@ -927,7 +964,7 @@ export default function AdminProductEditPage() {
                 value={formData.metaDescription || ''}
                 onChange={handleChange}
                 rows={3}
-                placeholder={formData.shortDescription || 'Product description for search engines'}
+                placeholder="Enter meta description for search engines..."
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
               />
               <p className={`mt-1 text-xs ${(formData.metaDescription?.length || 0) > 160 ? 'text-red-500' : 'text-gray-500'}`}>
@@ -939,7 +976,8 @@ export default function AdminProductEditPage() {
               <h4 className="text-sm font-medium text-gray-700 mb-2">Search Preview</h4>
               <div className="bg-white rounded border border-gray-200 p-3">
                 <p className="text-blue-600 text-lg hover:underline cursor-pointer">
-                  {formData.metaTitle || formData.name || 'Product Title'} | Motico Solutions
+                  {formData.metaTitle || formData.name || 'Product Title'}
+                  {!(formData.metaTitle || '').toLowerCase().includes('motico') && ' | Motico Solutions'}
                 </p>
                 <p className="text-green-700 text-sm">
                   moticosolutions.com/products/{formData.slug || 'product-slug'}

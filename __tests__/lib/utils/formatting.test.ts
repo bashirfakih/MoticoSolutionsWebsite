@@ -318,6 +318,33 @@ describe('Slug Utilities', () => {
   });
 });
 
+// B-5 Regression test: generateSlug should convert Unicode × to x
+describe('generateSlug Unicode handling', () => {
+  // Import the actual function from the module
+  const { generateSlug } = require('@/lib/utils/formatting');
+
+  it('converts Unicode multiplication sign × to x', () => {
+    expect(generateSlug('100×915mm Belt')).toBe('100x915mm-belt');
+    expect(generateSlug('Product 50×50')).toBe('product-50x50');
+  });
+
+  it('converts division sign ÷ to div', () => {
+    expect(generateSlug('Test ÷ Value')).toBe('test-div-value');
+  });
+
+  it('converts plus-minus sign ± to plus-minus', () => {
+    expect(generateSlug('Tolerance ±5mm')).toBe('tolerance-plus-minus5mm');
+  });
+
+  it('converts degree sign ° to deg', () => {
+    expect(generateSlug('45° Angle')).toBe('45deg-angle');
+  });
+
+  it('handles combination of Unicode symbols', () => {
+    expect(generateSlug('100×200mm ±5°')).toBe('100x200mm-plus-minus5deg');
+  });
+});
+
 describe('Address Formatting', () => {
   interface Address {
     street?: string;
@@ -436,5 +463,31 @@ describe('Order Number Formatting', () => {
   it('returns null for invalid format', () => {
     expect(parseOrderNumber('invalid')).toBeNull();
     expect(parseOrderNumber('ORD123')).toBeNull();
+  });
+});
+
+// U-6 Regression test: pluralize function
+describe('Pluralization', () => {
+  const { pluralize } = require('@/lib/utils/formatting');
+
+  it('returns singular form for count of 1', () => {
+    expect(pluralize(1, 'product')).toBe('1 product');
+    expect(pluralize(1, 'item')).toBe('1 item');
+    expect(pluralize(1, 'order')).toBe('1 order');
+  });
+
+  it('returns plural form for count of 0', () => {
+    expect(pluralize(0, 'product')).toBe('0 products');
+  });
+
+  it('returns plural form for count > 1', () => {
+    expect(pluralize(2, 'product')).toBe('2 products');
+    expect(pluralize(10, 'item')).toBe('10 items');
+    expect(pluralize(100, 'order')).toBe('100 orders');
+  });
+
+  it('handles custom plural forms', () => {
+    expect(pluralize(1, 'category', 'categories')).toBe('1 category');
+    expect(pluralize(5, 'category', 'categories')).toBe('5 categories');
   });
 });

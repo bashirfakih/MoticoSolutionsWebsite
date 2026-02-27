@@ -10,19 +10,16 @@ import { AuthProvider } from '@/lib/auth/AuthContext'
 import { ToastProvider } from '@/components/ui/Toast'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { Suspense } from 'react'
+import ServiceWorkerRegistration from '@/components/pwa/ServiceWorkerRegistration'
+import { socialLinks } from '@/lib/constants/social'
 
 const inter = Inter({ subsets: ['latin'] })
 
-// Social media URLs
-const socialLinks = {
-  facebook: 'https://facebook.com/moticosolutions',
-  instagram: 'https://instagram.com/moticosolutions',
-  linkedin: 'https://linkedin.com/company/motico-solutions',
-  youtube: 'https://youtube.com/@moticosolutions',
-}
-
 export const viewport: Viewport = {
   themeColor: '#004D8B',
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 }
 
 export const metadata: Metadata = {
@@ -169,9 +166,6 @@ const websiteJsonLd = {
   },
 }
 
-// Export social links for use in other components
-export { socialLinks }
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -183,6 +177,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         {/* Preload critical assets */}
         <link rel="preload" href="/logo-motico-solutions.png" as="image" />
+
+        {/* PWA Manifest and Icons */}
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Motico" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="application-name" content="Motico Solutions" />
+        <meta name="msapplication-TileColor" content="#004D8B" />
+        <meta name="msapplication-tap-highlight" content="no" />
 
         {/* Sitemap link */}
         <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
@@ -220,6 +225,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <CookieConsent />
               <BackToTop />
               <SpeedInsights />
+              <ServiceWorkerRegistration />
             </ThemeProvider>
           </ToastProvider>
         </AuthProvider>

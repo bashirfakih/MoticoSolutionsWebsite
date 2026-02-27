@@ -23,6 +23,8 @@ import {
   X,
   CheckCircle,
   Loader2,
+  ChevronUp,
+  ChevronDown,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useToast } from '@/components/ui/Toast';
@@ -73,6 +75,45 @@ function StatusBadge({ status }: { status: CustomerStatus }) {
   );
 }
 
+// Sortable column header component
+function SortableHeader({
+  label,
+  sortKey,
+  currentSortBy,
+  currentSortOrder,
+  onSort,
+  align = 'left',
+}: {
+  label: string;
+  sortKey: string;
+  currentSortBy: string;
+  currentSortOrder: 'asc' | 'desc';
+  onSort: (key: string) => void;
+  align?: 'left' | 'center' | 'right';
+}) {
+  const isActive = currentSortBy === sortKey;
+  const alignClass = align === 'right' ? 'justify-end' : align === 'center' ? 'justify-center' : 'justify-start';
+
+  return (
+    <th className={`px-4 py-3 text-${align} text-xs font-semibold text-gray-500 uppercase`}>
+      <button
+        onClick={() => onSort(sortKey)}
+        className={`inline-flex items-center gap-1 hover:text-gray-700 transition-colors ${alignClass}`}
+      >
+        {label}
+        <span className="flex flex-col">
+          <ChevronUp
+            className={`w-3 h-3 -mb-1 ${isActive && currentSortOrder === 'asc' ? 'text-[#004D8B]' : 'text-gray-300'}`}
+          />
+          <ChevronDown
+            className={`w-3 h-3 ${isActive && currentSortOrder === 'desc' ? 'text-[#004D8B]' : 'text-gray-300'}`}
+          />
+        </span>
+      </button>
+    </th>
+  );
+}
+
 function CustomersContent() {
   const toast = useToast();
 
@@ -84,18 +125,60 @@ function CustomersContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
 
+  // Sort state
+  const [sortBy, setSortBy] = useState<string>('name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
   const loadCustomers = useCallback(async () => {
     setIsLoading(true);
     try {
       const params = new URLSearchParams({ limit: '100' });
       if (search) params.set('search', search);
       if (statusFilter) params.set('status', statusFilter);
+      params.set('sortBy', sortBy);
+      params.set('sortOrder', sortOrder);
 
       const response = await fetch(`/api/customers?${params}`);
       if (!response.ok) throw new Error('Failed to fetch customers');
 
       const data = await response.json();
-      setCustomers(data.data || []);
+
+      // Sort the data client-side since the API may not support all sort fields
+      let sortedData = [...(data.data || [])];
+      sortedData.sort((a: Customer, b: Customer) => {
+        let aVal: string | number;
+        let bVal: string | number;
+
+        switch (sortBy) {
+          case 'email':
+            aVal = a.email.toLowerCase();
+            bVal = b.email.toLowerCase();
+            break;
+          case 'country':
+            aVal = a.country.toLowerCase();
+            bVal = b.country.toLowerCase();
+            break;
+          case 'totalSpent':
+            aVal = a.totalSpent;
+            bVal = b.totalSpent;
+            break;
+          case 'status':
+            aVal = a.status;
+            bVal = b.status;
+            break;
+          case 'name':
+          default:
+            aVal = a.name.toLowerCase();
+            bVal = b.name.toLowerCase();
+            break;
+        }
+
+        if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+        if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      setCustomers(sortedData);
 
       // Calculate stats from data
       const allCustomers = data.data || [];
@@ -111,7 +194,16 @@ function CustomersContent() {
     } finally {
       setIsLoading(false);
     }
-  }, [search, statusFilter, toast]);
+  }, [search, statusFilter, sortBy, sortOrder, toast]);
+
+  const handleSort = (key: string) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(key);
+      setSortOrder('asc');
+    }
+  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -284,12 +376,43 @@ function CustomersContent() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Customer</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Contact</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Location</th>
+                <SortableHeader
+                  label="Name"
+                  sortKey="name"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Email"
+                  sortKey="email"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
+                <SortableHeader
+                  label="Country"
+                  sortKey="country"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
                 <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Orders</th>
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Total Spent</th>
-                <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
+                <SortableHeader
+                  label="Total Spent"
+                  sortKey="totalSpent"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                  align="right"
+                />
+                <SortableHeader
+                  label="Status"
+                  sortKey="status"
+                  currentSortBy={sortBy}
+                  currentSortOrder={sortOrder}
+                  onSort={handleSort}
+                />
                 <th className="px-4 py-3 text-right text-xs font-semibold text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
