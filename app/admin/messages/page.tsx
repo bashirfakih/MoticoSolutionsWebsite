@@ -23,6 +23,7 @@ import {
   X,
   Send,
   CheckCircle,
+  ArrowLeft,
 } from 'lucide-react';
 import { messageService } from '@/lib/data/messageService';
 import { Message, MESSAGE_STATUS, MESSAGE_TYPE, MessageStatus, MessageType } from '@/lib/data/types';
@@ -209,8 +210,8 @@ export default function AdminMessagesPage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Message List */}
-        <div className="lg:col-span-1 bg-white rounded-xl border border-gray-200 overflow-hidden">
+        {/* Message List - Hidden on mobile when a message is selected */}
+        <div className={`lg:col-span-1 bg-white rounded-xl border border-gray-200 overflow-hidden ${selectedMessage ? 'hidden lg:block' : ''}`}>
           {/* Filters */}
           <div className="p-4 border-b border-gray-200">
             <div className="relative">
@@ -238,7 +239,7 @@ export default function AdminMessagesPage() {
           </div>
 
           {/* Messages */}
-          <div className="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+          <div className="divide-y divide-gray-100 max-h-[calc(100vh-400px)] lg:max-h-[600px] overflow-y-auto">
             {filteredMessages.map((message) => (
               <div
                 key={message.id}
@@ -293,23 +294,32 @@ export default function AdminMessagesPage() {
           </div>
         </div>
 
-        {/* Message Detail */}
-        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden">
+        {/* Message Detail - Hidden on mobile when no message is selected */}
+        <div className={`lg:col-span-2 bg-white rounded-xl border border-gray-200 overflow-hidden ${!selectedMessage ? 'hidden lg:block' : ''}`}>
           {selectedMessage ? (
             <div className="h-full flex flex-col">
               {/* Header */}
               <div className="p-4 border-b border-gray-200">
                 <div className="flex items-start justify-between">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-900">{selectedMessage.subject}</h2>
-                    <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
-                      <span>{selectedMessage.name}</span>
-                      <span>{selectedMessage.email}</span>
-                      {selectedMessage.phone && <span>{selectedMessage.phone}</span>}
+                  <div className="flex items-start gap-3">
+                    {/* Mobile back button */}
+                    <button
+                      onClick={() => setSelectedMessage(null)}
+                      className="lg:hidden p-1 -ml-1 text-gray-500 hover:text-gray-700"
+                    >
+                      <ArrowLeft className="w-5 h-5" />
+                    </button>
+                    <div>
+                      <h2 className="text-lg font-semibold text-gray-900">{selectedMessage.subject}</h2>
+                      <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                        <span>{selectedMessage.name}</span>
+                        <span>{selectedMessage.email}</span>
+                        {selectedMessage.phone && <span>{selectedMessage.phone}</span>}
+                      </div>
+                      {selectedMessage.company && (
+                        <p className="text-sm text-gray-500 mt-0.5">{selectedMessage.company}</p>
+                      )}
                     </div>
-                    {selectedMessage.company && (
-                      <p className="text-sm text-gray-500 mt-0.5">{selectedMessage.company}</p>
-                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     <button

@@ -21,7 +21,6 @@ import {
   TrendingUp,
   TrendingDown,
   ArrowRight,
-  Clock,
   AlertTriangle,
   FileText,
   Plus,
@@ -51,8 +50,8 @@ function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   }).format(amount);
 }
 
@@ -73,10 +72,16 @@ function getRelativeTime(dateStr: string): string {
   const diffHours = Math.floor(diffMins / 60);
   const diffDays = Math.floor(diffHours / 24);
 
+  if (diffMins < 1) return 'Just now';
+  if (diffMins === 1) return '1 minute ago';
   if (diffMins < 60) return `${diffMins} minutes ago`;
+  if (diffHours === 1) return '1 hour ago';
   if (diffHours < 24) return `${diffHours} hours ago`;
   if (diffDays === 1) return 'Yesterday';
-  return `${diffDays} days ago`;
+  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) > 1 ? 's' : ''} ago`;
+  if (diffDays < 365) return `${Math.floor(diffDays / 30)} month${Math.floor(diffDays / 30) > 1 ? 's' : ''} ago`;
+  return date.toLocaleDateString();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -139,21 +144,6 @@ function OrderStatusBadge({ status }: { status: string }) {
   );
 }
 
-function ComingSoonCard({ title }: { title: string }) {
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
-      <div className="text-center py-8">
-        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-          <Clock className="w-8 h-8 text-gray-400" />
-        </div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          This feature is coming soon.
-        </p>
-      </div>
-    </div>
-  );
-}
 
 function LoadingState() {
   return (
@@ -434,13 +424,76 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Coming Soon Section */}
+      {/* Quick Actions & Stats */}
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">More Features</h2>
+        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <ComingSoonCard title="Sales Analytics" />
-          <ComingSoonCard title="Inventory Management" />
-          <ComingSoonCard title="Customer Insights" />
+          {/* Brands & Categories */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                <Package className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white">Catalog</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {data.overview.totalBrands} brands, {data.overview.totalCategories} categories
+                </p>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Link
+                href="/admin/brands"
+                className="flex-1 px-3 py-2 text-sm text-center bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              >
+                Brands
+              </Link>
+              <Link
+                href="/admin/categories"
+                className="flex-1 px-3 py-2 text-sm text-center bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+              >
+                Categories
+              </Link>
+            </div>
+          </div>
+
+          {/* Analytics Preview */}
+          <Link
+            href="/admin/analytics"
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white group-hover:text-[#004D8B]">Analytics</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">View detailed reports</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Sales trends, customer insights, and inventory reports
+            </p>
+          </Link>
+
+          {/* Settings */}
+          <Link
+            href="/admin/settings"
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                <FileText className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900 dark:text-white group-hover:text-[#004D8B]">Settings</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Store configuration</p>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Company info, notifications, inventory & currency settings
+            </p>
+          </Link>
         </div>
       </div>
 

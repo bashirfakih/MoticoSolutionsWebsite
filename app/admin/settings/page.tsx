@@ -8,25 +8,18 @@
  * @module app/admin/settings/page
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Settings,
   Building2,
-  Mail,
-  Phone,
-  Globe,
   Bell,
-  Shield,
-  Palette,
   Save,
   RotateCcw,
-  CheckCircle,
   AlertTriangle,
-  MapPin,
-  Clock,
   DollarSign,
   Package,
+  Loader2,
 } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
 
 interface CompanySettings {
   name: string;
@@ -95,46 +88,156 @@ const defaultCurrencySettings: CurrencySettings = {
 };
 
 export default function AdminSettingsPage() {
+  const toast = useToast();
   const [activeTab, setActiveTab] = useState<'company' | 'notifications' | 'inventory' | 'currency'>('company');
   const [company, setCompany] = useState<CompanySettings>(defaultCompanySettings);
   const [notifications, setNotifications] = useState<NotificationSettings>(defaultNotificationSettings);
   const [inventory, setInventory] = useState<InventorySettings>(defaultInventorySettings);
   const [currency, setCurrency] = useState<CurrencySettings>(defaultCurrencySettings);
-  const [saved, setSaved] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const loadSettings = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      // Load from API
+      const response = await fetch('/api/settings');
+      if (response.ok) {
+        const dbSettings = await response.json();
+        // Map database fields to local state
+        setCompany(prev => ({
+          ...prev,
+          name: dbSettings.siteName || prev.name,
+          email: dbSettings.contactEmail || prev.email,
+          phone: dbSettings.contactPhone || prev.phone,
+          address: dbSettings.address || prev.address,
+        }));
+        setNotifications(prev => ({
+          ...prev,
+          emailNewOrders: dbSettings.enableEmailNotifications ?? prev.emailNewOrders,
+          emailNewQuotes: dbSettings.enableEmailNotifications ?? prev.emailNewQuotes,
+          emailNewMessages: dbSettings.enableEmailNotifications ?? prev.emailNewMessages,
+          emailLowStock: dbSettings.enableEmailNotifications ?? prev.emailLowStock,
+        }));
+        setInventory(prev => ({
+          ...prev,
+          lowStockThreshold: dbSettings.lowStockAlertThreshold ?? prev.lowStockThreshold,
+        }));
+        // Currency enum from DB
+        if (dbSettings.currency) {
+          setCurrency(prev => ({
+            ...prev,
+            currency: dbSettings.currency,
+          }));
+        }
+      }
+
+      // Also load extended settings from localStorage (for fields not in DB)
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const localSettings = JSON.parse(stored);
+        // Merge localStorage fields that aren't in DB
+        if (localSettings.company) {
+          setCompany(prev => ({
+            ...prev,
+            city: localSettings.company.city || prev.city,
+            country: localSettings.company.country || prev.country,
+            website: localSettings.company.website || prev.website,
+            taxId: localSettings.company.taxId || prev.taxId,
+          }));
+        }
+        if (localSettings.notifications) {
+          setNotifications(prev => ({
+            ...prev,
+            browserNotifications: localSettings.notifications.browserNotifications ?? prev.browserNotifications,
+          }));
+        }
+        if (localSettings.inventory) {
+          setInventory(prev => ({
+            ...prev,
+            outOfStockBehavior: localSettings.inventory.outOfStockBehavior || prev.outOfStockBehavior,
+            trackInventory: localSettings.inventory.trackInventory ?? prev.trackInventory,
+          }));
+        }
+        if (localSettings.currency) {
+          setCurrency(prev => ({
+            ...prev,
+            currencySymbol: localSettings.currency.currencySymbol || prev.currencySymbol,
+            decimalPlaces: localSettings.currency.decimalPlaces ?? prev.decimalPlaces,
+            thousandsSeparator: localSettings.currency.thousandsSeparator || prev.thousandsSeparator,
+          }));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+      toast.error('Failed to load settings');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
     loadSettings();
-  }, []);
+  }, [loadSettings]);
 
-  const loadSettings = () => {
-    if (typeof window === 'undefined') return;
+  const saveSettings = async () => {
+    setIsSaving(true);
+    try {
+      // Save to API (database)
+      const apiPayload = {
+        siteName: company.name,
+        contactEmail: company.email,
+        contactPhone: company.phone,
+        address: company.address,
+        currency: currency.currency,
+        lowStockAlertThreshold: inventory.lowStockThreshold,
+        enableEmailNotifications: notifications.emailNewOrders || notifications.emailNewQuotes || notifications.emailNewMessages || notifications.emailLowStock,
+      };
 
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      const settings = JSON.parse(stored);
-      setCompany(settings.company || defaultCompanySettings);
-      setNotifications(settings.notifications || defaultNotificationSettings);
-      setInventory(settings.inventory || defaultInventorySettings);
-      setCurrency(settings.currency || defaultCurrencySettings);
+      const response = await fetch('/api/settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(apiPayload),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save settings');
+      }
+
+      // Save extended settings to localStorage (for fields not in DB schema)
+      const localSettings = {
+        company: {
+          city: company.city,
+          country: company.country,
+          website: company.website,
+          taxId: company.taxId,
+        },
+        notifications: {
+          browserNotifications: notifications.browserNotifications,
+        },
+        inventory: {
+          outOfStockBehavior: inventory.outOfStockBehavior,
+          trackInventory: inventory.trackInventory,
+        },
+        currency: {
+          currencySymbol: currency.currencySymbol,
+          decimalPlaces: currency.decimalPlaces,
+          thousandsSeparator: currency.thousandsSeparator,
+        },
+        updatedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(localSettings));
+
+      setHasChanges(false);
+      toast.success('Settings saved successfully');
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to save settings');
+    } finally {
+      setIsSaving(false);
     }
-  };
-
-  const saveSettings = () => {
-    if (typeof window === 'undefined') return;
-
-    const settings = {
-      company,
-      notifications,
-      inventory,
-      currency,
-      updatedAt: new Date().toISOString(),
-    };
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
-    setSaved(true);
-    setHasChanges(false);
-    setTimeout(() => setSaved(false), 3000);
   };
 
   const resetSettings = () => {
@@ -150,6 +253,14 @@ export default function AdminSettingsPage() {
   const handleChange = () => {
     setHasChanges(true);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#004D8B]" />
+      </div>
+    );
+  }
 
   const tabs = [
     { id: 'company', label: 'Company', icon: Building2 },
@@ -169,32 +280,34 @@ export default function AdminSettingsPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={resetSettings}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+            disabled={isSaving}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <RotateCcw className="w-4 h-4" />
             Reset
           </button>
           <button
             onClick={saveSettings}
-            disabled={!hasChanges}
+            disabled={!hasChanges || isSaving}
             className="flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg font-medium hover:bg-[#003a6a] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <Save className="w-4 h-4" />
-            Save Changes
+            {isSaving ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="w-4 h-4" />
+                Save Changes
+              </>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Success Message */}
-      {saved && (
-        <div className="bg-green-50 text-green-700 px-4 py-3 rounded-lg flex items-center gap-2">
-          <CheckCircle className="w-5 h-5" />
-          Settings saved successfully!
-        </div>
-      )}
-
       {/* Unsaved Changes Warning */}
-      {hasChanges && !saved && (
+      {hasChanges && (
         <div className="bg-yellow-50 text-yellow-700 px-4 py-3 rounded-lg flex items-center gap-2">
           <AlertTriangle className="w-5 h-5" />
           You have unsaved changes. Don&apos;t forget to save!

@@ -10,22 +10,53 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import ProductImage from '@/components/ui/ProductImage';
 import DataTable, { Column } from '@/components/admin/DataTable';
-import StockBadge, { StockIndicator } from '@/components/admin/StockBadge';
+import { StockIndicator } from '@/components/admin/StockBadge';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
-import { productService } from '@/lib/data/productService';
-import { brandService } from '@/lib/data/brandService';
-import { categoryService } from '@/lib/data/categoryService';
-import {
-  Product,
-  Brand,
-  Category,
-  ProductFilter,
-  STOCK_STATUS,
-} from '@/lib/data/types';
+import { STOCK_STATUS, StockStatus } from '@/lib/data/types';
+
+// Types for API responses
+interface Product {
+  id: string;
+  sku: string;
+  name: string;
+  slug: string;
+  price: number | null;
+  stockQuantity: number;
+  stockStatus: StockStatus;
+  minStockLevel: number;
+  isPublished: boolean;
+  isFeatured: boolean;
+  categoryId: string;
+  brandId: string;
+  category?: { id: string; name: string; slug: string };
+  brand?: { id: string; name: string; slug: string };
+  images: Array<{ url: string; alt: string }>;
+}
+
+interface Brand {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  parentId: string | null;
+}
+
+interface ProductFilter {
+  search?: string;
+  categoryId?: string;
+  brandId?: string;
+  stockStatus?: string;
+  isPublished?: boolean;
+}
 import {
   Plus,
   Search,
@@ -39,8 +70,6 @@ import {
   EyeOff,
   Star,
   StarOff,
-  Package,
-  Download,
   RefreshCw,
 } from 'lucide-react';
 
@@ -82,24 +111,51 @@ export default function AdminProductsPage() {
   const [isBulkDeleting, setIsBulkDeleting] = useState(false);
 
   // Load data
-  const loadData = useCallback(() => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
+    try {
+      // Build query params
+      const params = new URLSearchParams();
+      params.set('page', page.toString());
+      params.set('limit', limit.toString());
+      params.set('sortBy', sortBy);
+      params.set('sortOrder', sortOrder);
+      if (search) params.set('search', search);
+      if (filters.categoryId) params.set('categoryId', filters.categoryId);
+      if (filters.brandId) params.set('brandId', filters.brandId);
+      if (filters.stockStatus) params.set('stockStatus', filters.stockStatus);
+      if (filters.isPublished !== undefined) params.set('published', String(filters.isPublished));
 
-    // Load products with pagination and filters
-    const result = productService.getPaginated(
-      { page, limit, sortBy, sortOrder },
-      { ...filters, search: search || undefined }
-    );
+      // Load products from API
+      const productRes = await fetch(`/api/products?${params}`);
+      if (productRes.ok) {
+        const data = await productRes.json();
+        setProducts(data.data || []);
+        setTotal(data.total || 0);
+      }
 
-    setProducts(result.data);
-    setTotal(result.total);
+      // Load brands and categories from API
+      const [brandsRes, categoriesRes] = await Promise.all([
+        fetch('/api/brands'),
+        fetch('/api/categories'),
+      ]);
 
-    // Load brands and categories for filters
-    setBrands(brandService.getAll());
-    setCategories(categoryService.getAll());
+      if (brandsRes.ok) {
+        const data = await brandsRes.json();
+        setBrands(data.data || []);
+      }
 
-    setIsLoading(false);
-  }, [page, limit, sortBy, sortOrder, filters, search]);
+      if (categoriesRes.ok) {
+        const data = await categoriesRes.json();
+        setCategories(data.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to load data:', error);
+      toast.error('Failed to load products');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [page, limit, sortBy, sortOrder, filters, search, toast]);
 
   useEffect(() => {
     loadData();
@@ -144,42 +200,101 @@ export default function AdminProductsPage() {
 
   // Toggle publish status
   const handleTogglePublish = async (product: Product) => {
+    setActionMenuId(null);
     try {
-      productService.togglePublished(product.id);
+      const response = await fetch(`/api/products/${product.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isPublished: !product.isPublished }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update product');
+      }
+
+      // Update local state immediately for instant feedback
+      setProducts(prev => prev.map(p =>
+        p.id === product.id ? { ...p, isPublished: !p.isPublished } : p
+      ));
+
       toast.success(
         product.isPublished ? 'Product unpublished' : 'Product published'
       );
-      loadData();
     } catch (error) {
       toast.error('Failed to update product');
     }
-    setActionMenuId(null);
   };
 
   // Toggle featured status
   const handleToggleFeatured = async (product: Product) => {
+    setActionMenuId(null);
     try {
-      productService.toggleFeatured(product.id);
+      const response = await fetch(`/api/products/${product.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isFeatured: !product.isFeatured }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update product');
+      }
+
+      // Update local state immediately for instant feedback
+      setProducts(prev => prev.map(p =>
+        p.id === product.id ? { ...p, isFeatured: !p.isFeatured } : p
+      ));
+
       toast.success(
         product.isFeatured ? 'Removed from featured' : 'Added to featured'
       );
-      loadData();
     } catch (error) {
       toast.error('Failed to update product');
     }
-    setActionMenuId(null);
   };
 
   // Duplicate product
   const handleDuplicate = async (product: Product) => {
+    setActionMenuId(null);
     try {
-      const newProduct = productService.duplicate(product.id);
+      // Fetch full product data
+      const getRes = await fetch(`/api/products/${product.id}`);
+      if (!getRes.ok) throw new Error('Failed to fetch product');
+
+      const original = await getRes.json();
+
+      // Generate unique SKU and slug
+      const timestamp = Date.now().toString().slice(-4);
+      const newSku = `${original.sku}-COPY-${timestamp}`;
+      const newSlug = `${original.slug}-copy-${timestamp}`;
+
+      // Create duplicate
+      const createRes = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...original,
+          id: undefined,
+          sku: newSku,
+          slug: newSlug,
+          name: `${original.name} (Copy)`,
+          isPublished: false,
+          createdAt: undefined,
+          updatedAt: undefined,
+          publishedAt: undefined,
+        }),
+      });
+
+      if (!createRes.ok) {
+        const error = await createRes.json();
+        throw new Error(error.error || 'Failed to duplicate product');
+      }
+
+      const newProduct = await createRes.json();
       toast.success('Product duplicated');
       router.push(`/admin/products/${newProduct.id}`);
     } catch (error) {
-      toast.error('Failed to duplicate product');
+      toast.error(error instanceof Error ? error.message : 'Failed to duplicate product');
     }
-    setActionMenuId(null);
   };
 
   // Delete product
@@ -187,16 +302,25 @@ export default function AdminProductsPage() {
     if (!productToDelete) return;
 
     try {
-      productService.delete(productToDelete.id);
+      const response = await fetch(`/api/products/${productToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete product');
+      }
+
       toast.success('Product deleted');
-      loadData();
+      setProducts(prev => prev.filter(p => p.id !== productToDelete.id));
+      setTotal(prev => prev - 1);
       setSelectedIds(prev => {
         const newSet = new Set(prev);
         newSet.delete(productToDelete.id);
         return newSet;
       });
     } catch (error) {
-      toast.error('Failed to delete product');
+      toast.error(error instanceof Error ? error.message : 'Failed to delete product');
     }
     setDeleteDialogOpen(false);
     setProductToDelete(null);
@@ -206,10 +330,17 @@ export default function AdminProductsPage() {
   const handleBulkDelete = async () => {
     setIsBulkDeleting(true);
     try {
-      const count = productService.deleteMany(Array.from(selectedIds));
-      toast.success(`${count} products deleted`);
+      const deletePromises = Array.from(selectedIds).map(id =>
+        fetch(`/api/products/${id}`, { method: 'DELETE' })
+      );
+
+      const results = await Promise.allSettled(deletePromises);
+      const successCount = results.filter(r => r.status === 'fulfilled').length;
+
+      toast.success(`${successCount} products deleted`);
+      setProducts(prev => prev.filter(p => !selectedIds.has(p.id)));
+      setTotal(prev => prev - successCount);
       setSelectedIds(new Set());
-      loadData();
     } catch (error) {
       toast.error('Failed to delete products');
     }
@@ -224,20 +355,13 @@ export default function AdminProductsPage() {
       header: '',
       width: '60px',
       render: (product) => (
-        <div className="w-10 h-10 rounded bg-gray-100 overflow-hidden">
-          {product.images[0] ? (
-            <Image
-              src={product.images[0].url}
-              alt={product.name}
-              width={40}
-              height={40}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Package className="w-5 h-5 text-gray-300" />
-            </div>
-          )}
+        <div className="w-10 h-10 rounded bg-gray-100 overflow-hidden relative">
+          <ProductImage
+            src={product.images[0]?.url || ''}
+            alt={product.name}
+            width={40}
+            height={40}
+          />
         </div>
       ),
     },
@@ -261,27 +385,21 @@ export default function AdminProductsPage() {
       key: 'categoryId',
       header: 'Category',
       sortable: true,
-      render: (product) => {
-        const category = categories.find(c => c.id === product.categoryId);
-        return (
-          <span className="text-sm text-gray-600">
-            {category?.name || '-'}
-          </span>
-        );
-      },
+      render: (product) => (
+        <span className="text-sm text-gray-600">
+          {product.category?.name || '-'}
+        </span>
+      ),
     },
     {
       key: 'brandId',
       header: 'Brand',
       sortable: true,
-      render: (product) => {
-        const brand = brands.find(b => b.id === product.brandId);
-        return (
-          <span className="text-sm text-gray-600">
-            {brand?.name || '-'}
-          </span>
-        );
-      },
+      render: (product) => (
+        <span className="text-sm text-gray-600">
+          {product.brand?.name || '-'}
+        </span>
+      ),
     },
     {
       key: 'price',
@@ -411,7 +529,7 @@ export default function AdminProductsPage() {
         </div>
       ),
     },
-  ], [categories, brands, actionMenuId]);
+  ], [actionMenuId]);
 
   const totalPages = Math.ceil(total / limit);
   const hasActiveFilters = Object.values(filters).some(v => v !== undefined) || search;

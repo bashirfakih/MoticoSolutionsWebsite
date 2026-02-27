@@ -15,12 +15,8 @@ import ImageUploader from '@/components/admin/ImageUploader';
 import { StockIndicator } from '@/components/admin/StockBadge';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
-import { productService } from '@/lib/data/productService';
-import { brandService } from '@/lib/data/brandService';
-import { categoryService } from '@/lib/data/categoryService';
+// Using API routes instead of localStorage services
 import {
-  Product,
-  ProductInput,
   ProductImage,
   ProductSpecification,
   Brand,
@@ -130,47 +126,69 @@ export default function AdminProductEditPage() {
 
   // Load data
   useEffect(() => {
-    // Load brands and categories
-    setBrands(brandService.getActive());
-    setCategories(categoryService.getAll());
+    async function loadData() {
+      try {
+        // Load brands and categories from API
+        const [brandsRes, categoriesRes] = await Promise.all([
+          fetch('/api/brands?limit=100'),
+          fetch('/api/categories?limit=500'),
+        ]);
 
-    // Load product if editing
-    if (!isNew) {
-      const product = productService.getById(productId);
-      if (!product) {
-        toast.error('Product not found');
-        router.push('/admin/products');
-        return;
+        if (brandsRes.ok) {
+          const brandsData = await brandsRes.json();
+          setBrands(brandsData.data || []);
+        }
+        if (categoriesRes.ok) {
+          const categoriesData = await categoriesRes.json();
+          setCategories(categoriesData.data || []);
+        }
+
+        // Load product if editing
+        if (!isNew) {
+          const productRes = await fetch(`/api/products/${productId}`);
+          if (!productRes.ok) {
+            toast.error('Product not found');
+            router.push('/admin/products');
+            return;
+          }
+
+          const product = await productRes.json();
+          setFormData({
+            sku: product.sku,
+            name: product.name,
+            slug: product.slug,
+            shortDescription: product.shortDescription || '',
+            description: product.description,
+            features: product.features?.length > 0 ? product.features : [''],
+            categoryId: product.categoryId,
+            subcategoryId: product.subcategoryId || '',
+            brandId: product.brandId,
+            images: product.images || [],
+            specifications: product.specifications || [],
+            price: product.price?.toString() || '',
+            compareAtPrice: product.compareAtPrice?.toString() || '',
+            currency: product.currency,
+            stockQuantity: product.stockQuantity?.toString() || '0',
+            minStockLevel: product.minStockLevel?.toString() || '10',
+            trackInventory: product.trackInventory ?? true,
+            allowBackorder: product.allowBackorder ?? false,
+            isPublished: product.isPublished ?? false,
+            isFeatured: product.isFeatured ?? false,
+            isNew: product.isNew ?? true,
+            metaTitle: product.metaTitle || '',
+            metaDescription: product.metaDescription || '',
+          });
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error('Failed to load data:', error);
+        toast.error('Failed to load data');
       }
-
-      setFormData({
-        sku: product.sku,
-        name: product.name,
-        slug: product.slug,
-        shortDescription: product.shortDescription || '',
-        description: product.description,
-        features: product.features.length > 0 ? product.features : [''],
-        categoryId: product.categoryId,
-        subcategoryId: product.subcategoryId || '',
-        brandId: product.brandId,
-        images: product.images,
-        specifications: product.specifications,
-        price: product.price?.toString() || '',
-        compareAtPrice: product.compareAtPrice?.toString() || '',
-        currency: product.currency,
-        stockQuantity: product.stockQuantity.toString(),
-        minStockLevel: product.minStockLevel.toString(),
-        trackInventory: product.trackInventory,
-        allowBackorder: product.allowBackorder,
-        isPublished: product.isPublished,
-        isFeatured: product.isFeatured,
-        isNew: product.isNew,
-        metaTitle: product.metaTitle || '',
-        metaDescription: product.metaDescription || '',
-      });
-      setIsLoading(false);
     }
-  }, [productId, isNew, router, toast]);
+
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId, isNew]);
 
   // Handle form changes
   const handleChange = useCallback((
@@ -276,7 +294,7 @@ export default function AdminProductEditPage() {
     setIsSaving(true);
 
     try {
-      const input: ProductInput = {
+      const productData = {
         sku: formData.sku,
         name: formData.name,
         slug: formData.slug || generateSlug(formData.name),
@@ -290,7 +308,7 @@ export default function AdminProductEditPage() {
         specifications: formData.specifications.filter(s => s.key && s.value),
         price: formData.price ? parseFloat(formData.price) : null,
         compareAtPrice: formData.compareAtPrice ? parseFloat(formData.compareAtPrice) : null,
-        currency: formData.currency as typeof CURRENCY[keyof typeof CURRENCY],
+        currency: formData.currency,
         stockQuantity: parseInt(formData.stockQuantity) || 0,
         minStockLevel: parseInt(formData.minStockLevel) || 10,
         trackInventory: formData.trackInventory,
@@ -303,11 +321,32 @@ export default function AdminProductEditPage() {
       };
 
       if (isNew) {
-        const product = productService.create(input);
+        const response = await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productData),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to create product');
+        }
+
+        const product = await response.json();
         toast.success('Product created');
         router.push(`/admin/products/${product.id}`);
       } else {
-        productService.update(productId, input);
+        const response = await fetch(`/api/products/${productId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(productData),
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || 'Failed to update product');
+        }
+
         toast.success('Product saved');
         setHasUnsavedChanges(false);
       }
@@ -319,13 +358,21 @@ export default function AdminProductEditPage() {
   };
 
   // Delete product
-  const handleDelete = () => {
+  const handleDelete = async () => {
     try {
-      productService.delete(productId);
+      const response = await fetch(`/api/products/${productId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete product');
+      }
+
       toast.success('Product deleted');
       router.push('/admin/products');
-    } catch (error) {
-      toast.error('Failed to delete product');
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Failed to delete product');
     }
   };
 
@@ -861,13 +908,13 @@ export default function AdminProductEditPage() {
               <input
                 type="text"
                 name="metaTitle"
-                value={formData.metaTitle}
+                value={formData.metaTitle || ''}
                 onChange={handleChange}
                 placeholder={formData.name || 'Product name'}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
               />
-              <p className="mt-1 text-xs text-gray-500">
-                {formData.metaTitle.length}/60 characters
+              <p className={`mt-1 text-xs ${(formData.metaTitle?.length || 0) > 60 ? 'text-red-500' : 'text-gray-500'}`}>
+                {formData.metaTitle?.length || 0}/60 characters
               </p>
             </div>
 
@@ -877,14 +924,14 @@ export default function AdminProductEditPage() {
               </label>
               <textarea
                 name="metaDescription"
-                value={formData.metaDescription}
+                value={formData.metaDescription || ''}
                 onChange={handleChange}
                 rows={3}
                 placeholder={formData.shortDescription || 'Product description for search engines'}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
               />
-              <p className="mt-1 text-xs text-gray-500">
-                {formData.metaDescription.length}/160 characters
+              <p className={`mt-1 text-xs ${(formData.metaDescription?.length || 0) > 160 ? 'text-red-500' : 'text-gray-500'}`}>
+                {formData.metaDescription?.length || 0}/160 characters
               </p>
             </div>
 

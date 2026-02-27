@@ -8,7 +8,7 @@
  * @module app/admin/quotes/page
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   FileText,
   Search,
@@ -21,9 +21,52 @@ import {
   ArrowRight,
   X,
   MessageSquare,
+  Loader2,
 } from 'lucide-react';
-import { quoteService } from '@/lib/data/quoteService';
-import { Quote, QUOTE_STATUS, QuoteStatus } from '@/lib/data/types';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { useToast } from '@/components/ui/Toast';
+import { QUOTE_STATUS, QuoteStatus } from '@/lib/data/types';
+
+interface QuoteItem {
+  id: string;
+  productId: string | null;
+  productName: string;
+  description: string | null;
+  quantity: number;
+  unitPrice: number | null;
+  totalPrice: number | null;
+}
+
+interface Quote {
+  id: string;
+  quoteNumber: string;
+  customerId: string | null;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string | null;
+  company: string | null;
+  items: QuoteItem[];
+  subtotal: number | null;
+  discount: number;
+  total: number | null;
+  currency: string;
+  status: QuoteStatus;
+  validUntil: string | null;
+  customerMessage: string | null;
+  internalNotes: string | null;
+  responseMessage: string | null;
+  orderId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  sentAt: string | null;
+}
+
+interface QuoteStats {
+  total: number;
+  pending: number;
+  converted: number;
+  totalValue: number;
+}
 
 const statusConfig: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
   [QUOTE_STATUS.PENDING]: { label: 'Pending', color: 'text-yellow-700', bg: 'bg-yellow-100', icon: Clock },
@@ -36,8 +79,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string; i
 };
 
 function StatusBadge({ status }: { status: QuoteStatus }) {
-  const config = statusConfig[status];
-  if (!config) return null;
+  const config = statusConfig[status] || statusConfig[QUOTE_STATUS.PENDING];
   const Icon = config.icon;
 
   return (
@@ -48,52 +90,73 @@ function StatusBadge({ status }: { status: QuoteStatus }) {
   );
 }
 
-export default function AdminQuotesPage() {
+function QuotesContent() {
+  const toast = useToast();
+
   const [quotes, setQuotes] = useState<Quote[]>([]);
-  const [filteredQuotes, setFilteredQuotes] = useState<Quote[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
-  const [stats, setStats] = useState<ReturnType<typeof quoteService.getStats> | null>(null);
+  const [stats, setStats] = useState<QuoteStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadQuotes = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({ limit: '100' });
+      if (search) params.set('search', search);
+      if (statusFilter) params.set('status', statusFilter);
+
+      const response = await fetch(`/api/quotes?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch quotes');
+
+      const data = await response.json();
+      setQuotes(data.data || []);
+
+      // Calculate stats
+      const allQuotes = data.data || [];
+      setStats({
+        total: data.total || allQuotes.length,
+        pending: allQuotes.filter((q: Quote) => q.status === 'pending').length,
+        converted: allQuotes.filter((q: Quote) => q.status === 'converted').length,
+        totalValue: allQuotes
+          .filter((q: Quote) => q.total !== null)
+          .reduce((sum: number, q: Quote) => sum + (q.total || 0), 0),
+      });
+    } catch (error) {
+      console.error('Failed to load quotes:', error);
+      toast.error('Failed to load quotes');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [search, statusFilter, toast]);
 
   useEffect(() => {
-    loadQuotes();
-  }, []);
+    const timer = setTimeout(() => {
+      loadQuotes();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [loadQuotes]);
 
-  useEffect(() => {
-    filterQuotes();
-  }, [quotes, search, statusFilter]);
+  const handleStatusUpdate = async (quoteId: string, newStatus: QuoteStatus) => {
+    try {
+      const response = await fetch(`/api/quotes/${quoteId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
 
-  const loadQuotes = () => {
-    setQuotes(quoteService.getAll());
-    setStats(quoteService.getStats());
-  };
+      if (!response.ok) throw new Error('Failed to update quote');
 
-  const filterQuotes = () => {
-    let result = quotes;
+      toast.success('Quote status updated');
+      loadQuotes();
 
-    if (search) {
-      const searchLower = search.toLowerCase();
-      result = result.filter(
-        q =>
-          q.quoteNumber.toLowerCase().includes(searchLower) ||
-          q.customerName.toLowerCase().includes(searchLower) ||
-          q.customerEmail.toLowerCase().includes(searchLower)
-      );
-    }
-
-    if (statusFilter) {
-      result = result.filter(q => q.status === statusFilter);
-    }
-
-    setFilteredQuotes(result);
-  };
-
-  const handleStatusUpdate = (quoteId: string, newStatus: QuoteStatus) => {
-    quoteService.updateStatus(quoteId, newStatus);
-    loadQuotes();
-    if (selectedQuote?.id === quoteId) {
-      setSelectedQuote(quoteService.getById(quoteId));
+      if (selectedQuote?.id === quoteId) {
+        const updated = await response.json();
+        setSelectedQuote(updated);
+      }
+    } catch (error) {
+      toast.error('Failed to update quote status');
     }
   };
 
@@ -111,8 +174,18 @@ export default function AdminQuotesPage() {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
+
+  if (isLoading && quotes.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -218,7 +291,7 @@ export default function AdminQuotesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredQuotes.map((quote) => (
+              {quotes.map((quote) => (
                 <tr key={quote.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <span className="font-mono text-sm font-medium text-[#004D8B]">
@@ -230,7 +303,7 @@ export default function AdminQuotesPage() {
                     <p className="text-xs text-gray-500">{quote.company || quote.customerEmail}</p>
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className="text-sm text-gray-900">{quote.items.length}</span>
+                    <span className="text-sm text-gray-900">{quote.items?.length || 0}</span>
                   </td>
                   <td className="px-4 py-3 text-right">
                     <span className="font-semibold text-gray-900">{formatCurrency(quote.total)}</span>
@@ -251,7 +324,7 @@ export default function AdminQuotesPage() {
                   </td>
                 </tr>
               ))}
-              {filteredQuotes.length === 0 && (
+              {quotes.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-12 text-center text-gray-500">
                     No quotes found
@@ -337,7 +410,7 @@ export default function AdminQuotesPage() {
               <div>
                 <h3 className="font-semibold text-gray-900 mb-3">Items</h3>
                 <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  {selectedQuote.items.map((item) => (
+                  {(selectedQuote.items || []).map((item) => (
                     <div key={item.id} className="flex items-center justify-between px-4 py-3 border-b border-gray-100 last:border-0">
                       <div>
                         <p className="font-medium text-gray-900">{item.productName}</p>
@@ -397,5 +470,13 @@ export default function AdminQuotesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminQuotesPage() {
+  return (
+    <ErrorBoundary>
+      <QuotesContent />
+    </ErrorBoundary>
   );
 }

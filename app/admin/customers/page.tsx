@@ -8,13 +8,11 @@
  * @module app/admin/customers/page
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users,
   Search,
-  Plus,
   Eye,
-  Edit,
   Trash2,
   Mail,
   Phone,
@@ -24,11 +22,41 @@ import {
   Tag,
   X,
   CheckCircle,
-  XCircle,
-  Clock,
+  Loader2,
 } from 'lucide-react';
-import { customerService } from '@/lib/data/customerService';
-import { Customer, CUSTOMER_STATUS, CustomerStatus } from '@/lib/data/types';
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { useToast } from '@/components/ui/Toast';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { CUSTOMER_STATUS, CustomerStatus } from '@/lib/data/types';
+
+interface Customer {
+  id: string;
+  email: string;
+  name: string;
+  company: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  region: string | null;
+  postalCode: string | null;
+  country: string;
+  totalOrders: number;
+  totalSpent: number;
+  lastOrderAt: string | null;
+  status: CustomerStatus;
+  isVerified: boolean;
+  notes: string | null;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface CustomerStats {
+  total: number;
+  active: number;
+  withOrders: number;
+  totalRevenue: number;
+}
 
 const statusConfig: Record<string, { label: string; color: string; bg: string }> = {
   [CUSTOMER_STATUS.ACTIVE]: { label: 'Active', color: 'text-green-700', bg: 'bg-green-100' },
@@ -37,9 +65,7 @@ const statusConfig: Record<string, { label: string; color: string; bg: string }>
 };
 
 function StatusBadge({ status }: { status: CustomerStatus }) {
-  const config = statusConfig[status];
-  if (!config) return null;
-
+  const config = statusConfig[status] || statusConfig[CUSTOMER_STATUS.ACTIVE];
   return (
     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg} ${config.color}`}>
       {config.label}
@@ -47,63 +73,95 @@ function StatusBadge({ status }: { status: CustomerStatus }) {
   );
 }
 
-export default function AdminCustomersPage() {
+function CustomersContent() {
+  const toast = useToast();
+
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [stats, setStats] = useState<ReturnType<typeof customerService.getStats> | null>(null);
+  const [stats, setStats] = useState<CustomerStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
+
+  const loadCustomers = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams({ limit: '100' });
+      if (search) params.set('search', search);
+      if (statusFilter) params.set('status', statusFilter);
+
+      const response = await fetch(`/api/customers?${params}`);
+      if (!response.ok) throw new Error('Failed to fetch customers');
+
+      const data = await response.json();
+      setCustomers(data.data || []);
+
+      // Calculate stats from data
+      const allCustomers = data.data || [];
+      setStats({
+        total: data.total || allCustomers.length,
+        active: allCustomers.filter((c: Customer) => c.status === 'active').length,
+        withOrders: allCustomers.filter((c: Customer) => c.totalOrders > 0).length,
+        totalRevenue: allCustomers.reduce((sum: number, c: Customer) => sum + (c.totalSpent || 0), 0),
+      });
+    } catch (error) {
+      console.error('Failed to load customers:', error);
+      toast.error('Failed to load customers');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [search, statusFilter, toast]);
 
   useEffect(() => {
-    loadCustomers();
-  }, []);
-
-  useEffect(() => {
-    filterCustomers();
-  }, [customers, search, statusFilter]);
-
-  const loadCustomers = () => {
-    setCustomers(customerService.getAll());
-    setStats(customerService.getStats());
-  };
-
-  const filterCustomers = () => {
-    let result = customers;
-
-    if (search) {
-      const searchLower = search.toLowerCase();
-      result = result.filter(
-        c =>
-          c.name.toLowerCase().includes(searchLower) ||
-          c.email.toLowerCase().includes(searchLower) ||
-          c.company?.toLowerCase().includes(searchLower)
-      );
-    }
-
-    if (statusFilter) {
-      result = result.filter(c => c.status === statusFilter);
-    }
-
-    setFilteredCustomers(result);
-  };
-
-  const handleStatusUpdate = (customerId: string, newStatus: CustomerStatus) => {
-    customerService.updateStatus(customerId, newStatus);
-    loadCustomers();
-    if (selectedCustomer?.id === customerId) {
-      setSelectedCustomer(customerService.getById(customerId));
-    }
-  };
-
-  const handleDelete = (customerId: string) => {
-    if (confirm('Are you sure you want to delete this customer?')) {
-      customerService.delete(customerId);
+    const timer = setTimeout(() => {
       loadCustomers();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [loadCustomers]);
+
+  const handleStatusUpdate = async (customerId: string, newStatus: CustomerStatus) => {
+    try {
+      const response = await fetch(`/api/customers/${customerId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update customer');
+
+      toast.success('Customer status updated');
+      loadCustomers();
+
       if (selectedCustomer?.id === customerId) {
+        const updated = await response.json();
+        setSelectedCustomer(updated);
+      }
+    } catch (error) {
+      toast.error('Failed to update customer status');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!customerToDelete) return;
+
+    try {
+      const response = await fetch(`/api/customers/${customerToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete customer');
+
+      toast.success('Customer deleted');
+      loadCustomers();
+
+      if (selectedCustomer?.id === customerToDelete.id) {
         setSelectedCustomer(null);
       }
+    } catch (error) {
+      toast.error('Failed to delete customer');
     }
+    setCustomerToDelete(null);
   };
 
   const formatDate = (date: string | null) => {
@@ -119,8 +177,18 @@ export default function AdminCustomersPage() {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount);
   };
+
+  if (isLoading && customers.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -226,7 +294,7 @@ export default function AdminCustomersPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {filteredCustomers.map((customer) => (
+              {customers.map((customer) => (
                 <tr key={customer.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -267,7 +335,7 @@ export default function AdminCustomersPage() {
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
-                        onClick={() => handleDelete(customer.id)}
+                        onClick={() => setCustomerToDelete(customer)}
                         className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -276,7 +344,7 @@ export default function AdminCustomersPage() {
                   </td>
                 </tr>
               ))}
-              {filteredCustomers.length === 0 && (
+              {customers.length === 0 && (
                 <tr>
                   <td colSpan={7} className="px-4 py-12 text-center text-gray-500">
                     No customers found
@@ -358,7 +426,7 @@ export default function AdminCustomersPage() {
               </div>
 
               {/* Tags */}
-              {selectedCustomer.tags.length > 0 && (
+              {selectedCustomer.tags && selectedCustomer.tags.length > 0 && (
                 <div>
                   <p className="text-xs font-medium text-gray-500 mb-2">Tags</p>
                   <div className="flex flex-wrap gap-2">
@@ -407,6 +475,25 @@ export default function AdminCustomersPage() {
           </div>
         </div>
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        isOpen={!!customerToDelete}
+        onClose={() => setCustomerToDelete(null)}
+        onConfirm={handleDelete}
+        title="Delete Customer"
+        message={`Are you sure you want to delete "${customerToDelete?.name}"? This action cannot be undone.`}
+        confirmText="Delete"
+        variant="danger"
+      />
     </div>
+  );
+}
+
+export default function AdminCustomersPage() {
+  return (
+    <ErrorBoundary>
+      <CustomersContent />
+    </ErrorBoundary>
   );
 }

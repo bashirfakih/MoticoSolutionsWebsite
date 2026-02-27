@@ -9,12 +9,13 @@
  * @module app/admin/layout
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { AdminRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/lib/auth/AuthContext';
+import GlobalSearch from '@/components/admin/GlobalSearch';
 import {
   LayoutDashboard,
   Users,
@@ -26,12 +27,18 @@ import {
   X,
   ChevronDown,
   Bell,
-  Search,
   ShoppingCart,
   BarChart3,
   MessageSquare,
   HelpCircle,
 } from 'lucide-react';
+
+// Badge counts interface
+interface BadgeCounts {
+  pendingOrders: number;
+  pendingQuotes: number;
+  unreadMessages: number;
+}
 
 // ═══════════════════════════════════════════════════════════════
 // NAVIGATION CONFIG
@@ -42,39 +49,43 @@ const navigation = [
     name: 'Dashboard',
     href: '/admin/dashboard',
     icon: LayoutDashboard,
+    badgeKey: null,
   },
   {
     name: 'Orders',
     href: '/admin/orders',
     icon: ShoppingCart,
-    badge: '12',
+    badgeKey: 'pendingOrders' as const,
   },
   {
     name: 'Customers',
     href: '/admin/customers',
     icon: Users,
+    badgeKey: null,
   },
   {
     name: 'Products',
     href: '/admin/products',
     icon: Package,
+    badgeKey: null,
   },
   {
     name: 'Quotes',
     href: '/admin/quotes',
     icon: FileText,
-    badge: '5',
+    badgeKey: 'pendingQuotes' as const,
   },
   {
     name: 'Analytics',
     href: '/admin/analytics',
     icon: BarChart3,
+    badgeKey: null,
   },
   {
     name: 'Messages',
     href: '/admin/messages',
     icon: MessageSquare,
-    badge: '3',
+    badgeKey: 'unreadMessages' as const,
   },
 ];
 
@@ -98,9 +109,11 @@ const secondaryNavigation = [
 function Sidebar({
   isOpen,
   onClose,
+  badgeCounts,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  badgeCounts: BadgeCounts;
 }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
@@ -171,9 +184,9 @@ function Sidebar({
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     <span className="flex-1">{item.name}</span>
-                    {item.badge && (
+                    {item.badgeKey && badgeCounts[item.badgeKey] > 0 && (
                       <span className="bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                        {item.badge}
+                        {badgeCounts[item.badgeKey]}
                       </span>
                     )}
                   </Link>
@@ -247,7 +260,7 @@ function Sidebar({
 // TOP HEADER COMPONENT
 // ═══════════════════════════════════════════════════════════════
 
-function TopHeader({ onMenuClick }: { onMenuClick: () => void }) {
+function TopHeader({ onMenuClick, totalNotifications }: { onMenuClick: () => void; totalNotifications: number }) {
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
       {/* Left Side */}
@@ -260,15 +273,8 @@ function TopHeader({ onMenuClick }: { onMenuClick: () => void }) {
         </button>
 
         {/* Search */}
-        <div className="hidden sm:flex items-center">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-64 pl-9 pr-4 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-transparent"
-            />
-          </div>
+        <div className="hidden sm:block">
+          <GlobalSearch />
         </div>
       </div>
 
@@ -277,7 +283,11 @@ function TopHeader({ onMenuClick }: { onMenuClick: () => void }) {
         {/* Notifications */}
         <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
           <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
+          {totalNotifications > 0 && (
+            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
+              {totalNotifications > 99 ? '99+' : totalNotifications}
+            </span>
+          )}
         </button>
 
         {/* View Site */}
@@ -299,16 +309,50 @@ function TopHeader({ onMenuClick }: { onMenuClick: () => void }) {
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [badgeCounts, setBadgeCounts] = useState<BadgeCounts>({
+    pendingOrders: 0,
+    pendingQuotes: 0,
+    unreadMessages: 0,
+  });
+
+  // Fetch badge counts from API
+  const fetchBadgeCounts = useCallback(async () => {
+    try {
+      const response = await fetch('/api/dashboard/stats', {
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setBadgeCounts({
+          pendingOrders: data.orders?.byStatus?.pending || 0,
+          pendingQuotes: data.alerts?.pendingQuotes || 0,
+          unreadMessages: data.alerts?.unreadMessages || 0,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch badge counts:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBadgeCounts();
+    // Refresh counts every 60 seconds
+    const interval = setInterval(fetchBadgeCounts, 60000);
+    return () => clearInterval(interval);
+  }, [fetchBadgeCounts]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} badgeCounts={badgeCounts} />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <TopHeader onMenuClick={() => setSidebarOpen(true)} />
+        <TopHeader
+          onMenuClick={() => setSidebarOpen(true)}
+          totalNotifications={badgeCounts.pendingOrders + badgeCounts.pendingQuotes + badgeCounts.unreadMessages}
+        />
 
         {/* Page Content */}
         <main className="flex-1 p-4 lg:p-6 overflow-auto">
