@@ -175,9 +175,11 @@ export default function AbrasiveBeltsPage() {
           {/* Gallery Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-6">
             {filteredProducts.map((product) => (
-              <Link
+              <a
                 key={product.slug}
-                href={`/products/abrasive-belts/${product.slug}`}
+                href={`https://wa.me/9613741565?text=${encodeURIComponent(`Hello! I'm interested in ${product.name}.`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl border border-gray-100 transition-all duration-300 hover:-translate-y-1 flex flex-col"
               >
                 {/* Image */}
@@ -208,12 +210,12 @@ export default function AbrasiveBeltsPage() {
                     {product.description}
                   </p>
                   <div className="mt-4 flex items-center justify-between">
-                    <span className="text-blue-800 font-semibold text-sm group-hover:underline">
-                      View Details →
+                    <span className="text-green-600 font-semibold text-sm group-hover:underline flex items-center gap-1">
+                      <MessageCircle className="w-4 h-4" /> Inquire on WhatsApp
                     </span>
                   </div>
                 </div>
-              </Link>
+              </a>
             ))}
           </div>
         </div>

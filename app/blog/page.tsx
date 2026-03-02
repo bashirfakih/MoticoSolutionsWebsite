@@ -73,10 +73,9 @@ export default function BlogPage() {
       <main className="max-w-6xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {articles.map((article) => (
-            <Link
+            <div
               key={article.slug}
-              href={`/blog/${article.slug}`}
-              className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100"
+              className="group bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100"
             >
               {/* Image */}
               <div className="relative h-48 overflow-hidden">
@@ -84,7 +83,7 @@ export default function BlogPage() {
                   src={article.image}
                   alt={article.title}
                   fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="object-cover"
                 />
                 <div
                   className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-semibold"
@@ -107,17 +106,17 @@ export default function BlogPage() {
                     {article.readTime}
                   </span>
                 </div>
-                <h2 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-[#004D8B] transition-colors">
+                <h2 className="font-bold text-lg text-gray-900 mb-2">
                   {article.title}
                 </h2>
                 <p className="text-sm text-gray-600 mb-4 line-clamp-2">
                   {article.excerpt}
                 </p>
-                <span className="text-sm font-semibold text-[#004D8B] flex items-center gap-1 group-hover:text-[#bb0c15] transition-colors">
-                  Read More <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                <span className="text-sm font-semibold text-amber-600 flex items-center gap-1">
+                  Coming Soon
                 </span>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
 
