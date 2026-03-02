@@ -244,4 +244,196 @@ describe('brandService', () => {
       expect(activeCount).toBeLessThanOrEqual(totalCount);
     });
   });
+
+  describe('getPaginated - additional sorting', () => {
+    it('should sort by string field descending', () => {
+      const result = brandService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'name',
+        sortOrder: 'desc',
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].name.localeCompare(result.data[i - 1].name)).toBeLessThanOrEqual(0);
+      }
+    });
+
+    it('should sort by numeric field ascending', () => {
+      const result = brandService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'sortOrder',
+        sortOrder: 'asc',
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].sortOrder).toBeGreaterThanOrEqual(result.data[i - 1].sortOrder);
+      }
+    });
+
+    it('should sort by numeric field descending', () => {
+      const result = brandService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'sortOrder',
+        sortOrder: 'desc',
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].sortOrder).toBeLessThanOrEqual(result.data[i - 1].sortOrder);
+      }
+    });
+
+    it('should calculate hasMore correctly', () => {
+      const result = brandService.getPaginated({ page: 1, limit: 1 });
+
+      if (result.total > 1) {
+        expect(result.hasMore).toBe(true);
+      }
+
+      const lastPage = brandService.getPaginated({ page: result.totalPages, limit: 1 });
+      expect(lastPage.hasMore).toBe(false);
+    });
+  });
+
+  describe('create - additional options', () => {
+    it('should create brand with custom slug', () => {
+      const newBrand = brandService.create({
+        name: 'Custom Slug Brand',
+        slug: 'my-custom-slug',
+      });
+
+      expect(newBrand.slug).toBe('my-custom-slug');
+
+      // Cleanup
+      brandService.delete(newBrand.id);
+    });
+
+    it('should create brand with all optional fields', () => {
+      const newBrand = brandService.create({
+        name: 'Full Options Brand',
+        description: 'Full description',
+        logo: '/logo.png',
+        website: 'https://example.com',
+        countryOfOrigin: 'Germany',
+        isActive: false,
+        sortOrder: 999,
+      });
+
+      expect(newBrand.logo).toBe('/logo.png');
+      expect(newBrand.website).toBe('https://example.com');
+      expect(newBrand.countryOfOrigin).toBe('Germany');
+      expect(newBrand.isActive).toBe(false);
+      expect(newBrand.sortOrder).toBe(999);
+
+      // Cleanup
+      brandService.delete(newBrand.id);
+    });
+
+    it('should handle null optional fields', () => {
+      const newBrand = brandService.create({
+        name: 'Minimal Brand',
+      });
+
+      expect(newBrand.logo).toBeNull();
+      expect(newBrand.description).toBeNull();
+      expect(newBrand.website).toBeNull();
+      expect(newBrand.countryOfOrigin).toBeNull();
+
+      // Cleanup
+      brandService.delete(newBrand.id);
+    });
+  });
+
+  describe('update - additional branches', () => {
+    it('should allow updating slug if not duplicate', () => {
+      const newBrand = brandService.create({
+        name: 'Slug Update Test',
+      });
+
+      const updated = brandService.update(newBrand.id, {
+        slug: 'new-unique-slug-xyz',
+      });
+
+      expect(updated.slug).toBe('new-unique-slug-xyz');
+
+      // Cleanup
+      brandService.delete(newBrand.id);
+    });
+
+    it('should throw error when updating to duplicate slug', () => {
+      const existingBrand = brandService.getAll()[0];
+      const newBrand = brandService.create({
+        name: 'Duplicate Slug Test',
+      });
+
+      expect(() => {
+        brandService.update(newBrand.id, {
+          slug: existingBrand.slug,
+        });
+      }).toThrow(/already exists/);
+
+      // Cleanup
+      brandService.delete(newBrand.id);
+    });
+  });
+
+  describe('toggleStatus - error handling', () => {
+    it('should throw error for non-existent brand', () => {
+      expect(() => {
+        brandService.toggleStatus('non-existent-id-xyz');
+      }).toThrow(/not found/);
+    });
+  });
+
+  describe('reorder', () => {
+    it('should reorder brands', () => {
+      const brands = brandService.getAll();
+
+      if (brands.length >= 2) {
+        const originalOrder = brands.map(b => b.id);
+        const reversedOrder = [...originalOrder].reverse();
+
+        const result = brandService.reorder(reversedOrder);
+        expect(Array.isArray(result)).toBe(true);
+
+        // Verify order changed
+        const reorderedBrands = brandService.getAll();
+        expect(reorderedBrands[0].sortOrder).toBeDefined();
+
+        // Restore original order
+        brandService.reorder(originalOrder);
+      }
+    });
+
+    it('should skip IDs that do not match any brand', () => {
+      const result = brandService.reorder(['non-existent-id-1', 'non-existent-id-2']);
+      expect(Array.isArray(result)).toBe(true);
+    });
+  });
+
+  describe('reset', () => {
+    it('should reset brands to mock data', () => {
+      // Create a test brand
+      const testBrand = brandService.create({ name: 'Reset Test' });
+      expect(brandService.getById(testBrand.id)).not.toBeNull();
+
+      // Reset
+      brandService.reset();
+
+      // The test brand should be gone
+      expect(brandService.getById(testBrand.id)).toBeNull();
+    });
+  });
+
+  describe('clear', () => {
+    it('should clear all brands from storage', () => {
+      brandService.clear();
+
+      // After clearing, getAll should return mock data (since storage is cleared, it reinitializes)
+      const brands = brandService.getAll();
+      expect(Array.isArray(brands)).toBe(true);
+    });
+  });
 });

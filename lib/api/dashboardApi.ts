@@ -6,6 +6,11 @@
  * @module lib/api/dashboardApi
  */
 
+export interface DailyRevenue {
+  date: string;
+  revenue: number;
+}
+
 export interface DashboardStats {
   overview: {
     totalOrders: number;
@@ -42,6 +47,10 @@ export interface DashboardStats {
     total: number;
     pending: number;
   };
+  // Actionable widget stats
+  ordersLast24Hours: number;
+  outOfStockProducts: number;
+  dailyRevenue: DailyRevenue[];
 }
 
 /**

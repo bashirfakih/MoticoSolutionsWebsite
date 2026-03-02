@@ -8,6 +8,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
+// Force dynamic - never cache this route
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET - List categories with optional filtering
 export async function GET(request: NextRequest) {
   try {
@@ -68,7 +72,7 @@ export async function GET(request: NextRequest) {
     // Get total count
     const total = await prisma.category.count({ where });
 
-    // Get paginated results
+    // Get paginated results with published product count
     const categories = await prisma.category.findMany({
       where,
       include: {
@@ -76,7 +80,12 @@ export async function GET(request: NextRequest) {
           select: { id: true, name: true, slug: true },
         },
         _count: {
-          select: { children: true, products: true },
+          select: { children: true },
+        },
+        // Include published products to count them
+        products: {
+          where: { isPublished: true },
+          select: { id: true },
         },
       },
       orderBy: { [sortBy]: sortOrder },
@@ -88,7 +97,9 @@ export async function GET(request: NextRequest) {
       data: categories.map(cat => ({
         ...cat,
         childrenCount: cat._count.children,
-        productCount: cat._count.products,
+        // Count only published products
+        productCount: cat.products.length,
+        products: undefined, // Don't send the full products array
         _count: undefined,
       })),
       total,

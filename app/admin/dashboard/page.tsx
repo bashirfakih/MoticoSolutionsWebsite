@@ -13,7 +13,14 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { getDashboardStats, DashboardStats } from '@/lib/api/dashboardApi';
-import Sparkline from '@/components/admin/Sparkline';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import {
   ShoppingCart,
   Users,
@@ -29,6 +36,7 @@ import {
   Loader2,
   Clock,
   MessageSquare,
+  PackageX,
 } from 'lucide-react';
 import { pluralize } from '@/lib/utils/formatting';
 
@@ -330,57 +338,105 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Actionable Widgets */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Pending Orders Widget */}
+      {/* Actionable Widgets - Row 1 */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        {/* Orders in Last 24 Hours */}
         <Link
-          href="/admin/orders?status=pending"
-          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-yellow-200 dark:hover:border-yellow-800 transition-all group"
+          href={`/admin/orders?dateFrom=${new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]}`}
+          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-[#004D8B]/30 transition-all group"
         >
           <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+            <div className="w-10 h-10 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-[#004D8B]" />
             </div>
-            {(data.orders.byStatus?.pending || 0) > 0 && (
-              <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-xs font-bold rounded-full">
-                Needs Attention
+            {data.ordersLast24Hours > 0 && (
+              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-[#004D8B] text-xs font-bold rounded-full">
+                Today
               </span>
             )}
           </div>
-          <p className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-yellow-600 transition-colors">
-            {data.orders.byStatus?.pending || 0}
+          <p className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-[#004D8B] transition-colors">
+            {data.ordersLast24Hours}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-            Pending Orders
+            {pluralize(data.ordersLast24Hours, 'order')} today
             <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
           </p>
         </Link>
 
-        {/* Low Stock Widget */}
+        {/* Out of Stock Products */}
         <Link
-          href="/admin/products?stockStatus=low_stock"
+          href="/admin/products?stockStatus=out_of_stock"
           className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-red-200 dark:hover:border-red-800 transition-all group"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="w-10 h-10 rounded-lg bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-              <Package className="w-5 h-5 text-red-600 dark:text-red-400" />
+              <PackageX className="w-5 h-5 text-red-600 dark:text-red-400" />
             </div>
-            {data.alerts.lowStockProducts > 0 && (
+            {data.outOfStockProducts > 0 && (
               <span className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold rounded-full">
-                Restock
+                Urgent
               </span>
             )}
           </div>
           <p className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-red-600 transition-colors">
-            {data.alerts.lowStockProducts}
+            {data.outOfStockProducts}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
-            Low Stock Items
+            Out of Stock
             <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
           </p>
         </Link>
 
-        {/* Unread Messages Widget */}
+        {/* Low Stock Products */}
+        <Link
+          href="/admin/products?stockStatus=low_stock"
+          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-yellow-200 dark:hover:border-yellow-800 transition-all group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center">
+              <Package className="w-5 h-5 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            {data.alerts.lowStockProducts > 0 && (
+              <span className="px-2 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 text-xs font-bold rounded-full">
+                Restock
+              </span>
+            )}
+          </div>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-yellow-600 transition-colors">
+            {data.alerts.lowStockProducts}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+            Low Stock
+            <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </p>
+        </Link>
+
+        {/* Pending Quote Requests */}
+        <Link
+          href="/admin/quotes?status=pending"
+          className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-purple-200 dark:hover:border-purple-800 transition-all group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="w-10 h-10 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+              <FileText className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+            </div>
+            {data.alerts.pendingQuotes > 0 && (
+              <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-xs font-bold rounded-full">
+                Respond
+              </span>
+            )}
+          </div>
+          <p className="text-3xl font-bold text-gray-900 dark:text-white group-hover:text-purple-600 transition-colors">
+            {data.alerts.pendingQuotes}
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+            Pending Quotes
+            <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </p>
+        </Link>
+
+        {/* Unread Messages */}
         <Link
           href="/admin/messages?status=unread"
           className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all group"
@@ -404,27 +460,31 @@ export default function AdminDashboard() {
           </p>
         </Link>
 
-        {/* 7-Day Revenue Sparkline Widget */}
+        {/* 7-Day Revenue Sparkline */}
         <Link
           href="/admin/analytics"
           className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-green-200 dark:hover:border-green-800 transition-all group"
         >
-          <div className="flex items-center justify-between mb-3">
-            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center shrink-0">
               <DollarSign className="w-5 h-5 text-green-600 dark:text-green-400" />
             </div>
-            <div className="flex-1 ml-3">
-              <Sparkline
-                data={[100, 120, 90, 150, 130, 180, 200]}
-                width={80}
-                height={28}
-                strokeColor="#16a34a"
-                fillColor="rgba(22, 163, 74, 0.1)"
-              />
+            <div className="flex-1 h-10">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={data.dailyRevenue}>
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="#16a34a"
+                    fill="rgba(22, 163, 74, 0.2)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             </div>
           </div>
           <p className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-green-600 transition-colors">
-            {formatCurrency(data.overview.totalRevenue)}
+            {formatCurrency(data.dailyRevenue.reduce((sum, d) => sum + d.revenue, 0))}
           </p>
           <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
             7-Day Revenue

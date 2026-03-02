@@ -15,8 +15,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { AdminRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/lib/auth/AuthContext';
-import GlobalSearch from '@/components/admin/GlobalSearch';
 import CommandPalette from '@/components/admin/CommandPalette';
+import NotificationBell from '@/components/admin/NotificationBell';
 import {
   LayoutDashboard,
   Users,
@@ -27,11 +27,11 @@ import {
   Menu,
   X,
   ChevronDown,
-  Bell,
   ShoppingCart,
   BarChart3,
   MessageSquare,
   HelpCircle,
+  Search,
 } from 'lucide-react';
 
 // Badge counts interface
@@ -261,7 +261,14 @@ function Sidebar({
 // TOP HEADER COMPONENT
 // ═══════════════════════════════════════════════════════════════
 
-function TopHeader({ onMenuClick, totalNotifications }: { onMenuClick: () => void; totalNotifications: number }) {
+function TopHeader({ onMenuClick, onOpenCommandPalette }: { onMenuClick: () => void; onOpenCommandPalette: () => void }) {
+  // Detect Mac vs Windows/Linux for keyboard shortcut display
+  const [isMac, setIsMac] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMac(navigator.platform.toUpperCase().indexOf('MAC') >= 0);
+  }, []);
+
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
       {/* Left Side */}
@@ -273,23 +280,23 @@ function TopHeader({ onMenuClick, totalNotifications }: { onMenuClick: () => voi
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* Search */}
-        <div className="hidden sm:block">
-          <GlobalSearch />
-        </div>
+        {/* Search - now a button that opens command palette */}
+        <button
+          onClick={onOpenCommandPalette}
+          className="hidden sm:flex items-center gap-3 px-3 py-2 text-sm text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors min-w-[240px]"
+        >
+          <Search className="w-4 h-4" />
+          <span className="flex-1 text-left">Search...</span>
+          <kbd className="hidden md:inline-flex items-center gap-0.5 px-1.5 py-0.5 text-xs font-medium text-gray-400 bg-white border border-gray-200 rounded">
+            {isMac ? '⌘' : 'Ctrl'}K
+          </kbd>
+        </button>
       </div>
 
       {/* Right Side */}
       <div className="flex items-center gap-2">
         {/* Notifications */}
-        <button className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
-          <Bell className="w-5 h-5" />
-          {totalNotifications > 0 && (
-            <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center px-1">
-              {totalNotifications > 99 ? '99+' : totalNotifications}
-            </span>
-          )}
-        </button>
+        <NotificationBell />
 
         {/* View Site */}
         <Link
@@ -310,6 +317,7 @@ function TopHeader({ onMenuClick, totalNotifications }: { onMenuClick: () => voi
 
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [badgeCounts, setBadgeCounts] = useState<BadgeCounts>({
     pendingOrders: 0,
     pendingQuotes: 0,
@@ -345,7 +353,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Command Palette */}
-      <CommandPalette />
+      <CommandPalette isOpen={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} />
 
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} badgeCounts={badgeCounts} />
@@ -355,7 +363,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         {/* Top Header */}
         <TopHeader
           onMenuClick={() => setSidebarOpen(true)}
-          totalNotifications={badgeCounts.pendingOrders + badgeCounts.pendingQuotes + badgeCounts.unreadMessages}
+          onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         />
 
         {/* Page Content */}

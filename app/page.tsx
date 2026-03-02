@@ -7,7 +7,7 @@ import {
   BadgeCheck, Zap, Headphones, Package, Users, Globe,
   Clock, Truck, ShieldCheck, Phone, Mail, MapPin,
   Menu, X, ChevronRight, ChevronLeft, ChevronDown, ArrowRight, CircleCheck,
-  Facebook, Instagram, Linkedin, Youtube, MessageCircle,
+  Facebook, Instagram, Linkedin, Youtube,
   Star, Layers, Scissors, Wrench, Disc, Settings, Quote, Smartphone,
 } from 'lucide-react'
 import CountUp from '@/components/ui/CountUp'
@@ -17,6 +17,7 @@ import SearchDropdown from '@/components/ui/SearchDropdown'
 import NewsletterForm from '@/components/ui/NewsletterForm'
 import FloatingActions from '@/components/ui/FloatingActions'
 import ThemeToggle from '@/components/ui/ThemeToggle'
+import NavAuthButton from '@/components/auth/NavAuthButton'
 
 /* ─── Social Media Links ─────────────────────────────────── */
 const socialLinks = {
@@ -436,27 +437,7 @@ export default function Home() {
 
             {/* Right buttons */}
             <div className="hidden md:flex items-center gap-3">
-              <a
-                href="https://wa.me/9613741565"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-medium px-4 py-2 rounded-lg border transition-all active:scale-95 flex items-center gap-2"
-                style={{
-                  borderColor: '#25D366',
-                  color: '#25D366',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = '#25D366'
-                  e.currentTarget.style.color = 'white'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = 'transparent'
-                  e.currentTarget.style.color = '#25D366'
-                }}
-              >
-                <MessageCircle className="w-4 h-4" />
-                WhatsApp
-              </a>
+              <NavAuthButton />
               <a
                 href="#cta"
                 className="btn-shimmer text-sm font-semibold px-5 py-2 rounded-lg text-white active:scale-95 transition-transform"
@@ -538,17 +519,11 @@ export default function Home() {
                 </Link>
               </div>
 
-              <a
-                href="https://wa.me/9613741565"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xl font-semibold py-3 border-b flex items-center gap-2"
-                style={{ color: '#25D366', borderColor: '#f1f5f9', animation: `lineReveal 0.4s cubic-bezier(0.16,1,0.3,1) ${4 * 60}ms both` }}
-                onClick={() => setMenuOpen(false)}
-              >
-                <MessageCircle className="w-5 h-5" />
-                WhatsApp Us
-              </a>
+              {/* Auth Section */}
+              <div className="py-3 border-b" style={{ borderColor: '#f1f5f9' }}>
+                <NavAuthButton variant="mobile" />
+              </div>
+
               <a
                 href="#cta"
                 onClick={() => setMenuOpen(false)}

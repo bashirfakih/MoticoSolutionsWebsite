@@ -330,4 +330,244 @@ describe('orderService', () => {
       expect(pendingCount).toBeLessThanOrEqual(totalCount);
     });
   });
+
+  describe('getPaginated - additional filters', () => {
+    it('should filter by search term', () => {
+      const orders = orderService.getAll();
+      const orderNumber = orders[0].orderNumber;
+
+      const result = orderService.getPaginated(
+        { page: 1, limit: 100 },
+        { search: orderNumber }
+      );
+
+      expect(result.data.some(o => o.orderNumber === orderNumber)).toBe(true);
+    });
+
+    it('should filter by paymentStatus', () => {
+      const result = orderService.getPaginated(
+        { page: 1, limit: 100 },
+        { paymentStatus: PAYMENT_STATUS.PENDING }
+      );
+
+      result.data.forEach(o => {
+        expect(o.paymentStatus).toBe(PAYMENT_STATUS.PENDING);
+      });
+    });
+
+    it('should filter by customerId', () => {
+      const orders = orderService.getAll();
+      const customerId = orders[0].customerId;
+
+      const result = orderService.getPaginated(
+        { page: 1, limit: 100 },
+        { customerId }
+      );
+
+      result.data.forEach(o => {
+        expect(o.customerId).toBe(customerId);
+      });
+    });
+
+    it('should filter by dateFrom', () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const result = orderService.getPaginated(
+        { page: 1, limit: 100 },
+        { dateFrom: yesterday.toISOString() }
+      );
+
+      result.data.forEach(o => {
+        expect(new Date(o.createdAt).getTime()).toBeGreaterThanOrEqual(yesterday.getTime());
+      });
+    });
+
+    it('should filter by dateTo', () => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const result = orderService.getPaginated(
+        { page: 1, limit: 100 },
+        { dateTo: tomorrow.toISOString() }
+      );
+
+      result.data.forEach(o => {
+        expect(new Date(o.createdAt).getTime()).toBeLessThanOrEqual(tomorrow.getTime());
+      });
+    });
+
+    it('should sort by string field ascending', () => {
+      const result = orderService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'customerName',
+        sortOrder: 'asc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].customerName.localeCompare(result.data[i-1].customerName)).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    it('should sort by string field descending', () => {
+      const result = orderService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'customerName',
+        sortOrder: 'desc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].customerName.localeCompare(result.data[i-1].customerName)).toBeLessThanOrEqual(0);
+      }
+    });
+
+    it('should sort by numeric field ascending', () => {
+      const result = orderService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'total',
+        sortOrder: 'asc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].total).toBeGreaterThanOrEqual(result.data[i-1].total);
+      }
+    });
+
+    it('should sort by numeric field descending', () => {
+      const result = orderService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'total',
+        sortOrder: 'desc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].total).toBeLessThanOrEqual(result.data[i-1].total);
+      }
+    });
+
+    it('should calculate hasMore correctly', () => {
+      const result = orderService.getPaginated({ page: 1, limit: 1 });
+
+      if (result.total > 1) {
+        expect(result.hasMore).toBe(true);
+      }
+
+      const lastPage = orderService.getPaginated({ page: result.totalPages, limit: 1 });
+      expect(lastPage.hasMore).toBe(false);
+    });
+  });
+
+  describe('create - additional fields', () => {
+    it('should create order with shippingCost', () => {
+      const newOrder = orderService.create({
+        customerId: 'cust-ship',
+        items: [
+          { productId: 'p1', productName: 'Test', sku: 'T1', quantity: 1, unitPrice: 100, totalPrice: 100 },
+        ],
+        shippingAddress: { name: 'Test', company: null, address: '', city: '', region: null, postalCode: null, country: 'Lebanon', phone: null },
+        shippingCost: 15,
+      });
+
+      expect(newOrder.shippingCost).toBe(15);
+      expect(newOrder.total).toBe(115); // 100 + 15 shipping
+
+      // Cleanup
+      orderService.delete(newOrder.id);
+    });
+
+    it('should create order with discount', () => {
+      const newOrder = orderService.create({
+        customerId: 'cust-disc',
+        items: [
+          { productId: 'p1', productName: 'Test', sku: 'T1', quantity: 1, unitPrice: 100, totalPrice: 100 },
+        ],
+        shippingAddress: { name: 'Test', company: null, address: '', city: '', region: null, postalCode: null, country: 'Lebanon', phone: null },
+        discount: 10,
+      });
+
+      expect(newOrder.discount).toBe(10);
+      expect(newOrder.total).toBe(90); // 100 - 10 discount
+
+      // Cleanup
+      orderService.delete(newOrder.id);
+    });
+
+    it('should create order with customerNote', () => {
+      const newOrder = orderService.create({
+        customerId: 'cust-note',
+        items: [],
+        shippingAddress: { name: 'Test', company: null, address: '', city: '', region: null, postalCode: null, country: 'Lebanon', phone: null },
+        customerNote: 'Please deliver in the morning',
+      });
+
+      expect(newOrder.customerNote).toBe('Please deliver in the morning');
+
+      // Cleanup
+      orderService.delete(newOrder.id);
+    });
+
+    it('should create order with internalNote', () => {
+      const newOrder = orderService.create({
+        customerId: 'cust-internal',
+        items: [],
+        shippingAddress: { name: 'Test', company: null, address: '', city: '', region: null, postalCode: null, country: 'Lebanon', phone: null },
+        internalNote: 'VIP customer',
+      });
+
+      expect(newOrder.internalNote).toBe('VIP customer');
+
+      // Cleanup
+      orderService.delete(newOrder.id);
+    });
+
+    it('should calculate itemCount correctly', () => {
+      const newOrder = orderService.create({
+        customerId: 'cust-items',
+        items: [
+          { productId: 'p1', productName: 'Test1', sku: 'T1', quantity: 2, unitPrice: 50, totalPrice: 100 },
+          { productId: 'p2', productName: 'Test2', sku: 'T2', quantity: 3, unitPrice: 30, totalPrice: 90 },
+        ],
+        shippingAddress: { name: 'Test', company: null, address: '', city: '', region: null, postalCode: null, country: 'Lebanon', phone: null },
+      });
+
+      expect(newOrder.itemCount).toBe(5); // 2 + 3
+      expect(newOrder.subtotal).toBe(190); // 100 + 90
+
+      // Cleanup
+      orderService.delete(newOrder.id);
+    });
+  });
+
+  describe('search - additional coverage', () => {
+    it('should search by customer email', () => {
+      const orders = orderService.getAll();
+      const orderWithEmail = orders.find(o => o.customerEmail);
+
+      if (orderWithEmail && orderWithEmail.customerEmail) {
+        const results = orderService.search(orderWithEmail.customerEmail);
+        expect(results.some(o => o.customerEmail === orderWithEmail.customerEmail)).toBe(true);
+      }
+    });
+  });
+
+  describe('updatePaymentStatus - additional coverage', () => {
+    it('should not set paidAt for non-paid status', () => {
+      const newOrder = orderService.create({
+        customerId: 'cust-payment',
+        items: [],
+        shippingAddress: { name: 'Test', company: null, address: '', city: '', region: null, postalCode: null, country: 'Lebanon', phone: null },
+      });
+
+      const updated = orderService.updatePaymentStatus(newOrder.id, PAYMENT_STATUS.FAILED);
+      expect(updated.paymentStatus).toBe(PAYMENT_STATUS.FAILED);
+      expect(updated.paidAt).toBeNull();
+
+      // Cleanup
+      orderService.delete(newOrder.id);
+    });
+  });
 });

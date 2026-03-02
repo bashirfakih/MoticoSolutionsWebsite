@@ -9,6 +9,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 
+// Force dynamic - never cache this route
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET - List products with optional filtering
 export async function GET(request: NextRequest) {
   try {
@@ -163,6 +167,20 @@ export async function POST(request: NextRequest) {
     if (!brand) {
       return NextResponse.json(
         { error: 'Brand not found' },
+        { status: 400 }
+      );
+    }
+
+    // Validate price and stock quantity are non-negative
+    if (body.price !== undefined && body.price !== null && body.price < 0) {
+      return NextResponse.json(
+        { error: 'Price cannot be negative' },
+        { status: 400 }
+      );
+    }
+    if (body.stockQuantity !== undefined && body.stockQuantity < 0) {
+      return NextResponse.json(
+        { error: 'Stock quantity cannot be negative' },
         { status: 400 }
       );
     }

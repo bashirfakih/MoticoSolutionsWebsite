@@ -9,10 +9,11 @@
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { categoryService } from '@/lib/data/categoryService';
+import { categoryApiService } from '@/lib/api/categoryService';
 import { Category, CategoryInput, generateSlug } from '@/lib/data/types';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
+import { pluralize } from '@/lib/utils/formatting';
 import {
   Plus,
   Edit,
@@ -91,7 +92,7 @@ function CategoryTreeItem({
             )}
           </div>
           <p className="text-xs text-gray-500 truncate">
-            /{category.slug} • {category.productCount || 0} products
+            /{category.slug} • {pluralize(category.productCount || 0, 'product')}
           </p>
         </div>
 
@@ -298,11 +299,18 @@ export default function AdminCategoriesPage() {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
 
   // Load categories
-  const loadCategories = useCallback(() => {
+  const loadCategories = useCallback(async () => {
     setIsLoading(true);
-    setCategories(categoryService.getAll());
-    setIsLoading(false);
-  }, []);
+    try {
+      const data = await categoryApiService.getAll();
+      setCategories(data);
+    } catch (error) {
+      toast.error('Failed to load categories');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [toast]);
 
   useEffect(() => {
     loadCategories();
@@ -332,13 +340,13 @@ export default function AdminCategoriesPage() {
     setIsSaving(true);
     try {
       if (id) {
-        categoryService.update(id, input);
+        await categoryApiService.update(id, input);
         toast.success('Category updated');
       } else {
-        categoryService.create(input);
+        await categoryApiService.create(input);
         toast.success('Category created');
       }
-      loadCategories();
+      await loadCategories();
       setShowForm(false);
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : 'Failed to save category');
@@ -348,13 +356,13 @@ export default function AdminCategoriesPage() {
   };
 
   // Handle delete
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (!categoryToDelete) return;
 
     try {
-      categoryService.delete(categoryToDelete.id);
+      await categoryApiService.delete(categoryToDelete.id);
       toast.success('Category deleted');
-      loadCategories();
+      await loadCategories();
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : 'Failed to delete category');
     }

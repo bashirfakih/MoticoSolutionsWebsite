@@ -9,7 +9,7 @@
  * @module components/ui/Toast
  */
 
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 import { CheckCircle2, AlertCircle, Info, X, AlertTriangle } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════════
@@ -160,7 +160,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     addToast({ type: 'info', title, message });
   }, [addToast]);
 
-  const value: ToastContextType = {
+  const value = useMemo<ToastContextType>(() => ({
     toasts,
     addToast,
     removeToast,
@@ -168,7 +168,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     error,
     warning,
     info,
-  };
+  }), [toasts, addToast, removeToast, success, error, warning, info]);
 
   return (
     <ToastContext.Provider value={value}>

@@ -35,10 +35,10 @@ import {
   DollarSign,
   Layers,
   FileText,
-  Settings,
   ImageIcon,
   AlertTriangle,
 } from 'lucide-react';
+import { notifyOutOfStock } from '@/lib/notifications/notificationService';
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -369,6 +369,12 @@ export default function AdminProductEditPage() {
         }
 
         const product = await response.json();
+
+        // Trigger out-of-stock notification if stock is 0
+        if (productData.stockQuantity === 0) {
+          notifyOutOfStock(productData.name, product.id);
+        }
+
         toast.success('Product created');
         safeNavigate(`/admin/products/${product.id}`);
       } else {
@@ -381,6 +387,11 @@ export default function AdminProductEditPage() {
         if (!response.ok) {
           const error = await response.json();
           throw new Error(error.error || 'Failed to update product');
+        }
+
+        // Trigger out-of-stock notification if stock is 0
+        if (productData.stockQuantity === 0) {
+          notifyOutOfStock(productData.name, productId);
         }
 
         toast.success('Product saved');

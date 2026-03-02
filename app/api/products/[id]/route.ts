@@ -9,6 +9,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
+// Force dynamic - never cache this route
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -109,6 +113,20 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
           { status: 409 }
         );
       }
+    }
+
+    // Validate price and stock quantity are non-negative
+    if (body.price !== undefined && body.price !== null && body.price < 0) {
+      return NextResponse.json(
+        { error: 'Price cannot be negative' },
+        { status: 400 }
+      );
+    }
+    if (body.stockQuantity !== undefined && body.stockQuantity < 0) {
+      return NextResponse.json(
+        { error: 'Stock quantity cannot be negative' },
+        { status: 400 }
+      );
     }
 
     // Build update data

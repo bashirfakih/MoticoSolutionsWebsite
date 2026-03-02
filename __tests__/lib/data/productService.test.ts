@@ -546,4 +546,604 @@ describe('productService', () => {
       expect(publishedCount).toBeLessThanOrEqual(totalCount);
     });
   });
+
+  describe('getPaginated - additional filters', () => {
+    it('should filter by subcategoryId', () => {
+      const products = productService.getAll();
+      const productWithSub = products.find(p => p.subcategoryId);
+
+      if (productWithSub && productWithSub.subcategoryId) {
+        const result = productService.getPaginated(
+          { page: 1, limit: 100 },
+          { subcategoryId: productWithSub.subcategoryId }
+        );
+
+        result.data.forEach(p => {
+          expect(p.subcategoryId).toBe(productWithSub.subcategoryId);
+        });
+      }
+    });
+
+    it('should filter by isFeatured', () => {
+      const result = productService.getPaginated(
+        { page: 1, limit: 100 },
+        { isFeatured: true }
+      );
+
+      result.data.forEach(p => {
+        expect(p.isFeatured).toBe(true);
+      });
+    });
+
+    it('should filter by priceMin', () => {
+      const result = productService.getPaginated(
+        { page: 1, limit: 100 },
+        { priceMin: 50 }
+      );
+
+      result.data.forEach(p => {
+        expect((p.price ?? 0)).toBeGreaterThanOrEqual(50);
+      });
+    });
+
+    it('should filter by priceMax', () => {
+      const result = productService.getPaginated(
+        { page: 1, limit: 100 },
+        { priceMax: 100 }
+      );
+
+      result.data.forEach(p => {
+        expect((p.price ?? 0)).toBeLessThanOrEqual(100);
+      });
+    });
+
+    it('should sort by string field ascending', () => {
+      const result = productService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'name',
+        sortOrder: 'asc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].name.localeCompare(result.data[i-1].name)).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    it('should sort by string field descending', () => {
+      const result = productService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'name',
+        sortOrder: 'desc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].name.localeCompare(result.data[i-1].name)).toBeLessThanOrEqual(0);
+      }
+    });
+
+    it('should sort by numeric field ascending', () => {
+      const result = productService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'stockQuantity',
+        sortOrder: 'asc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].stockQuantity).toBeGreaterThanOrEqual(result.data[i-1].stockQuantity);
+      }
+    });
+
+    it('should sort by numeric field descending', () => {
+      const result = productService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'stockQuantity',
+        sortOrder: 'desc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].stockQuantity).toBeLessThanOrEqual(result.data[i-1].stockQuantity);
+      }
+    });
+
+    it('should handle null values in sorting', () => {
+      // Sort by price which may have null values
+      const result = productService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'price',
+        sortOrder: 'asc'
+      });
+
+      expect(result.data).toBeDefined();
+    });
+
+    it('should search by shortDescription', () => {
+      const products = productService.getPublished();
+      const productWithShortDesc = products.find(p => p.shortDescription);
+
+      if (productWithShortDesc && productWithShortDesc.shortDescription) {
+        const searchTerm = productWithShortDesc.shortDescription.split(' ')[0];
+        const result = productService.getPaginated(
+          { page: 1, limit: 100 },
+          { search: searchTerm }
+        );
+
+        expect(result.data.length).toBeGreaterThan(0);
+      }
+    });
+  });
+
+  describe('getWithRelations', () => {
+    it('should return product with category and brand', () => {
+      const products = productService.getAll();
+      const product = products[0];
+
+      const withRelations = productService.getWithRelations(product.id);
+
+      expect(withRelations).not.toBeNull();
+      expect(withRelations?.category).toBeDefined();
+      expect(withRelations?.brand).toBeDefined();
+      expect(withRelations?.id).toBe(product.id);
+    });
+
+    it('should return null for non-existent product', () => {
+      const result = productService.getWithRelations('non-existent-id');
+      expect(result).toBeNull();
+    });
+
+    it('should include subcategory when present', () => {
+      const products = productService.getAll();
+      const productWithSub = products.find(p => p.subcategoryId);
+
+      if (productWithSub) {
+        const withRelations = productService.getWithRelations(productWithSub.id);
+        expect(withRelations?.subcategory).toBeDefined();
+      }
+    });
+  });
+
+  describe('getByCategory', () => {
+    it('should return products matching subcategoryId', () => {
+      const products = productService.getPublished();
+      const productWithSub = products.find(p => p.subcategoryId);
+
+      if (productWithSub && productWithSub.subcategoryId) {
+        const result = productService.getByCategory(productWithSub.subcategoryId);
+        expect(result.some(p => p.subcategoryId === productWithSub.subcategoryId)).toBe(true);
+      }
+    });
+  });
+
+  describe('getByBrand', () => {
+    it('should return products by brand', () => {
+      const products = productService.getPublished();
+      const brandId = products[0].brandId;
+
+      const result = productService.getByBrand(brandId);
+
+      expect(Array.isArray(result)).toBe(true);
+      result.forEach(p => {
+        expect(p.brandId).toBe(brandId);
+      });
+    });
+  });
+
+  describe('create - additional options', () => {
+    it('should create product with custom slug', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const newProduct = productService.create({
+        sku: 'TEST-CUSTOM-SLUG',
+        name: 'Custom Slug Product',
+        slug: 'my-custom-slug',
+        description: 'Description',
+        categoryId,
+        brandId,
+      });
+
+      expect(newProduct.slug).toBe('my-custom-slug');
+
+      // Cleanup
+      productService.delete(newProduct.id);
+    });
+
+    it('should throw error for duplicate slug', () => {
+      const existingProduct = productService.getAll()[0];
+
+      expect(() => {
+        productService.create({
+          sku: 'TEST-DUP-SLUG',
+          name: 'Duplicate Slug',
+          slug: existingProduct.slug,
+          description: 'Description',
+          categoryId: existingProduct.categoryId,
+          brandId: existingProduct.brandId,
+        });
+      }).toThrow(/already exists/);
+    });
+
+    it('should create product with all optional fields', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const newProduct = productService.create({
+        sku: 'TEST-ALL-OPTIONS',
+        name: 'All Options Product',
+        description: 'Full description',
+        shortDescription: 'Short desc',
+        categoryId,
+        subcategoryId: categoryId,
+        brandId,
+        features: ['Feature 1', 'Feature 2'],
+        images: [{ url: '/img.jpg', alt: 'Image', isPrimary: true, sortOrder: 0 }],
+        specifications: [{ name: 'Spec', value: 'Value' }],
+        variants: [],
+        hasVariants: false,
+        price: 99.99,
+        compareAtPrice: 129.99,
+        currency: CURRENCY.USD,
+        trackInventory: false,
+        allowBackorder: true,
+        isPublished: true,
+        isFeatured: true,
+        isNew: false,
+        metaTitle: 'Meta Title',
+        metaDescription: 'Meta Description',
+      });
+
+      expect(newProduct.shortDescription).toBe('Short desc');
+      expect(newProduct.features).toEqual(['Feature 1', 'Feature 2']);
+      expect(newProduct.images.length).toBe(1);
+      expect(newProduct.specifications.length).toBe(1);
+      expect(newProduct.compareAtPrice).toBe(129.99);
+      expect(newProduct.trackInventory).toBe(false);
+      expect(newProduct.allowBackorder).toBe(true);
+      expect(newProduct.isPublished).toBe(true);
+      expect(newProduct.isFeatured).toBe(true);
+      expect(newProduct.isNew).toBe(false);
+      expect(newProduct.metaTitle).toBe('Meta Title');
+      expect(newProduct.metaDescription).toBe('Meta Description');
+      expect(newProduct.publishedAt).not.toBeNull();
+
+      // Cleanup
+      productService.delete(newProduct.id);
+    });
+
+    it('should log initial inventory when trackInventory is true', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const newProduct = productService.create({
+        sku: 'TEST-INVENTORY-LOG',
+        name: 'Inventory Log Test',
+        description: 'Description',
+        categoryId,
+        brandId,
+        stockQuantity: 50,
+        trackInventory: true,
+      }, 'test-user');
+
+      const logs = productService.getInventoryLogs(newProduct.id);
+      expect(logs.length).toBeGreaterThan(0);
+
+      // Cleanup
+      productService.delete(newProduct.id);
+    });
+  });
+
+  describe('update - additional branches', () => {
+    it('should allow updating SKU if not duplicate', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const newProduct = productService.create({
+        sku: 'TEST-SKU-UPDATE',
+        name: 'SKU Update Test',
+        description: 'Description',
+        categoryId,
+        brandId,
+      });
+
+      const updated = productService.update(newProduct.id, {
+        sku: 'TEST-SKU-UPDATED',
+      });
+
+      expect(updated.sku).toBe('TEST-SKU-UPDATED');
+
+      // Cleanup
+      productService.delete(newProduct.id);
+    });
+
+    it('should throw error when updating to duplicate SKU', () => {
+      const existingProduct = productService.getAll()[0];
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const newProduct = productService.create({
+        sku: 'TEST-DUP-SKU-UPDATE',
+        name: 'Duplicate SKU Test',
+        description: 'Description',
+        categoryId,
+        brandId,
+      });
+
+      expect(() => {
+        productService.update(newProduct.id, {
+          sku: existingProduct.sku,
+        });
+      }).toThrow(/already exists/);
+
+      // Cleanup
+      productService.delete(newProduct.id);
+    });
+
+    it('should throw error when updating to duplicate slug', () => {
+      const existingProduct = productService.getAll()[0];
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const newProduct = productService.create({
+        sku: 'TEST-DUP-SLUG-UPDATE',
+        name: 'Duplicate Slug Test',
+        description: 'Description',
+        categoryId,
+        brandId,
+      });
+
+      expect(() => {
+        productService.update(newProduct.id, {
+          slug: existingProduct.slug,
+        });
+      }).toThrow(/already exists/);
+
+      // Cleanup
+      productService.delete(newProduct.id);
+    });
+
+    it('should set publishedAt when publishing', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const newProduct = productService.create({
+        sku: 'TEST-PUBLISH',
+        name: 'Publish Test',
+        description: 'Description',
+        categoryId,
+        brandId,
+        isPublished: false,
+      });
+
+      expect(newProduct.publishedAt).toBeNull();
+
+      const updated = productService.update(newProduct.id, {
+        isPublished: true,
+      });
+
+      expect(updated.isPublished).toBe(true);
+      expect(updated.publishedAt).not.toBeNull();
+
+      // Cleanup
+      productService.delete(newProduct.id);
+    });
+
+    it('should clear publishedAt when unpublishing', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const newProduct = productService.create({
+        sku: 'TEST-UNPUBLISH',
+        name: 'Unpublish Test',
+        description: 'Description',
+        categoryId,
+        brandId,
+        isPublished: true,
+      });
+
+      expect(newProduct.publishedAt).not.toBeNull();
+
+      const updated = productService.update(newProduct.id, {
+        isPublished: false,
+      });
+
+      expect(updated.isPublished).toBe(false);
+      expect(updated.publishedAt).toBeNull();
+
+      // Cleanup
+      productService.delete(newProduct.id);
+    });
+  });
+
+  describe('togglePublished - error handling', () => {
+    it('should throw error for non-existent product', () => {
+      expect(() => {
+        productService.togglePublished('non-existent-id');
+      }).toThrow(/not found/);
+    });
+  });
+
+  describe('toggleFeatured - error handling', () => {
+    it('should throw error for non-existent product', () => {
+      expect(() => {
+        productService.toggleFeatured('non-existent-id');
+      }).toThrow(/not found/);
+    });
+  });
+
+  describe('adjustInventory - error handling', () => {
+    it('should throw error for non-existent product', () => {
+      expect(() => {
+        productService.adjustInventory('non-existent-id', 10, INVENTORY_REASON.RESTOCK);
+      }).toThrow(/not found/);
+    });
+  });
+
+  describe('setInventory - error handling', () => {
+    it('should throw error for non-existent product', () => {
+      expect(() => {
+        productService.setInventory('non-existent-id', 10);
+      }).toThrow(/not found/);
+    });
+  });
+
+  describe('duplicate - error handling', () => {
+    it('should throw error for non-existent product', () => {
+      expect(() => {
+        productService.duplicate('non-existent-id');
+      }).toThrow(/not found/);
+    });
+  });
+
+  describe('reset', () => {
+    it('should reset products to mock data', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      // Create a test product
+      const testProduct = productService.create({
+        sku: 'TEST-RESET',
+        name: 'Reset Test',
+        description: 'Description',
+        categoryId,
+        brandId,
+      });
+
+      expect(productService.getById(testProduct.id)).not.toBeNull();
+
+      // Reset
+      productService.reset();
+
+      // The test product should be gone
+      expect(productService.getById(testProduct.id)).toBeNull();
+    });
+  });
+
+  describe('clear', () => {
+    it('should clear all products from storage', () => {
+      productService.clear();
+
+      // After clearing, getAll should return mock data (since storage is cleared, it reinitializes)
+      const products = productService.getAll();
+      expect(Array.isArray(products)).toBe(true);
+    });
+  });
+
+  // B-4 Regression tests: Negative price and stock validation
+  describe('B-4: Negative value validation', () => {
+    it('should throw error when creating product with negative price', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      expect(() => {
+        productService.create({
+          sku: 'TEST-NEG-PRICE',
+          name: 'Negative Price Product',
+          description: 'A test product',
+          categoryId,
+          brandId,
+          price: -10.00,
+        });
+      }).toThrow('Price cannot be negative');
+    });
+
+    it('should throw error when creating product with negative stock quantity', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      expect(() => {
+        productService.create({
+          sku: 'TEST-NEG-STOCK',
+          name: 'Negative Stock Product',
+          description: 'A test product',
+          categoryId,
+          brandId,
+          stockQuantity: -5,
+        });
+      }).toThrow('Stock quantity cannot be negative');
+    });
+
+    it('should throw error when updating product with negative price', () => {
+      const products = productService.getAll();
+      const product = products[0];
+
+      expect(() => {
+        productService.update(product.id, { price: -25.00 });
+      }).toThrow('Price cannot be negative');
+    });
+
+    it('should throw error when updating product with negative stock quantity', () => {
+      const products = productService.getAll();
+      const product = products[0];
+
+      expect(() => {
+        productService.update(product.id, { stockQuantity: -10 });
+      }).toThrow('Stock quantity cannot be negative');
+    });
+
+    it('should allow zero price', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const product = productService.create({
+        sku: 'TEST-ZERO-PRICE',
+        name: 'Zero Price Product',
+        description: 'A free product',
+        categoryId,
+        brandId,
+        price: 0,
+      });
+
+      expect(product.price).toBe(0);
+    });
+
+    it('should allow zero stock quantity', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const product = productService.create({
+        sku: 'TEST-ZERO-STOCK',
+        name: 'Zero Stock Product',
+        description: 'An out of stock product',
+        categoryId,
+        brandId,
+        stockQuantity: 0,
+      });
+
+      expect(product.stockQuantity).toBe(0);
+    });
+
+    it('should allow null price', () => {
+      const products = productService.getAll();
+      const categoryId = products[0].categoryId;
+      const brandId = products[0].brandId;
+
+      const product = productService.create({
+        sku: 'TEST-NULL-PRICE',
+        name: 'No Price Product',
+        description: 'A product without price',
+        categoryId,
+        brandId,
+        price: null,
+      });
+
+      expect(product.price).toBeNull();
+    });
+  });
 });

@@ -26,6 +26,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from 'lucide-react';
+import FilterChips from '@/components/admin/FilterChips';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useToast } from '@/components/ui/Toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -205,6 +206,21 @@ function CustomersContent() {
     }
   };
 
+  // Clear filters
+  const clearFilters = () => {
+    setStatusFilter('');
+    setSearch('');
+  };
+
+  // Apply filter from chip
+  const handleApplyChipFilter = (filter: Record<string, string | boolean | undefined>) => {
+    if (filter.status) {
+      setStatusFilter(String(filter.status));
+    } else {
+      setStatusFilter('');
+    }
+  };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       loadCustomers();
@@ -367,8 +383,18 @@ function CustomersContent() {
               </option>
             ))}
           </select>
+
         </div>
       </div>
+
+      {/* Filter Chips */}
+      <FilterChips
+        pageType="customers"
+        currentFilter={{ status: statusFilter || undefined }}
+        onApplyFilter={handleApplyChipFilter}
+        onClearFilter={clearFilters}
+        hasActiveFilter={!!statusFilter}
+      />
 
       {/* Customers Table */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">

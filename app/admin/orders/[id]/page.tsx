@@ -491,7 +491,7 @@ function OrderDetailContent() {
         title="Update Order Status"
         message={`Are you sure you want to change the order status to "${pendingStatus ? (statusConfig[pendingStatus]?.label || pendingStatus) : ''}"? This will notify the customer.`}
         confirmText="Update Status"
-        variant="primary"
+        variant="default"
         isLoading={isSaving}
       />
     </div>

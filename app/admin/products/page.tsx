@@ -73,6 +73,7 @@ import {
   StarOff,
   RefreshCw,
 } from 'lucide-react';
+import FilterChips from '@/components/admin/FilterChips';
 
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT
@@ -197,6 +198,12 @@ export default function AdminProductsPage() {
   const clearFilters = () => {
     setFilters({});
     setSearch('');
+    setPage(1);
+  };
+
+  // Apply filter from chip
+  const handleApplyChipFilter = (filter: Record<string, string | boolean | undefined>) => {
+    setFilters(filter as ProductFilter);
     setPage(1);
   };
 
@@ -849,6 +856,15 @@ export default function AdminProductsPage() {
           </div>
         </div>
       )}
+
+      {/* Filter Chips */}
+      <FilterChips
+        pageType="products"
+        currentFilter={filters as Record<string, string | boolean | undefined>}
+        onApplyFilter={handleApplyChipFilter}
+        onClearFilter={clearFilters}
+        hasActiveFilter={!!hasActiveFilters}
+      />
 
       {/* Data Table */}
       <DataTable

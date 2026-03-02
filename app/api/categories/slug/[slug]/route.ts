@@ -7,6 +7,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
+// Force dynamic - never cache this route
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface RouteParams {
   params: Promise<{ slug: string }>;
 }
@@ -27,8 +31,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
           select: { id: true, name: true, slug: true, image: true, description: true },
           orderBy: { sortOrder: 'asc' },
         },
-        _count: {
-          select: { products: true },
+        // Count only published products
+        products: {
+          where: { isPublished: true },
+          select: { id: true },
         },
       },
     });
@@ -42,8 +48,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({
       ...category,
-      productCount: category._count.products,
-      _count: undefined,
+      productCount: category.products.length,
+      products: undefined,
     });
   } catch (error) {
     console.error('Category by slug GET error:', error);

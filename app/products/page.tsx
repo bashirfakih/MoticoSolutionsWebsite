@@ -36,8 +36,10 @@ export default function ProductsPage() {
       setIsLoading(true)
       setError(null)
       try {
-        // Fetch root categories (no parent) that are active
-        const response = await fetch('/api/categories?parentId=null&active=true&limit=100')
+        // Fetch root categories (no parent) that are active - no cache for fresh data
+        const response = await fetch('/api/categories?parentId=null&active=true&limit=100', {
+          cache: 'no-store',
+        })
         if (!response.ok) {
           throw new Error('Failed to load categories')
         }

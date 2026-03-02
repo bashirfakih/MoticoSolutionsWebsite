@@ -2,101 +2,104 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
-import { ArrowLeft, Phone, MessageCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ArrowLeft, Phone, MessageCircle, Loader2, Package } from 'lucide-react'
 
-// Filter Categories
-const categories = ["All", "Heavy-Duty Grinding", "Surface Conditioning", "Mirror Finish", "High-Gloss Polishing", "Eco Smart"]
+// Types
+interface ProductImage {
+  id: string
+  url: string
+  alt: string
+  isPrimary: boolean
+}
+
+interface Product {
+  id: string
+  name: string
+  slug: string
+  shortDescription: string | null
+  price: number | null
+  images: ProductImage[]
+  isFeatured: boolean
+  isNew: boolean
+}
 
 // Badge color mapping
 const badgeColorMap: Record<string, string> = {
-  "Best Seller": "bg-red-600",
-  "Premium": "bg-amber-500",
-  "Popular": "bg-blue-600",
-  "Eco Smart": "bg-emerald-600",
+  "Featured": "bg-red-600",
+  "New": "bg-blue-600",
 }
 
-// Product Gallery Data
-const products = [
-  {
-    slug: 'zirconium-grinding-sleeve',
-    name: 'Zirconium Grinding Sleeve',
-    category: 'Heavy-Duty Grinding',
-    description: 'High-quality zircon fabric for removing deep scratches, rust, scale and weld seams.',
-    image: '/product-zirconium-grinding-sleeve-1.jpg',
-    badge: 'Best Seller',
-  },
-  {
-    slug: 'trizact-sleeve',
-    name: 'Trizact™ Sleeve',
-    category: 'Heavy-Duty Grinding',
-    description: 'Pyramid-shaped grain structure for high material removal with very fine grinding. Ideal prep for mirror polish.',
-    image: '/product-trizact-sleeve-1.jpg',
-    badge: 'Premium',
-  },
-  {
-    slug: 'sc-fleece-sleeves',
-    name: 'SC Fleece Sleeves',
-    category: 'Surface Conditioning',
-    description: 'Technical fleece for removing oxide layers, deburring, fine grinding, and decorative satin finishing.',
-    image: '/product-sc-fleece-sleeves-1.jpg',
-    badge: null,
-  },
-  {
-    slug: 'superpolish-polishing-sleeve',
-    name: 'SuperPolish Polishing Sleeve',
-    category: 'Mirror Finish',
-    description: 'Revolutionary special fleece achieving brilliant mirror shine on stainless steel and non-ferrous metals.',
-    image: '/product-superpolish-sleeve-1.jpg',
-    badge: 'Popular',
-  },
-  {
-    slug: 'cotton-polishing-rings',
-    name: 'Cotton & Mirror Finish Polishing Rings',
-    category: 'High-Gloss Polishing',
-    description: 'Buffing discs for high-gloss polishing with pastes and creams on flat and uneven surfaces.',
-    image: '/product-cotton-polishing-rings-1.jpg',
-    badge: null,
-  },
-  {
-    slug: 'eco-smart-flap-wheel',
-    name: 'Eco Smart Flap Wheel',
-    category: 'Eco Smart',
-    description: 'Elastic abrasive flap wheel for removing rust, oxide layers, paint, scratches and strong structuring.',
-    image: '/product-eco-smart-flap-wheel-1.jpg',
-    badge: 'Eco Smart',
-  },
-  {
-    slug: 'eco-smart-combi-fleece-wheel',
-    name: 'Eco Smart Combi-Fleece Mix Wheel',
-    category: 'Eco Smart',
-    description: 'Nylon fleece with corundum abrasive for matting, satin finishing, and surface smoothing on metal and wood.',
-    image: '/product-eco-smart-combi-wheel-1.jpg',
-    badge: 'Eco Smart',
-  },
-  {
-    slug: 'eco-smart-fleece-wheel',
-    name: 'Eco Smart Fleece Wheel',
-    category: 'Eco Smart',
-    description: 'Shadow-free industrial finish for matting, satin finishing, pre-polishing and surface smoothing.',
-    image: '/product-eco-smart-fleece-wheel-1.jpg',
-    badge: 'Eco Smart',
-  },
-]
+// Default image
+const DEFAULT_PRODUCT_IMAGE = '/slide-1-grinding.png'
 
 export default function GrindingSleevesPage() {
-  const [activeFilter, setActiveFilter] = useState("All")
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const filteredProducts = activeFilter === "All"
-    ? products
-    : products.filter(p => p.category === activeFilter)
+  // Fetch products from API
+  useEffect(() => {
+    async function loadProducts() {
+      setIsLoading(true)
+      setError(null)
+      try {
+        // First get the category ID for grinding-sleeves
+        const catResponse = await fetch('/api/categories/slug/grinding-sleeves', {
+          cache: 'no-store',
+        })
+
+        if (!catResponse.ok) {
+          throw new Error('Category not found')
+        }
+
+        const category = await catResponse.json()
+
+        // Then fetch published products for this category
+        const productsResponse = await fetch(
+          `/api/products?categoryId=${category.id}&published=true&limit=100`,
+          { cache: 'no-store' }
+        )
+
+        if (!productsResponse.ok) {
+          throw new Error('Failed to load products')
+        }
+
+        const data = await productsResponse.json()
+        setProducts(data.data || [])
+      } catch (err) {
+        console.error('Failed to load products:', err)
+        setError('Failed to load products. Please try again.')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadProducts()
+  }, [])
+
+  // Get primary image or first image
+  const getProductImage = (product: Product) => {
+    if (!product.images || product.images.length === 0) {
+      return DEFAULT_PRODUCT_IMAGE
+    }
+    const primary = product.images.find(img => img.isPrimary)
+    return primary?.url || product.images[0]?.url || DEFAULT_PRODUCT_IMAGE
+  }
+
+  // Get badge for product
+  const getProductBadge = (product: Product) => {
+    if (product.isFeatured) return 'Featured'
+    if (product.isNew) return 'New'
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-28 flex items-center justify-between">
-          <Link href="/#products" className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-800 transition-colors">
+          <Link href="/products" className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-800 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Products
           </Link>
@@ -118,7 +121,7 @@ export default function GrindingSleevesPage() {
         <div className="max-w-7xl mx-auto flex items-center gap-2">
           <Link href="/" className="hover:text-blue-700 transition-colors">Home</Link>
           <span className="text-gray-300">/</span>
-          <Link href="/#products" className="hover:text-blue-700 transition-colors">Products</Link>
+          <Link href="/products" className="hover:text-blue-700 transition-colors">Products</Link>
           <span className="text-gray-300">/</span>
           <span className="text-gray-800 font-medium">Grinding Sleeves</span>
         </div>
@@ -128,7 +131,7 @@ export default function GrindingSleevesPage() {
       <section className="relative w-full h-[420px] flex items-center justify-center overflow-hidden">
         <Image
           src="/product-zirconium-grinding-sleeve-1.jpg"
-          alt="Grinding Sleeves & Wheels"
+          alt="Grinding Sleeves"
           fill
           className="object-cover object-center"
           priority
@@ -137,13 +140,13 @@ export default function GrindingSleevesPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-2 bg-red-600 text-white text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
-            Premium Collection
+            {products.length > 0 ? `${products.length} Products` : 'Premium Collection'}
           </span>
           <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-4">
             Grinding <span className="text-red-500">Sleeves</span>
           </h1>
           <p className="text-white/80 text-lg max-w-xl mx-auto">
-            High-performance sleeves for metal finishing, rust removal, and surface preparation — designed for expansion rollers on professional grinding machines.
+            Premium grinding sleeves for precision surface finishing on curved and cylindrical surfaces.
           </p>
         </div>
       </section>
@@ -164,74 +167,105 @@ export default function GrindingSleevesPage() {
                 backgroundClip: 'text',
               }}
             >
-              Grinding Sleeves & Wheels
+              Grinding Sleeves
             </h2>
             <p className="text-lg max-w-2xl mx-auto text-gray-500">
               Click on any product to view detailed specifications and technical data.
             </p>
           </div>
 
-          {/* Category Filter Buttons */}
-          <div className="flex flex-wrap gap-2 justify-center mb-10">
-            {categories.map((cat) => (
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="w-10 h-10 text-[#004D8B] animate-spin mb-4" />
+              <p className="text-gray-600">Loading products...</p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !isLoading && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                <Package className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Failed to Load</h3>
+              <p className="text-gray-600 mb-6">{error}</p>
               <button
-                key={cat}
-                onClick={() => setActiveFilter(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
-                  activeFilter === cat
-                    ? "bg-blue-900 text-white border-blue-900"
-                    : "bg-white text-gray-600 border-gray-300 hover:border-blue-900 hover:text-blue-900"
-                }`}
+                onClick={() => window.location.reload()}
+                className="px-6 py-2.5 rounded-full font-semibold text-white bg-[#004D8B] hover:bg-[#003a6a] transition-all"
               >
-                {cat}
+                Try Again
               </button>
-            ))}
-          </div>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!isLoading && !error && products.length === 0 && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <Package className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">No Products Found</h3>
+              <p className="text-gray-600 mb-6">Check back soon for new products in this category.</p>
+              <Link
+                href="/products"
+                className="px-6 py-2.5 rounded-full font-semibold text-white bg-[#004D8B] hover:bg-[#003a6a] transition-all inline-block"
+              >
+                Browse All Products
+              </Link>
+            </div>
+          )}
 
           {/* Gallery Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-6">
-            {filteredProducts.map((product) => (
-              <Link
-                key={product.slug}
-                href={`/products/grinding-sleeves/${product.slug}`}
-                className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl border border-gray-100 transition-all duration-300 hover:-translate-y-1 flex flex-col"
-              >
-                {/* Image */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {/* Badge */}
-                  {product.badge && (
-                    <span className={`absolute top-3 left-3 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full text-white ${badgeColorMap[product.badge]}`}>
-                      {product.badge}
-                    </span>
-                  )}
-                  {/* Category tag */}
-                  <span className="absolute bottom-3 left-3 text-[10px] font-semibold uppercase tracking-widest text-white/90 bg-black/50 px-2 py-0.5 rounded">
-                    {product.category}
-                  </span>
-                </div>
-                {/* Info Panel — always visible */}
-                <div className="p-4 flex flex-col flex-1">
-                  <h3 className="font-bold text-gray-900 text-base mb-1 group-hover:text-blue-800 transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-500 text-sm leading-relaxed flex-1">
-                    {product.description}
-                  </p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-blue-800 font-semibold text-sm group-hover:underline">
-                      View Details →
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {!isLoading && !error && products.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-6">
+              {products.map((product) => {
+                const badge = getProductBadge(product)
+                return (
+                  <Link
+                    key={product.id}
+                    href={`/products/${product.id}`}
+                    className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl border border-gray-100 transition-all duration-300 hover:-translate-y-1 flex flex-col"
+                  >
+                    {/* Image */}
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                      <Image
+                        src={getProductImage(product)}
+                        alt={product.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {/* Badge */}
+                      {badge && (
+                        <span className={`absolute top-3 left-3 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full text-white ${badgeColorMap[badge]}`}>
+                          {badge}
+                        </span>
+                      )}
+                    </div>
+                    {/* Info Panel */}
+                    <div className="p-4 flex flex-col flex-1">
+                      <h3 className="font-bold text-gray-900 text-base mb-1 group-hover:text-blue-800 transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-gray-500 text-sm leading-relaxed flex-1">
+                        {product.shortDescription || 'High-quality grinding sleeve for industrial applications.'}
+                      </p>
+                      <div className="mt-4 flex items-center justify-between">
+                        <span className="text-blue-800 font-semibold text-sm group-hover:underline">
+                          View Details →
+                        </span>
+                        {product.price && (
+                          <span className="text-gray-900 font-bold">
+                            ${product.price.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -272,9 +306,9 @@ export default function GrindingSleevesPage() {
           <Link href="/" className="text-white font-semibold text-base hover:text-red-400 transition-colors">
             ← Motico Solutions
           </Link>
-          <p className="text-gray-500">Industrial Abrasives & Tools — Beirut, Lebanon</p>
+          <p className="text-gray-500">Industrial Abrasives &amp; Tools — Beirut, Lebanon</p>
           <div className="flex gap-6">
-            <a href="/#products" className="hover:text-white transition-colors">All Products</a>
+            <Link href="/products" className="hover:text-white transition-colors">All Products</Link>
             <a href="tel:+9613741565" className="hover:text-white transition-colors">+961 3 741 565</a>
           </div>
         </div>

@@ -346,4 +346,285 @@ describe('quoteService', () => {
       expect(pendingCount).toBeLessThanOrEqual(totalCount);
     });
   });
+
+  describe('getPaginated - additional filters', () => {
+    it('should filter by search term in company', () => {
+      // Create a quote with a unique company name
+      const newQuote = quoteService.create({
+        customerName: 'Search Test',
+        customerEmail: 'searchtest@test.com',
+        company: 'UniqueCompanyXYZ123',
+        items: [],
+      });
+
+      const result = quoteService.getPaginated(
+        { page: 1, limit: 10 },
+        { search: 'UniqueCompanyXYZ123' }
+      );
+
+      expect(result.data.some(q => q.id === newQuote.id)).toBe(true);
+
+      // Cleanup
+      quoteService.delete(newQuote.id);
+    });
+
+    it('should filter by customerId', () => {
+      const quotes = quoteService.getAll();
+      const quoteWithCustomer = quotes.find(q => q.customerId);
+
+      if (quoteWithCustomer && quoteWithCustomer.customerId) {
+        const result = quoteService.getPaginated(
+          { page: 1, limit: 100 },
+          { customerId: quoteWithCustomer.customerId }
+        );
+
+        result.data.forEach(q => {
+          expect(q.customerId).toBe(quoteWithCustomer.customerId);
+        });
+      }
+    });
+
+    it('should filter by dateFrom', () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const result = quoteService.getPaginated(
+        { page: 1, limit: 100 },
+        { dateFrom: yesterday.toISOString() }
+      );
+
+      result.data.forEach(q => {
+        expect(new Date(q.createdAt).getTime()).toBeGreaterThanOrEqual(yesterday.getTime());
+      });
+    });
+
+    it('should filter by dateTo', () => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const result = quoteService.getPaginated(
+        { page: 1, limit: 100 },
+        { dateTo: tomorrow.toISOString() }
+      );
+
+      result.data.forEach(q => {
+        expect(new Date(q.createdAt).getTime()).toBeLessThanOrEqual(tomorrow.getTime());
+      });
+    });
+
+    it('should filter by date range', () => {
+      const lastWeek = new Date();
+      lastWeek.setDate(lastWeek.getDate() - 7);
+      const today = new Date();
+
+      const result = quoteService.getPaginated(
+        { page: 1, limit: 100 },
+        { dateFrom: lastWeek.toISOString(), dateTo: today.toISOString() }
+      );
+
+      result.data.forEach(q => {
+        const createdTime = new Date(q.createdAt).getTime();
+        expect(createdTime).toBeGreaterThanOrEqual(lastWeek.getTime());
+        expect(createdTime).toBeLessThanOrEqual(today.getTime());
+      });
+    });
+
+    it('should sort by string field ascending', () => {
+      const result = quoteService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'customerName',
+        sortOrder: 'asc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].customerName.localeCompare(result.data[i-1].customerName)).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    it('should sort by string field descending', () => {
+      const result = quoteService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'customerName',
+        sortOrder: 'desc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].customerName.localeCompare(result.data[i-1].customerName)).toBeLessThanOrEqual(0);
+      }
+    });
+
+    it('should sort by numeric field ascending', () => {
+      const result = quoteService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'discount',
+        sortOrder: 'asc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].discount).toBeGreaterThanOrEqual(result.data[i-1].discount);
+      }
+    });
+
+    it('should sort by numeric field descending', () => {
+      const result = quoteService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'discount',
+        sortOrder: 'desc'
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].discount).toBeLessThanOrEqual(result.data[i-1].discount);
+      }
+    });
+
+    it('should calculate hasMore correctly', () => {
+      const result = quoteService.getPaginated({ page: 1, limit: 1 });
+
+      if (result.total > 1) {
+        expect(result.hasMore).toBe(true);
+      }
+
+      const lastPage = quoteService.getPaginated({ page: result.totalPages, limit: 1 });
+      expect(lastPage.hasMore).toBe(false);
+    });
+  });
+
+  describe('create - additional fields', () => {
+    it('should create quote with customerId', () => {
+      const newQuote = quoteService.create({
+        customerName: 'Test',
+        customerEmail: 'test@test.com',
+        customerId: 'cust-123',
+        items: [],
+      });
+
+      expect(newQuote.customerId).toBe('cust-123');
+
+      // Cleanup
+      quoteService.delete(newQuote.id);
+    });
+
+    it('should create quote with customerPhone', () => {
+      const newQuote = quoteService.create({
+        customerName: 'Test',
+        customerEmail: 'test@test.com',
+        customerPhone: '555-1234',
+        items: [],
+      });
+
+      expect(newQuote.customerPhone).toBe('555-1234');
+
+      // Cleanup
+      quoteService.delete(newQuote.id);
+    });
+
+    it('should create quote with company', () => {
+      const newQuote = quoteService.create({
+        customerName: 'Test',
+        customerEmail: 'test@test.com',
+        company: 'Test Company',
+        items: [],
+      });
+
+      expect(newQuote.company).toBe('Test Company');
+
+      // Cleanup
+      quoteService.delete(newQuote.id);
+    });
+
+    it('should create quote with customerMessage', () => {
+      const newQuote = quoteService.create({
+        customerName: 'Test',
+        customerEmail: 'test@test.com',
+        customerMessage: 'Please provide bulk pricing',
+        items: [],
+      });
+
+      expect(newQuote.customerMessage).toBe('Please provide bulk pricing');
+
+      // Cleanup
+      quoteService.delete(newQuote.id);
+    });
+
+    it('should handle null optional fields', () => {
+      const newQuote = quoteService.create({
+        customerName: 'Test',
+        customerEmail: 'test@test.com',
+        items: [],
+      });
+
+      expect(newQuote.customerId).toBeNull();
+      expect(newQuote.customerPhone).toBeNull();
+      expect(newQuote.company).toBeNull();
+      expect(newQuote.customerMessage).toBeNull();
+
+      // Cleanup
+      quoteService.delete(newQuote.id);
+    });
+  });
+
+  describe('search - additional coverage', () => {
+    it('should search by customer email', () => {
+      const newQuote = quoteService.create({
+        customerName: 'Email Test',
+        customerEmail: 'uniqueemail123xyz@test.com',
+        items: [],
+      });
+
+      const results = quoteService.search('uniqueemail123xyz@test.com');
+      expect(results.some(q => q.id === newQuote.id)).toBe(true);
+
+      // Cleanup
+      quoteService.delete(newQuote.id);
+    });
+
+    it('should search by company name', () => {
+      const newQuote = quoteService.create({
+        customerName: 'Company Test',
+        customerEmail: 'companytest@test.com',
+        company: 'UniqueSearchCompany999',
+        items: [],
+      });
+
+      const results = quoteService.search('UniqueSearchCompany999');
+      expect(results.some(q => q.id === newQuote.id)).toBe(true);
+
+      // Cleanup
+      quoteService.delete(newQuote.id);
+    });
+  });
+
+  describe('respond - additional coverage', () => {
+    it('should respond without discount (default to 0)', () => {
+      const newQuote = quoteService.create({
+        customerName: 'No Discount Test',
+        customerEmail: 'nodiscount@test.com',
+        items: [
+          { productName: 'Product B', sku: 'PROD-B', quantity: 2, requestedPrice: null },
+        ],
+      });
+
+      const validUntil = new Date();
+      validUntil.setDate(validUntil.getDate() + 30);
+
+      const responded = quoteService.respond(newQuote.id, {
+        items: [
+          { ...newQuote.items[0], unitPrice: 50, totalPrice: 100 },
+        ],
+        subtotal: 100,
+        total: 100,
+        validUntil: validUntil.toISOString(),
+        responseMessage: 'Quote response',
+      });
+
+      expect(responded.discount).toBe(0);
+
+      // Cleanup
+      quoteService.delete(newQuote.id);
+    });
+  });
 });

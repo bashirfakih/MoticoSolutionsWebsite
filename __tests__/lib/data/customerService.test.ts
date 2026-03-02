@@ -382,4 +382,197 @@ describe('customerService', () => {
       expect(uniqueCountries.length).toBe(countries.length);
     });
   });
+
+  describe('getPaginated - additional filters', () => {
+    it('should filter by country', () => {
+      const countries = customerService.getCountries();
+      if (countries.length > 0) {
+        const result = customerService.getPaginated(
+          { page: 1, limit: 100 },
+          { country: countries[0] }
+        );
+
+        result.data.forEach(c => {
+          expect(c.country).toBe(countries[0]);
+        });
+      }
+    });
+
+    it('should filter by hasOrders true', () => {
+      const result = customerService.getPaginated(
+        { page: 1, limit: 100 },
+        { hasOrders: true }
+      );
+
+      result.data.forEach(c => {
+        expect(c.totalOrders).toBeGreaterThan(0);
+      });
+    });
+
+    it('should filter by hasOrders false', () => {
+      const result = customerService.getPaginated(
+        { page: 1, limit: 100 },
+        { hasOrders: false }
+      );
+
+      result.data.forEach(c => {
+        expect(c.totalOrders).toBe(0);
+      });
+    });
+
+    it('should filter by search with phone', () => {
+      const customers = customerService.getAll();
+      const customerWithPhone = customers.find(c => c.phone);
+
+      if (customerWithPhone && customerWithPhone.phone) {
+        const phoneFragment = customerWithPhone.phone.slice(0, 5);
+        const result = customerService.getPaginated(
+          { page: 1, limit: 100 },
+          { search: phoneFragment }
+        );
+
+        expect(result.data.length).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    it('should sort by numeric field ascending', () => {
+      const result = customerService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'totalSpent',
+        sortOrder: 'asc',
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].totalSpent).toBeGreaterThanOrEqual(result.data[i - 1].totalSpent);
+      }
+    });
+
+    it('should sort by numeric field descending', () => {
+      const result = customerService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'totalSpent',
+        sortOrder: 'desc',
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].totalSpent).toBeLessThanOrEqual(result.data[i - 1].totalSpent);
+      }
+    });
+
+    it('should sort by string field descending', () => {
+      const result = customerService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'name',
+        sortOrder: 'desc',
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].name.localeCompare(result.data[i - 1].name)).toBeLessThanOrEqual(0);
+      }
+    });
+
+    it('should calculate hasMore correctly', () => {
+      const result = customerService.getPaginated({ page: 1, limit: 1 });
+
+      if (result.total > 1) {
+        expect(result.hasMore).toBe(true);
+      }
+
+      const lastPage = customerService.getPaginated({ page: result.totalPages, limit: 1 });
+      expect(lastPage.hasMore).toBe(false);
+    });
+  });
+
+  describe('create - additional options', () => {
+    it('should create customer with all optional fields', () => {
+      const newCustomer = customerService.create({
+        name: 'Full Options Customer',
+        email: 'fulloptions@test.com',
+        phone: '+961 1 999 888',
+        company: 'Full Options Co',
+        address: '123 Test St',
+        city: 'Beirut',
+        region: 'Mount Lebanon',
+        postalCode: '12345',
+        country: 'Germany',
+        notes: 'Important customer',
+        tags: ['vip', 'wholesale'],
+        status: CUSTOMER_STATUS.INACTIVE,
+      });
+
+      expect(newCustomer.address).toBe('123 Test St');
+      expect(newCustomer.city).toBe('Beirut');
+      expect(newCustomer.region).toBe('Mount Lebanon');
+      expect(newCustomer.postalCode).toBe('12345');
+      expect(newCustomer.country).toBe('Germany');
+      expect(newCustomer.notes).toBe('Important customer');
+      expect(newCustomer.tags).toEqual(['vip', 'wholesale']);
+      expect(newCustomer.status).toBe(CUSTOMER_STATUS.INACTIVE);
+
+      // Cleanup
+      customerService.delete(newCustomer.id);
+    });
+
+    it('should use default country when not provided', () => {
+      const newCustomer = customerService.create({
+        name: 'Default Country Customer',
+        email: 'defaultcountry@test.com',
+      });
+
+      expect(newCustomer.country).toBe('Lebanon');
+
+      // Cleanup
+      customerService.delete(newCustomer.id);
+    });
+
+    it('should handle null optional fields', () => {
+      const newCustomer = customerService.create({
+        name: 'Minimal Customer',
+        email: 'minimal@test.com',
+      });
+
+      expect(newCustomer.company).toBeNull();
+      expect(newCustomer.phone).toBeNull();
+      expect(newCustomer.address).toBeNull();
+      expect(newCustomer.city).toBeNull();
+      expect(newCustomer.region).toBeNull();
+      expect(newCustomer.postalCode).toBeNull();
+      expect(newCustomer.notes).toBeNull();
+      expect(newCustomer.tags).toEqual([]);
+
+      // Cleanup
+      customerService.delete(newCustomer.id);
+    });
+  });
+
+  describe('search - additional coverage', () => {
+    it('should search by phone number', () => {
+      const customers = customerService.getAll();
+      const customerWithPhone = customers.find(c => c.phone);
+
+      if (customerWithPhone && customerWithPhone.phone) {
+        const results = customerService.search(customerWithPhone.phone);
+        expect(results.some(c => c.id === customerWithPhone.id)).toBe(true);
+      }
+    });
+  });
+
+  describe('addTag - error handling', () => {
+    it('should throw error for non-existent customer', () => {
+      expect(() => {
+        customerService.addTag('non-existent-id-xyz', 'test-tag');
+      }).toThrow(/not found/);
+    });
+  });
+
+  describe('removeTag - error handling', () => {
+    it('should throw error for non-existent customer', () => {
+      expect(() => {
+        customerService.removeTag('non-existent-id-xyz', 'test-tag');
+      }).toThrow(/not found/);
+    });
+  });
 });

@@ -19,6 +19,14 @@ export const STOCK_STATUS = {
 
 export type StockStatus = typeof STOCK_STATUS[keyof typeof STOCK_STATUS];
 
+export const USER_ROLE = {
+  ADMIN: 'admin',
+  STAFF: 'staff',
+  CUSTOMER: 'customer',
+} as const;
+
+export type UserRole = (typeof USER_ROLE)[keyof typeof USER_ROLE];
+
 export const CURRENCY = {
   USD: 'USD',
   EUR: 'EUR',

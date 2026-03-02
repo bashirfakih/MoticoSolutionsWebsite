@@ -2,118 +2,104 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
-import { ArrowLeft, Phone, MessageCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ArrowLeft, Phone, MessageCircle, Loader2, Package } from 'lucide-react'
 
-// Filter Categories
-const categories = ["All", "Linear Grinders", "Belt Grinders", "Angle Grinders", "Polishers", "Power Files", "Multifunctional"]
+// Types
+interface ProductImage {
+  id: string
+  url: string
+  alt: string
+  isPrimary: boolean
+}
+
+interface Product {
+  id: string
+  name: string
+  slug: string
+  shortDescription: string | null
+  price: number | null
+  images: ProductImage[]
+  isFeatured: boolean
+  isNew: boolean
+}
 
 // Badge color mapping
 const badgeColorMap: Record<string, string> = {
-  "Best Seller": "bg-red-600",
-  "Premium": "bg-amber-500",
-  "Popular": "bg-blue-600",
-  "New": "bg-emerald-600",
+  "Featured": "bg-red-600",
+  "New": "bg-blue-600",
 }
 
-// Product Gallery Data - Eisenblätter Power Tools
-const products = [
-  {
-    slug: 'poly-ptx-802-ht-linear-grinder',
-    name: 'POLY-PTX 802 HT Linear Grinder',
-    category: 'Linear Grinders',
-    description: 'The inventor of the hand-held linear grinding machine. Unmatched torque and performance with new planetary gear technology.',
-    image: '/poly-ptx-802-ht-linear-grinder_01.jpg',
-    badge: 'Best Seller',
-  },
-  {
-    slug: 'rohr-max-802-ht-belt-grinder',
-    name: 'ROHR MAX 802 HT Pipe Belt Grinder',
-    category: 'Belt Grinders',
-    description: 'Multifunctional pipe belt sander for perfect sanding and polishing of closed and open pipe constructions.',
-    image: '/rohr-max-802-ht-belt-grinder-for-pipe_01.jpg',
-    badge: 'Premium',
-  },
-  {
-    slug: 'gladius-1802-ht-grinding-sword',
-    name: 'GLADIUS 1802 HT Grinding Sword',
-    category: 'Multifunctional',
-    description: 'Unique grinding sword with universal grinding properties. Can be used handheld or as stationary machine.',
-    image: '/gladius-1802-ht-multifunctional-grinding-sword_01.jpg',
-    badge: 'Popular',
-  },
-  {
-    slug: 'band-it-1100-power-file',
-    name: 'BAND-IT 1100 Power File',
-    category: 'Power Files',
-    description: 'Compact belt file ideal for working in tight spaces - edges, folds and corners in railing and metal construction.',
-    image: '/band-it-1100-power-file_01.jpg',
-    badge: null,
-  },
-  {
-    slug: 'mini-max-1100-multifunctional-grinder',
-    name: 'MINI MAX 1100 Multifunctional Grinder',
-    category: 'Multifunctional',
-    description: 'Versatile mini grinder with improved dust protection. Perfect longitudinal guidance for shadow-free surfaces.',
-    image: '/mini-max-1100-multifunctional-grinder_01.jpg',
-    badge: 'New',
-  },
-  {
-    slug: 'varilex-wsf-1100-angle-grinder',
-    name: 'VARILEX WSF 1100 Angle Grinder',
-    category: 'Angle Grinders',
-    description: 'Compact angle grinder with 1,100W variable speed. Smallest handle circumference in its class for fatigue-free grinding.',
-    image: '/varilex-wsf-1100-compact-angle-grinder_01.jpg',
-    badge: null,
-  },
-  // DCA Power Tools
-  {
-    slug: 'dca-asn100',
-    name: 'DCA ASN100 Sander Polisher',
-    category: 'Polishers',
-    description: '1400W sander polisher with adjustable speed and electronic constant speed control for consistent performance under load.',
-    image: '/dca-asn100_01.jpg',
-    badge: null,
-  },
-  {
-    slug: 'dca-ass150',
-    name: 'DCA ASS150 Stone Polisher',
-    category: 'Polishers',
-    description: '1020W stone polisher with adjustable speed, constant speed control, and water flow control for wet polishing applications.',
-    image: '/dca-ass150_01.jpg',
-    badge: null,
-  },
-  {
-    slug: 'dca-asm18-115',
-    name: 'DCA ASM18-115 Angle Grinder',
-    category: 'Angle Grinders',
-    description: 'Ultra-slim 860W angle grinder with only 178mm grip circumference. Powerful motor delivers 11800/min for optimum performance.',
-    image: '/dca-asm18-115_01.png',
-    badge: null,
-  },
-  {
-    slug: 'dca-asm04-125',
-    name: 'DCA ASM04-125 Angle Grinder',
-    category: 'Angle Grinders',
-    description: '1020W high power angle grinder with adjustable speed, constant output power under load, spindle lock, and slide switch.',
-    image: '/dca-asm04-125_01.png',
-    badge: 'Popular',
-  },
-]
+// Default image
+const DEFAULT_PRODUCT_IMAGE = '/slide-1-grinding.png'
 
 export default function AirPowerToolsPage() {
-  const [activeFilter, setActiveFilter] = useState("All")
+  const [products, setProducts] = useState<Product[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  const filteredProducts = activeFilter === "All"
-    ? products
-    : products.filter(p => p.category === activeFilter)
+  // Fetch products from API
+  useEffect(() => {
+    async function loadProducts() {
+      setIsLoading(true)
+      setError(null)
+      try {
+        // First get the category ID for air-power-tools
+        const catResponse = await fetch('/api/categories/slug/air-power-tools', {
+          cache: 'no-store',
+        })
+
+        if (!catResponse.ok) {
+          throw new Error('Category not found')
+        }
+
+        const category = await catResponse.json()
+
+        // Then fetch published products for this category
+        const productsResponse = await fetch(
+          `/api/products?categoryId=${category.id}&published=true&limit=100`,
+          { cache: 'no-store' }
+        )
+
+        if (!productsResponse.ok) {
+          throw new Error('Failed to load products')
+        }
+
+        const data = await productsResponse.json()
+        setProducts(data.data || [])
+      } catch (err) {
+        console.error('Failed to load products:', err)
+        setError('Failed to load products. Please try again.')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadProducts()
+  }, [])
+
+  // Get primary image or first image
+  const getProductImage = (product: Product) => {
+    if (!product.images || product.images.length === 0) {
+      return DEFAULT_PRODUCT_IMAGE
+    }
+    const primary = product.images.find(img => img.isPrimary)
+    return primary?.url || product.images[0]?.url || DEFAULT_PRODUCT_IMAGE
+  }
+
+  // Get badge for product
+  const getProductBadge = (product: Product) => {
+    if (product.isFeatured) return 'Featured'
+    if (product.isNew) return 'New'
+    return null
+  }
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-28 flex items-center justify-between">
-          <Link href="/#products" className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-800 transition-colors">
+          <Link href="/products" className="inline-flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-blue-800 transition-colors">
             <ArrowLeft className="w-4 h-4" />
             Back to Products
           </Link>
@@ -135,16 +121,16 @@ export default function AirPowerToolsPage() {
         <div className="max-w-7xl mx-auto flex items-center gap-2">
           <Link href="/" className="hover:text-blue-700 transition-colors">Home</Link>
           <span className="text-gray-300">/</span>
-          <Link href="/#products" className="hover:text-blue-700 transition-colors">Products</Link>
+          <Link href="/products" className="hover:text-blue-700 transition-colors">Products</Link>
           <span className="text-gray-300">/</span>
-          <span className="text-gray-800 font-medium">Air & Power Tools</span>
+          <span className="text-gray-800 font-medium">Air &amp; Power Tools</span>
         </div>
       </nav>
 
       {/* Hero Section */}
       <section className="relative w-full h-[420px] flex items-center justify-center overflow-hidden">
         <Image
-          src="/product-air-power-tools.png"
+          src="/poly-ptx-802-ht-linear-grinder_01.jpg"
           alt="Air & Power Tools"
           fill
           className="object-cover object-center"
@@ -154,13 +140,13 @@ export default function AirPowerToolsPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/70" />
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-2 bg-red-600 text-white text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">
-            Eisenblätter Germany
+            {products.length > 0 ? `${products.length} Products` : 'Premium Collection'}
           </span>
           <h1 className="text-5xl md:text-6xl font-extrabold text-white leading-tight mb-4">
-            Air & Power <span className="text-red-500">Tools</span>
+            Air &amp; Power <span className="text-red-500">Tools</span>
           </h1>
           <p className="text-white/80 text-lg max-w-xl mx-auto">
-            Professional-grade German-engineered power tools for industrial grinding, sanding, and polishing applications.
+            Professional-grade pneumatic and electric power tools for demanding industrial applications.
           </p>
         </div>
       </section>
@@ -181,74 +167,105 @@ export default function AirPowerToolsPage() {
                 backgroundClip: 'text',
               }}
             >
-              Power Tools Collection
+              Air &amp; Power Tools
             </h2>
             <p className="text-lg max-w-2xl mx-auto text-gray-500">
               Click on any product to view detailed specifications and technical data.
             </p>
           </div>
 
-          {/* Category Filter Buttons */}
-          <div className="flex flex-wrap gap-2 justify-center mb-10">
-            {categories.map((cat) => (
+          {/* Loading State */}
+          {isLoading && (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="w-10 h-10 text-[#004D8B] animate-spin mb-4" />
+              <p className="text-gray-600">Loading products...</p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !isLoading && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                <Package className="w-8 h-8 text-red-500" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Failed to Load</h3>
+              <p className="text-gray-600 mb-6">{error}</p>
               <button
-                key={cat}
-                onClick={() => setActiveFilter(cat)}
-                className={`px-4 py-2 rounded-full text-sm font-medium border transition-all ${
-                  activeFilter === cat
-                    ? "bg-blue-900 text-white border-blue-900"
-                    : "bg-white text-gray-600 border-gray-300 hover:border-blue-900 hover:text-blue-900"
-                }`}
+                onClick={() => window.location.reload()}
+                className="px-6 py-2.5 rounded-full font-semibold text-white bg-[#004D8B] hover:bg-[#003a6a] transition-all"
               >
-                {cat}
+                Try Again
               </button>
-            ))}
-          </div>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!isLoading && !error && products.length === 0 && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <Package className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">No Products Found</h3>
+              <p className="text-gray-600 mb-6">Check back soon for new products in this category.</p>
+              <Link
+                href="/products"
+                className="px-6 py-2.5 rounded-full font-semibold text-white bg-[#004D8B] hover:bg-[#003a6a] transition-all inline-block"
+              >
+                Browse All Products
+              </Link>
+            </div>
+          )}
 
           {/* Gallery Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-6">
-            {filteredProducts.map((product) => (
-              <Link
-                key={product.slug}
-                href={`/products/air-power-tools/${product.slug}`}
-                className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl border border-gray-100 transition-all duration-300 hover:-translate-y-1 flex flex-col"
-              >
-                {/* Image */}
-                <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                  {/* Badge */}
-                  {product.badge && (
-                    <span className={`absolute top-3 left-3 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full text-white ${badgeColorMap[product.badge]}`}>
-                      {product.badge}
-                    </span>
-                  )}
-                  {/* Category tag */}
-                  <span className="absolute bottom-3 left-3 text-[10px] font-semibold uppercase tracking-widest text-white/90 bg-black/50 px-2 py-0.5 rounded">
-                    {product.category}
-                  </span>
-                </div>
-                {/* Info Panel — always visible */}
-                <div className="p-4 flex flex-col flex-1">
-                  <h3 className="font-bold text-gray-900 text-base mb-1 group-hover:text-blue-800 transition-colors">
-                    {product.name}
-                  </h3>
-                  <p className="text-gray-500 text-sm leading-relaxed flex-1">
-                    {product.description}
-                  </p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className="text-blue-800 font-semibold text-sm group-hover:underline">
-                      View Details →
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
+          {!isLoading && !error && products.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto px-6">
+              {products.map((product) => {
+                const badge = getProductBadge(product)
+                return (
+                  <Link
+                    key={product.id}
+                    href={`/products/${product.id}`}
+                    className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl border border-gray-100 transition-all duration-300 hover:-translate-y-1 flex flex-col"
+                  >
+                    {/* Image */}
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                      <Image
+                        src={getProductImage(product)}
+                        alt={product.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      {/* Badge */}
+                      {badge && (
+                        <span className={`absolute top-3 left-3 text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full text-white ${badgeColorMap[badge]}`}>
+                          {badge}
+                        </span>
+                      )}
+                    </div>
+                    {/* Info Panel */}
+                    <div className="p-4 flex flex-col flex-1">
+                      <h3 className="font-bold text-gray-900 text-base mb-1 group-hover:text-blue-800 transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-gray-500 text-sm leading-relaxed flex-1">
+                        {product.shortDescription || 'Professional-grade power tool for industrial applications.'}
+                      </p>
+                      <div className="mt-4 flex items-center justify-between">
+                        <span className="text-blue-800 font-semibold text-sm group-hover:underline">
+                          View Details →
+                        </span>
+                        {product.price && (
+                          <span className="text-gray-900 font-bold">
+                            ${product.price.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -289,9 +306,9 @@ export default function AirPowerToolsPage() {
           <Link href="/" className="text-white font-semibold text-base hover:text-red-400 transition-colors">
             ← Motico Solutions
           </Link>
-          <p className="text-gray-500">Industrial Abrasives & Tools — Beirut, Lebanon</p>
+          <p className="text-gray-500">Industrial Abrasives &amp; Tools — Beirut, Lebanon</p>
           <div className="flex gap-6">
-            <a href="/#products" className="hover:text-white transition-colors">All Products</a>
+            <Link href="/products" className="hover:text-white transition-colors">All Products</Link>
             <a href="tel:+9613741565" className="hover:text-white transition-colors">+961 3 741 565</a>
           </div>
         </div>

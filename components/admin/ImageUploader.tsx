@@ -4,7 +4,7 @@
  * ImageUploader Component
  *
  * Drag & drop image uploader with preview.
- * Currently stores as base64/URLs - will be swapped for real upload later.
+ * Uploads images to server storage (local or Cloudinary).
  *
  * @module components/admin/ImageUploader
  */
@@ -39,7 +39,7 @@ export default function ImageUploader({
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Handle file selection
+  // Handle file selection - uploads to server
   const handleFiles = useCallback(async (files: FileList | null) => {
     if (!files || files.length === 0) return;
 
@@ -58,21 +58,35 @@ export default function ImageUploader({
         continue;
       }
 
-      // Convert to base64 (mock upload)
-      // In production, this would upload to a CDN and return a URL
-      const base64 = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(file);
-      });
+      try {
+        // Upload file to server storage
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('folder', 'products');
 
-      newImages.push({
-        id: generateId(),
-        url: base64,
-        alt: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
-        sortOrder: images.length + newImages.length + 1,
-        isPrimary: images.length === 0 && newImages.length === 0,
-      });
+        const response = await fetch('/api/upload', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.error(`Failed to upload ${file.name}:`, error.error);
+          continue;
+        }
+
+        const result = await response.json();
+
+        newImages.push({
+          id: generateId(),
+          url: result.url,
+          alt: file.name.replace(/\.[^/.]+$/, ''), // Remove extension
+          sortOrder: images.length + newImages.length + 1,
+          isPrimary: images.length === 0 && newImages.length === 0,
+        });
+      } catch (error) {
+        console.error(`Error uploading ${file.name}:`, error);
+      }
     }
 
     onChange([...images, ...newImages]);
@@ -224,12 +238,13 @@ export default function ImageUploader({
               >
                 {/* Image */}
                 <div className="aspect-square relative bg-gray-100">
-                  {image.url.startsWith('data:') || image.url.startsWith('/') ? (
+                  {image.url ? (
                     <Image
                       src={image.url}
                       alt={image.alt}
                       fill
                       className="object-cover"
+                      unoptimized={image.url.startsWith('http')}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

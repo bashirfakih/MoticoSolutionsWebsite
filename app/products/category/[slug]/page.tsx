@@ -67,8 +67,10 @@ export default function CategoryProductsPage() {
       setIsLoading(true)
       setError(null)
       try {
-        // Fetch category by slug
-        const catResponse = await fetch(`/api/categories/slug/${encodeURIComponent(categorySlug)}`)
+        // Fetch category by slug (no cache to ensure fresh data)
+        const catResponse = await fetch(`/api/categories/slug/${encodeURIComponent(categorySlug)}`, {
+          cache: 'no-store',
+        })
 
         if (catResponse.status === 404) {
           setError('Category not found')
@@ -81,9 +83,10 @@ export default function CategoryProductsPage() {
         const foundCategory = await catResponse.json()
         setCategory(foundCategory)
 
-        // Fetch products for this category
+        // Fetch products for this category (no cache to ensure fresh data)
         const productsResponse = await fetch(
-          `/api/products?categoryId=${foundCategory.id}&published=true&limit=100`
+          `/api/products?categoryId=${foundCategory.id}&published=true&limit=100`,
+          { cache: 'no-store' }
         )
         if (!productsResponse.ok) throw new Error('Failed to load products')
 

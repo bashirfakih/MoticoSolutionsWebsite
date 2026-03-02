@@ -9,6 +9,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
+// Force dynamic - never cache this route
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 interface RouteParams {
   params: Promise<{ id: string }>;
 }
@@ -55,8 +59,16 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// PATCH - Update category
+// PUT/PATCH - Update category
+export async function PUT(request: NextRequest, { params }: RouteParams) {
+  return updateCategory(request, params);
+}
+
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
+  return updateCategory(request, params);
+}
+
+async function updateCategory(request: NextRequest, params: Promise<{ id: string }>) {
   try {
     const { id } = await params;
     const body = await request.json();

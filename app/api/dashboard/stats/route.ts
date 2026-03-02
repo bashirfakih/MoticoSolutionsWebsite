@@ -24,6 +24,11 @@ export async function GET() {
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
     const endOfLastMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+    const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+    // Calculate dates for 7-day revenue
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    sevenDaysAgo.setHours(0, 0, 0, 0);
 
     // Run all queries in parallel
     const [
@@ -58,6 +63,11 @@ export async function GET() {
 
       // Low stock products
       lowStockProducts,
+
+      // New stats
+      ordersLast24Hours,
+      outOfStockProducts,
+      ordersForDailyRevenue,
     ] = await Promise.all([
       // Counts
       prisma.order.count(),
@@ -127,6 +137,31 @@ export async function GET() {
         WHERE "trackInventory" = true
         AND "stockQuantity" <= "minStockLevel"
       `,
+
+      // Orders in last 24 hours
+      prisma.order.count({
+        where: { createdAt: { gte: last24Hours } },
+      }),
+
+      // Out of stock products
+      prisma.product.count({
+        where: {
+          trackInventory: true,
+          stockQuantity: 0,
+        },
+      }),
+
+      // 7-day daily revenue (orders with payment status 'paid')
+      prisma.order.findMany({
+        where: {
+          createdAt: { gte: sevenDaysAgo },
+          paymentStatus: 'paid',
+        },
+        select: {
+          createdAt: true,
+          total: true,
+        },
+      }),
     ]);
 
     // Calculate month-over-month changes
@@ -148,6 +183,28 @@ export async function GET() {
 
     // Extract low stock count from raw query result
     const lowStockCount = Number(lowStockProducts[0]?.count || 0);
+
+    // Calculate daily revenue for the last 7 days
+    const dailyRevenueMap = new Map<string, number>();
+
+    // Initialize all 7 days with 0
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+      const dateStr = date.toISOString().split('T')[0];
+      dailyRevenueMap.set(dateStr, 0);
+    }
+
+    // Aggregate orders by date
+    for (const order of ordersForDailyRevenue) {
+      const dateStr = new Date(order.createdAt).toISOString().split('T')[0];
+      const current = dailyRevenueMap.get(dateStr) || 0;
+      dailyRevenueMap.set(dateStr, current + Number(order.total));
+    }
+
+    // Convert to sorted array (oldest first)
+    const dailyRevenue = Array.from(dailyRevenueMap.entries())
+      .map(([date, revenue]) => ({ date, revenue }))
+      .sort((a, b) => a.date.localeCompare(b.date));
 
     return NextResponse.json({
       overview: {
@@ -181,6 +238,10 @@ export async function GET() {
         total: totalQuotes,
         pending: pendingQuotes,
       },
+      // New actionable widget stats
+      ordersLast24Hours,
+      outOfStockProducts,
+      dailyRevenue,
     });
   } catch (error) {
     console.error('Dashboard stats error:', error);

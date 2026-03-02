@@ -13,11 +13,8 @@ import Link from 'next/link';
 import {
   Package,
   Search,
-  Filter,
   Eye,
   Truck,
-  CheckCircle,
-  XCircle,
   Clock,
   DollarSign,
   ChevronDown,
@@ -25,6 +22,7 @@ import {
   X,
   Plus,
 } from 'lucide-react';
+import FilterChips from '@/components/admin/FilterChips';
 import { orderService } from '@/lib/data/orderService';
 import { Order, ORDER_STATUS, PAYMENT_STATUS, OrderStatus } from '@/lib/data/types';
 import { useToast } from '@/components/ui/Toast';
@@ -216,6 +214,21 @@ export default function AdminOrdersPage() {
     }
   };
 
+  // Clear filters
+  const clearFilters = () => {
+    setStatusFilter('');
+    setSearch('');
+  };
+
+  // Apply filter from chip
+  const handleApplyChipFilter = (filter: Record<string, string | boolean | undefined>) => {
+    if (filter.status) {
+      setStatusFilter(String(filter.status));
+    } else {
+      setStatusFilter('');
+    }
+  };
+
   const executeStatusUpdate = (orderId: string, newStatus: OrderStatus) => {
     try {
       orderService.updateStatus(orderId, newStatus);
@@ -355,8 +368,18 @@ export default function AdminOrdersPage() {
               </option>
             ))}
           </select>
+
         </div>
       </div>
+
+      {/* Filter Chips */}
+      <FilterChips
+        pageType="orders"
+        currentFilter={{ status: statusFilter || undefined }}
+        onApplyFilter={handleApplyChipFilter}
+        onClearFilter={clearFilters}
+        hasActiveFilter={!!statusFilter}
+      />
 
       {/* Orders Table */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">

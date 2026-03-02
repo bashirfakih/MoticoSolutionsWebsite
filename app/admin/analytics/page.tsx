@@ -29,6 +29,7 @@ import { customerService } from '@/lib/data/customerService';
 import { quoteService } from '@/lib/data/quoteService';
 import { messageService } from '@/lib/data/messageService';
 import { productService } from '@/lib/data/productService';
+import { pluralize } from '@/lib/utils/formatting';
 
 interface StatCard {
   title: string;
@@ -428,7 +429,7 @@ export default function AdminAnalyticsPage() {
             <div>
               <h3 className="font-medium text-yellow-800">Low Stock Alert</h3>
               <p className="text-sm text-yellow-700">
-                {stats.products.lowStockProducts} products are running low on stock.{' '}
+                {pluralize(stats.products.lowStockProducts, 'product')} {stats.products.lowStockProducts === 1 ? 'is' : 'are'} running low on stock.{' '}
                 <a href="/admin/inventory" className="underline font-medium">View inventory</a>
               </p>
             </div>

@@ -22,10 +22,13 @@ import {
   X,
   MessageSquare,
   Loader2,
+  Plus,
+  Trash2,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useToast } from '@/components/ui/Toast';
 import { QUOTE_STATUS, QuoteStatus } from '@/lib/data/types';
+import { notifyQuoteRequest } from '@/lib/notifications/notificationService';
 
 interface QuoteItem {
   id: string;
@@ -90,6 +93,30 @@ function StatusBadge({ status }: { status: QuoteStatus }) {
   );
 }
 
+// New Quote Form State
+interface NewQuoteItem {
+  productName: string;
+  quantity: number;
+}
+
+interface NewQuoteForm {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  company: string;
+  items: NewQuoteItem[];
+  customerMessage: string;
+}
+
+const initialNewQuoteForm: NewQuoteForm = {
+  customerName: '',
+  customerEmail: '',
+  customerPhone: '',
+  company: '',
+  items: [{ productName: '', quantity: 1 }],
+  customerMessage: '',
+};
+
 function QuotesContent() {
   const toast = useToast();
 
@@ -99,6 +126,11 @@ function QuotesContent() {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [stats, setStats] = useState<QuoteStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // New Quote Modal State
+  const [showNewQuoteModal, setShowNewQuoteModal] = useState(false);
+  const [newQuoteForm, setNewQuoteForm] = useState<NewQuoteForm>(initialNewQuoteForm);
+  const [isCreatingQuote, setIsCreatingQuote] = useState(false);
 
   const loadQuotes = useCallback(async () => {
     setIsLoading(true);
@@ -160,6 +192,93 @@ function QuotesContent() {
     }
   };
 
+  // New Quote Handlers
+  const handleNewQuoteChange = (field: keyof NewQuoteForm, value: string) => {
+    setNewQuoteForm(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleNewQuoteItemChange = (index: number, field: keyof NewQuoteItem, value: string | number) => {
+    setNewQuoteForm(prev => {
+      const items = [...prev.items];
+      items[index] = { ...items[index], [field]: value };
+      return { ...prev, items };
+    });
+  };
+
+  const addQuoteItem = () => {
+    setNewQuoteForm(prev => ({
+      ...prev,
+      items: [...prev.items, { productName: '', quantity: 1 }],
+    }));
+  };
+
+  const removeQuoteItem = (index: number) => {
+    if (newQuoteForm.items.length > 1) {
+      setNewQuoteForm(prev => ({
+        ...prev,
+        items: prev.items.filter((_, i) => i !== index),
+      }));
+    }
+  };
+
+  const handleCreateQuote = async () => {
+    // Validation
+    if (!newQuoteForm.customerName.trim()) {
+      toast.error('Customer name is required');
+      return;
+    }
+
+    const validItems = newQuoteForm.items.filter(item => item.productName.trim());
+    if (validItems.length === 0) {
+      toast.error('At least one item is required');
+      return;
+    }
+
+    setIsCreatingQuote(true);
+
+    try {
+      const response = await fetch('/api/quotes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          customerName: newQuoteForm.customerName,
+          customerEmail: newQuoteForm.customerEmail || `${newQuoteForm.customerName.toLowerCase().replace(/\s+/g, '.')}@example.com`,
+          customerPhone: newQuoteForm.customerPhone || null,
+          company: newQuoteForm.company || null,
+          customerMessage: newQuoteForm.customerMessage || null,
+          items: validItems.map(item => ({
+            productName: item.productName,
+            quantity: item.quantity,
+            description: null,
+            productId: null,
+            unitPrice: null,
+            totalPrice: null,
+          })),
+          status: QUOTE_STATUS.PENDING,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create quote');
+      }
+
+      const newQuote = await response.json();
+
+      // Trigger notification for new quote
+      notifyQuoteRequest(newQuoteForm.customerName, newQuote.id);
+
+      toast.success('Quote created successfully');
+      setShowNewQuoteModal(false);
+      setNewQuoteForm(initialNewQuoteForm);
+      loadQuotes();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to create quote');
+    } finally {
+      setIsCreatingQuote(false);
+    }
+  };
+
   const formatDate = (date: string | null) => {
     if (!date) return '-';
     return new Date(date).toLocaleDateString('en-US', {
@@ -195,6 +314,13 @@ function QuotesContent() {
           <h1 className="text-2xl font-bold text-gray-900">Quotes</h1>
           <p className="text-sm text-gray-500 mt-1">Manage quote requests</p>
         </div>
+        <button
+          onClick={() => setShowNewQuoteModal(true)}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003a6a] transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          New Quote
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -465,6 +591,159 @@ function QuotesContent() {
                   <p className="text-sm text-yellow-900">{selectedQuote.internalNotes}</p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Quote Modal */}
+      {showNewQuoteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-900">New Quote Request</h2>
+              <button
+                onClick={() => {
+                  setShowNewQuoteModal(false);
+                  setNewQuoteForm(initialNewQuoteForm);
+                }}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Customer Info */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Customer Name <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={newQuoteForm.customerName}
+                  onChange={(e) => handleNewQuoteChange('customerName', e.target.value)}
+                  placeholder="Enter customer name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={newQuoteForm.customerEmail}
+                    onChange={(e) => handleNewQuoteChange('customerEmail', e.target.value)}
+                    placeholder="email@example.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Phone
+                  </label>
+                  <input
+                    type="tel"
+                    value={newQuoteForm.customerPhone}
+                    onChange={(e) => handleNewQuoteChange('customerPhone', e.target.value)}
+                    placeholder="+1 234 567 8900"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Company
+                </label>
+                <input
+                  type="text"
+                  value={newQuoteForm.company}
+                  onChange={(e) => handleNewQuoteChange('company', e.target.value)}
+                  placeholder="Company name (optional)"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+              </div>
+
+              {/* Items */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Items <span className="text-red-500">*</span>
+                </label>
+                <div className="space-y-2">
+                  {newQuoteForm.items.map((item, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        value={item.productName}
+                        onChange={(e) => handleNewQuoteItemChange(index, 'productName', e.target.value)}
+                        placeholder="Product name or description"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                      />
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => handleNewQuoteItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                        min="1"
+                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] text-center"
+                      />
+                      {newQuoteForm.items.length > 1 && (
+                        <button
+                          onClick={() => removeQuoteItem(index)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    onClick={addQuoteItem}
+                    className="inline-flex items-center gap-1 text-sm text-[#004D8B] hover:underline"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add item
+                  </button>
+                </div>
+              </div>
+
+              {/* Message */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Message
+                </label>
+                <textarea
+                  value={newQuoteForm.customerMessage}
+                  onChange={(e) => handleNewQuoteChange('customerMessage', e.target.value)}
+                  placeholder="Additional notes or requirements..."
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="sticky bottom-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowNewQuoteModal(false);
+                  setNewQuoteForm(initialNewQuoteForm);
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateQuote}
+                disabled={isCreatingQuote}
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003a6a] transition-colors disabled:opacity-50"
+              >
+                {isCreatingQuote && <Loader2 className="w-4 h-4 animate-spin" />}
+                Create Quote
+              </button>
             </div>
           </div>
         </div>

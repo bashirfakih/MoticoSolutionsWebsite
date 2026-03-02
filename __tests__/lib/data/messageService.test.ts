@@ -432,4 +432,188 @@ describe('messageService', () => {
       expect(unreadCount).toBeLessThanOrEqual(totalCount);
     });
   });
+
+  describe('getPaginated - additional filters', () => {
+    it('should filter by search term', () => {
+      const messages = messageService.getAll();
+      const subject = messages[0].subject;
+
+      const result = messageService.getPaginated(
+        { page: 1, limit: 100 },
+        { search: subject }
+      );
+
+      expect(result.data.some(m => m.subject === subject)).toBe(true);
+    });
+
+    it('should filter by dateFrom', () => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const result = messageService.getPaginated(
+        { page: 1, limit: 100 },
+        { dateFrom: yesterday.toISOString() }
+      );
+
+      result.data.forEach(m => {
+        expect(new Date(m.createdAt).getTime()).toBeGreaterThanOrEqual(yesterday.getTime());
+      });
+    });
+
+    it('should filter by dateTo', () => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const result = messageService.getPaginated(
+        { page: 1, limit: 100 },
+        { dateTo: tomorrow.toISOString() }
+      );
+
+      result.data.forEach(m => {
+        expect(new Date(m.createdAt).getTime()).toBeLessThanOrEqual(tomorrow.getTime());
+      });
+    });
+
+    it('should filter by isStarred false', () => {
+      const result = messageService.getPaginated(
+        { page: 1, limit: 100 },
+        { isStarred: false }
+      );
+
+      result.data.forEach(m => {
+        expect(m.isStarred).toBe(false);
+      });
+    });
+
+    it('should sort by string field ascending', () => {
+      const result = messageService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'name',
+        sortOrder: 'asc',
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].name.localeCompare(result.data[i - 1].name)).toBeGreaterThanOrEqual(0);
+      }
+    });
+
+    it('should sort by string field descending', () => {
+      const result = messageService.getPaginated({
+        page: 1,
+        limit: 100,
+        sortBy: 'name',
+        sortOrder: 'desc',
+      });
+
+      for (let i = 1; i < result.data.length; i++) {
+        expect(result.data[i].name.localeCompare(result.data[i - 1].name)).toBeLessThanOrEqual(0);
+      }
+    });
+
+    it('should calculate hasMore correctly', () => {
+      const result = messageService.getPaginated({ page: 1, limit: 1 });
+
+      if (result.total > 1) {
+        expect(result.hasMore).toBe(true);
+      }
+
+      const lastPage = messageService.getPaginated({ page: result.totalPages, limit: 1 });
+      expect(lastPage.hasMore).toBe(false);
+    });
+  });
+
+  describe('create - additional options', () => {
+    it('should use default type when not provided', () => {
+      const newMessage = messageService.create({
+        name: 'Default Type Test',
+        email: 'defaulttype@test.com',
+        subject: 'Test',
+        message: 'Test message',
+      });
+
+      expect(newMessage.type).toBe(MESSAGE_TYPE.CONTACT);
+
+      // Cleanup
+      messageService.delete(newMessage.id);
+    });
+
+    it('should handle null optional fields', () => {
+      const newMessage = messageService.create({
+        name: 'Minimal Message',
+        email: 'minimal@test.com',
+        subject: 'Minimal',
+        message: 'Minimal message',
+      });
+
+      expect(newMessage.phone).toBeNull();
+      expect(newMessage.company).toBeNull();
+
+      // Cleanup
+      messageService.delete(newMessage.id);
+    });
+  });
+
+  describe('search - additional coverage', () => {
+    it('should search by message content', () => {
+      const newMessage = messageService.create({
+        name: 'Content Search',
+        email: 'contentsearch@test.com',
+        subject: 'Search Test',
+        message: 'UniqueMessageContentXYZ123',
+      });
+
+      const results = messageService.search('UniqueMessageContentXYZ123');
+      expect(results.some(m => m.id === newMessage.id)).toBe(true);
+
+      // Cleanup
+      messageService.delete(newMessage.id);
+    });
+
+    it('should search by company', () => {
+      const newMessage = messageService.create({
+        name: 'Company Search',
+        email: 'companysearch@test.com',
+        subject: 'Company Test',
+        message: 'Test message',
+        company: 'UniqueCompanySearchXYZ999',
+      });
+
+      const results = messageService.search('UniqueCompanySearchXYZ999');
+      expect(results.some(m => m.id === newMessage.id)).toBe(true);
+
+      // Cleanup
+      messageService.delete(newMessage.id);
+    });
+  });
+
+  describe('toggleStar - error handling', () => {
+    it('should throw error for non-existent message', () => {
+      expect(() => {
+        messageService.toggleStar('non-existent-id-xyz');
+      }).toThrow(/not found/);
+    });
+  });
+
+  describe('markManyAsRead - additional coverage', () => {
+    it('should not count already read messages', () => {
+      // Create a message and mark it as read first
+      const msg1 = messageService.create({
+        name: 'Already Read',
+        email: 'alreadyread@test.com',
+        subject: 'Already Read',
+        message: 'Already read message',
+      });
+
+      // Mark it as read
+      messageService.markAsRead(msg1.id);
+
+      // Now try to mark it as read again with markManyAsRead
+      const readCount = messageService.markManyAsRead([msg1.id]);
+      expect(readCount).toBe(0); // Should be 0 since it was already read
+
+      // Cleanup
+      messageService.delete(msg1.id);
+    });
+  });
 });

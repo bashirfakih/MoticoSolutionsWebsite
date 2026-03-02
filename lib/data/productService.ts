@@ -326,6 +326,14 @@ export function createProduct(input: ProductInput, userId?: string): Product {
     throw new Error(`A product with slug "${slug}" already exists`);
   }
 
+  // Validate price and stock quantity are non-negative
+  if (input.price !== undefined && input.price !== null && input.price < 0) {
+    throw new Error('Price cannot be negative');
+  }
+  if (input.stockQuantity !== undefined && input.stockQuantity < 0) {
+    throw new Error('Stock quantity cannot be negative');
+  }
+
   const now = getCurrentTimestamp();
   const stockQuantity = input.stockQuantity ?? 0;
   const minStockLevel = input.minStockLevel ?? 10;
@@ -416,6 +424,14 @@ export function updateProduct(id: string, input: Partial<ProductInput>): Product
     if (existingSlug) {
       throw new Error(`A product with slug "${input.slug}" already exists`);
     }
+  }
+
+  // Validate price and stock quantity are non-negative
+  if (input.price !== undefined && input.price !== null && input.price < 0) {
+    throw new Error('Price cannot be negative');
+  }
+  if (input.stockQuantity !== undefined && input.stockQuantity < 0) {
+    throw new Error('Stock quantity cannot be negative');
   }
 
   const now = getCurrentTimestamp();
