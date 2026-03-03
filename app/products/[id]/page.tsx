@@ -1,9 +1,9 @@
 'use client'
 
-import { useParams, redirect } from 'next/navigation'
+import { useParams, redirect, useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft, Phone, MessageCircle } from 'lucide-react'
 
 // Badge color mapping
@@ -173,17 +173,73 @@ const categoryData: Record<string, {
 
 export default function ProductCategoryPage() {
   const params = useParams()
+  const router = useRouter()
   const productId = params.id as string
   const [activeFilter, setActiveFilter] = useState("All")
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
-  // Redirect to dedicated pages
+  // Check if this looks like a database product ID (CUID format)
+  const isDatabaseId = productId && /^c[a-z0-9]{20,}$/i.test(productId)
+
+  useEffect(() => {
+    if (isDatabaseId && !isRedirecting) {
+      setIsRedirecting(true)
+      // Fetch product from API to get its category and slug
+      fetch(`/api/products/${productId}`)
+        .then(res => res.ok ? res.json() : Promise.reject('Not found'))
+        .then(product => {
+          // Redirect to proper category/slug URL
+          if (product.category?.slug && product.slug) {
+            router.replace(`/products/${product.category.slug}/${product.slug}`)
+          } else if (product.category?.slug) {
+            router.replace(`/products/${product.category.slug}`)
+          } else {
+            router.replace('/products')
+          }
+        })
+        .catch(() => {
+          router.replace('/products')
+        })
+    }
+  }, [isDatabaseId, productId, router, isRedirecting])
+
+  // Show loading state while redirecting database IDs
+  if (isDatabaseId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading product...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Redirect to dedicated database-driven pages
   if (productId === 'abrasive-belts') {
     redirect('/products/abrasive-belts')
   }
   if (productId === 'grinding-sleeves') {
     redirect('/products/grinding-sleeves')
   }
+  if (productId === 'air-power-tools') {
+    redirect('/products/air-power-tools')
+  }
 
+  // For all other category slugs, redirect to the generic database-driven category page
+  // This handles: belt-disc-sanders, stationary-machines, abrasive-discs, cutting-discs,
+  // mounted-points, hand-finishing, polish-care, welding, accessories, and any new categories
+  const knownCategorySlugs = [
+    'belt-disc-sanders', 'stationary-machines', 'abrasive-discs', 'cutting-discs',
+    'mounted-points', 'hand-finishing', 'polish-care', 'welding', 'accessories'
+  ]
+
+  if (knownCategorySlugs.includes(productId) || /^[a-z]+(-[a-z]+)*$/.test(productId)) {
+    // Looks like a category slug - redirect to database-driven category page
+    redirect(`/products/category/${productId}`)
+  }
+
+  // Fallback for unknown routes (shouldn't normally reach here)
   const category = categoryData[productId] || {
     title: productId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
     heroTitle: productId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),

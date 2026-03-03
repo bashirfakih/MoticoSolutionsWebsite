@@ -3,11 +3,25 @@
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   ArrowLeft, CheckCircle, ChevronLeft, ChevronRight,
   MessageCircle, Download, ArrowRight, Layers, X, ZoomIn,
 } from 'lucide-react'
+
+// Database product type
+interface DbProduct {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  shortDescription: string | null
+  features: string[]
+  images: { url: string; alt: string | null }[]
+  specifications: { key: string; value: string }[]
+  brand: { name: string } | null
+  category: { name: string; slug: string } | null
+}
 
 // ═══════════════════════════════════════════════════════════════
 // PRODUCT DATA
@@ -289,13 +303,57 @@ const defaultProduct = {
 export default function BeltProductPage() {
   const params = useParams()
   const slug = params.slug as string
-  const product = products[slug] || { ...defaultProduct, title: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) }
+  const hardcodedProduct = products[slug]
 
+  const [dbProduct, setDbProduct] = useState<DbProduct | null>(null)
+  const [loading, setLoading] = useState(!hardcodedProduct)
   const [activeImage, setActiveImage] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
+  // Fetch from database if not in hardcoded products
+  useEffect(() => {
+    if (!hardcodedProduct && slug) {
+      setLoading(true)
+      fetch(`/api/products/slug/${slug}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          setDbProduct(data)
+          setLoading(false)
+        })
+        .catch(() => setLoading(false))
+    }
+  }, [slug, hardcodedProduct])
+
+  // Convert database product to display format
+  const product = hardcodedProduct || (dbProduct ? {
+    title: dbProduct.name,
+    subtitle: dbProduct.shortDescription || 'Industrial Quality',
+    description: dbProduct.shortDescription || dbProduct.description || '',
+    longDescription: dbProduct.description || 'Contact us for detailed product specifications.',
+    images: dbProduct.images.length > 0
+      ? dbProduct.images.map(img => img.url)
+      : ['/product-abrasive-belts.png'],
+    features: dbProduct.features || ['Premium quality', 'Industrial grade'],
+    technicalData: dbProduct.specifications.map(spec => ({ label: spec.key, value: spec.value })),
+    applications: ['Contact us for applications'],
+    brands: dbProduct.brand ? [dbProduct.brand.name] : ['Multiple brands available'],
+    relatedProducts: [],
+  } : { ...defaultProduct, title: slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) })
+
   const nextImage = () => setActiveImage((prev) => (prev + 1) % product.images.length)
   const prevImage = () => setActiveImage((prev) => (prev - 1 + product.images.length) % product.images.length)
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading product...</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-white">

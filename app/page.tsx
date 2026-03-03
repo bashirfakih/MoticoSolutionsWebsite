@@ -9,7 +9,45 @@ import {
   Menu, X, ChevronRight, ChevronLeft, ChevronDown, ArrowRight, CircleCheck,
   Facebook, Instagram, Linkedin, Youtube,
   Star, Layers, Scissors, Wrench, Disc, Settings, Quote, Smartphone,
+  Cog, Box, Hammer, Wind, Droplets, Ruler, Shield, Loader2,
+  type LucideIcon,
 } from 'lucide-react'
+
+// Icon mapping for dynamic resolution
+const ICON_MAP: Record<string, LucideIcon> = {
+  Layers,
+  Wrench,
+  Disc,
+  Cog,
+  Settings,
+  Package,
+  Box,
+  Hammer,
+  Zap,
+  Wind,
+  Droplets,
+  Ruler,
+  Scissors,
+  Shield,
+  Star,
+  ShieldCheck,
+}
+
+// Category type from database
+interface CategoryData {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  image: string | null
+  icon: string | null
+  color: string | null
+  featuredBrand: string | null
+  parentId: string | null
+  sortOrder: number
+  productCount: number
+  isActive: boolean
+}
 import CountUp from '@/components/ui/CountUp'
 import RevealOnScroll from '@/components/ui/RevealOnScroll'
 import QuoteForm from '@/components/ui/QuoteForm'
@@ -38,8 +76,8 @@ function useScrolled(threshold = 60) {
   return scrolled
 }
 
-/* ─── Product Categories Data ───────────────────────────── */
-const categories = [
+/* ─── Fallback Product Categories (used if database fetch fails) ─── */
+const fallbackCategories = [
   { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/product-abrasive-belts.png', brand: 'Hermes', productCount: '150+' },
   { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B', bg: '/product-air-power-tools.png', brand: 'DCA', productCount: '80+' },
   { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/product-belt-disc-sander.png', brand: 'ZAT', productCount: '45+' },
@@ -53,6 +91,21 @@ const categories = [
   { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/product-welding.png', brand: 'Sandwox', productCount: '25+' },
   { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004D8B', bg: '/product-accessories.png', brand: 'Osborn', productCount: '70+' },
 ]
+
+// Transform database category to UI format
+function mapCategoryToUI(cat: CategoryData, index: number) {
+  const iconName = cat.icon || 'Layers'
+  const IconComponent = ICON_MAP[iconName] || Layers
+  return {
+    id: cat.slug,
+    title: cat.name,
+    icon: IconComponent,
+    color: cat.color || (index % 2 === 0 ? '#bb0c15' : '#004D8B'),
+    bg: cat.image || `/product-${cat.slug}.png`,
+    brand: cat.featuredBrand || 'Premium',
+    productCount: cat.productCount > 0 ? `${cat.productCount}+` : '0',
+  }
+}
 
 /* ─── Why Motico Features ───────────────────────────────── */
 const features = [
@@ -213,11 +266,40 @@ export default function Home() {
   const [quoteFormOpen, setQuoteFormOpen] = useState(false)
   const [activeTestimonial, setActiveTestimonial] = useState(0)
   const [testimonialHovered, setTestimonialHovered] = useState(false)
+  const [categories, setCategories] = useState(fallbackCategories)
+  const [categoriesLoading, setCategoriesLoading] = useState(true)
   const heroRef = useRef<HTMLDivElement>(null)
   const featureRefs = useRef<(HTMLDivElement | null)[]>([])
   const productsMenuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => { setMounted(true) }, [])
+
+  /* Fetch categories from database */
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const response = await fetch('/api/categories?active=true&limit=50')
+        if (!response.ok) throw new Error('Failed to load categories')
+        const data = await response.json()
+        if (data.data && data.data.length > 0) {
+          // Sort by sortOrder and map to UI format
+          const sortedCategories = data.data
+            .filter((cat: CategoryData) => cat.isActive && !cat.parentId) // Only root categories
+            .sort((a: CategoryData, b: CategoryData) => (a.sortOrder || 0) - (b.sortOrder || 0))
+            .map((cat: CategoryData, index: number) => mapCategoryToUI(cat, index))
+          if (sortedCategories.length > 0) {
+            setCategories(sortedCategories)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load categories:', error)
+        // Keep fallback categories on error
+      } finally {
+        setCategoriesLoading(false)
+      }
+    }
+    loadCategories()
+  }, [])
 
   /* Auto-advance hero slider */
   const [isPaused, setIsPaused] = useState(false)

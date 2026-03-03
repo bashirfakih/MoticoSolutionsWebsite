@@ -647,9 +647,8 @@ describe('Products API', () => {
       it('returns 409 when slug already exists', async () => {
         const existingProduct = { id: 'prod-1', slug: 'product-1' };
         mockProductFindUnique
-          .mockResolvedValueOnce(existingProduct)
-          .mockResolvedValueOnce(null) // SKU check
-          .mockResolvedValueOnce({ id: 'prod-2', slug: 'duplicate' });
+          .mockResolvedValueOnce(existingProduct) // Find existing product
+          .mockResolvedValueOnce({ id: 'prod-2', slug: 'duplicate' }); // Slug duplicate check
 
         const request = createMockRequest('http://localhost/api/products/prod-1', {
           method: 'PATCH',

@@ -26,7 +26,52 @@ import {
   X,
   Loader2,
   GripVertical,
+  Layers,
+  Wrench,
+  Disc,
+  Cog,
+  Settings,
+  Package,
+  Box,
+  Hammer,
+  Zap,
+  Wind,
+  Droplets,
+  Ruler,
+  Scissors,
+  Shield,
+  type LucideIcon,
 } from 'lucide-react';
+
+// Common Lucide icons for category selection
+const CATEGORY_ICONS: { name: string; icon: LucideIcon }[] = [
+  { name: 'Layers', icon: Layers },
+  { name: 'Wrench', icon: Wrench },
+  { name: 'Disc', icon: Disc },
+  { name: 'Cog', icon: Cog },
+  { name: 'Settings', icon: Settings },
+  { name: 'Package', icon: Package },
+  { name: 'Box', icon: Box },
+  { name: 'Hammer', icon: Hammer },
+  { name: 'Zap', icon: Zap },
+  { name: 'Wind', icon: Wind },
+  { name: 'Droplets', icon: Droplets },
+  { name: 'Ruler', icon: Ruler },
+  { name: 'Scissors', icon: Scissors },
+  { name: 'Shield', icon: Shield },
+];
+
+// Predefined colors for category selection
+const CATEGORY_COLORS = [
+  { name: 'Red', value: '#bb0c15' },
+  { name: 'Blue', value: '#004D8B' },
+  { name: 'Green', value: '#10B981' },
+  { name: 'Orange', value: '#F59E0B' },
+  { name: 'Purple', value: '#8B5CF6' },
+  { name: 'Teal', value: '#14B8A6' },
+  { name: 'Pink', value: '#EC4899' },
+  { name: 'Gray', value: '#6B7280' },
+];
 
 // ═══════════════════════════════════════════════════════════════
 // CATEGORY TREE ITEM
@@ -74,12 +119,29 @@ function CategoryTreeItem({
           )}
         </button>
 
-        {/* Folder Icon */}
-        {hasChildren && isExpanded ? (
-          <FolderOpen className="w-5 h-5 text-yellow-500" />
-        ) : (
-          <Folder className="w-5 h-5 text-gray-400" />
-        )}
+        {/* Category Icon */}
+        {(() => {
+          const iconData = CATEGORY_ICONS.find(i => i.name === category.icon);
+          if (iconData) {
+            const IconComponent = iconData.icon;
+            return (
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: category.color ? `${category.color}20` : '#f3f4f6' }}
+              >
+                <IconComponent
+                  className="w-4 h-4"
+                  style={{ color: category.color || '#6b7280' }}
+                />
+              </div>
+            );
+          }
+          return hasChildren && isExpanded ? (
+            <FolderOpen className="w-5 h-5 text-yellow-500" />
+          ) : (
+            <Folder className="w-5 h-5 text-gray-400" />
+          );
+        })()}
 
         {/* Category Info */}
         <div className="flex-1 min-w-0">
@@ -160,6 +222,10 @@ function CategoryForm({ category, parentId, onSave, onCancel, isSaving }: Catego
   const [name, setName] = useState(category?.name || '');
   const [slug, setSlug] = useState(category?.slug || '');
   const [description, setDescription] = useState(category?.description || '');
+  const [image, setImage] = useState(category?.image || '');
+  const [icon, setIcon] = useState(category?.icon || '');
+  const [color, setColor] = useState(category?.color || '#004D8B');
+  const [featuredBrand, setFeaturedBrand] = useState(category?.featuredBrand || '');
   const [isActive, setIsActive] = useState(category?.isActive ?? true);
 
   const isEditing = !!category;
@@ -171,6 +237,10 @@ function CategoryForm({ category, parentId, onSave, onCancel, isSaving }: Catego
       name,
       slug: slug || generateSlug(name),
       description: description || null,
+      image: image || null,
+      icon: icon || null,
+      color: color || null,
+      featuredBrand: featuredBrand || null,
       parentId: parentId || category?.parentId || null,
       isActive,
     };
@@ -239,6 +309,90 @@ function CategoryForm({ category, parentId, onSave, onCancel, isSaving }: Catego
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
               />
+            </div>
+
+            {/* Icon Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Icon
+              </label>
+              <div className="grid grid-cols-7 gap-2">
+                {CATEGORY_ICONS.map(({ name: iconName, icon: IconComponent }) => (
+                  <button
+                    key={iconName}
+                    type="button"
+                    onClick={() => setIcon(iconName)}
+                    className={`p-2 rounded-lg border-2 transition-all ${
+                      icon === iconName
+                        ? 'border-[#004D8B] bg-blue-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    title={iconName}
+                  >
+                    <IconComponent className="w-5 h-5 mx-auto" style={{ color: color || '#6b7280' }} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Color Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Color
+              </label>
+              <div className="flex items-center gap-3">
+                <div className="flex gap-2 flex-wrap">
+                  {CATEGORY_COLORS.map(({ name: colorName, value }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => setColor(value)}
+                      className={`w-8 h-8 rounded-lg border-2 transition-all ${
+                        color === value ? 'border-gray-900 scale-110' : 'border-transparent'
+                      }`}
+                      style={{ backgroundColor: value }}
+                      title={colorName}
+                    />
+                  ))}
+                </div>
+                <input
+                  type="color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  className="w-10 h-8 rounded cursor-pointer border border-gray-300"
+                  title="Custom color"
+                />
+              </div>
+            </div>
+
+            {/* Featured Brand */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Featured Brand
+              </label>
+              <input
+                type="text"
+                value={featuredBrand}
+                onChange={(e) => setFeaturedBrand(e.target.value)}
+                placeholder="e.g., VSM, Klingspor, DeWalt"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+              />
+              <p className="text-xs text-gray-500 mt-1">Brand name shown on the homepage card</p>
+            </div>
+
+            {/* Image URL */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Image URL
+              </label>
+              <input
+                type="text"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+                placeholder="/category-image.jpg"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+              />
+              <p className="text-xs text-gray-500 mt-1">Path to category image (e.g., /product-grinding-sleeve.jpg)</p>
             </div>
 
             <label className="flex items-center gap-2 cursor-pointer">

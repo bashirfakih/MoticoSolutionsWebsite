@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
     // Filtering
     const search = searchParams.get('search') || undefined;
     const categoryId = searchParams.get('categoryId') || undefined;
+    const categorySlug = searchParams.get('categorySlug') || undefined;
     const brandId = searchParams.get('brandId') || undefined;
     const published = searchParams.get('published');
     const featured = searchParams.get('featured');
@@ -49,6 +50,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (categoryId) where.categoryId = categoryId;
+    if (categorySlug) where.category = { slug: categorySlug };
     if (brandId) where.brandId = brandId;
     if (published !== null && published !== undefined) {
       where.isPublished = published === 'true';

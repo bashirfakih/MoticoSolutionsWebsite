@@ -44,20 +44,9 @@ export default function AbrasiveBeltsPage() {
       setIsLoading(true)
       setError(null)
       try {
-        // First get the category ID for abrasive-belts
-        const catResponse = await fetch('/api/categories/slug/abrasive-belts', {
-          cache: 'no-store',
-        })
-
-        if (!catResponse.ok) {
-          throw new Error('Category not found')
-        }
-
-        const category = await catResponse.json()
-
-        // Then fetch published products for this category
+        // Fetch published products for this category using categorySlug
         const productsResponse = await fetch(
-          `/api/products?categoryId=${category.id}&published=true&limit=100`,
+          `/api/products?categorySlug=abrasive-belts&published=true&limit=100`,
           { cache: 'no-store' }
         )
 
@@ -224,7 +213,7 @@ export default function AbrasiveBeltsPage() {
                 return (
                   <Link
                     key={product.id}
-                    href={`/products/${product.id}`}
+                    href={`/products/abrasive-belts/${product.slug}`}
                     className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl border border-gray-100 transition-all duration-300 hover:-translate-y-1 flex flex-col"
                   >
                     {/* Image */}

@@ -14,6 +14,9 @@ export interface ApiCategory {
   slug: string;
   description: string | null;
   image: string | null;
+  icon: string | null;
+  color: string | null;
+  featuredBrand: string | null;
   parentId: string | null;
   sortOrder: number;
   isActive: boolean;
@@ -131,6 +134,9 @@ function mapApiToCategory(api: ApiCategory): Category {
     slug: api.slug,
     description: api.description,
     image: api.image,
+    icon: api.icon,
+    color: api.color,
+    featuredBrand: api.featuredBrand,
     parentId: api.parentId,
     sortOrder: api.sortOrder,
     isActive: api.isActive,

@@ -2,10 +2,55 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import { Search, X, ArrowRight, Layers, Wrench, Settings, Package, Disc, Scissors, Star, ShieldCheck, Zap } from 'lucide-react'
+import {
+  Search, X, ArrowRight, Layers, Wrench, Settings, Package, Disc, Scissors,
+  Star, ShieldCheck, Zap, Loader2, Cog, Box, Hammer, Wind, Droplets, Ruler, Shield,
+  type LucideIcon,
+} from 'lucide-react'
 
-// Product categories data for search
-const categories = [
+// Icon mapping for dynamic resolution
+const ICON_MAP: Record<string, LucideIcon> = {
+  Layers,
+  Wrench,
+  Disc,
+  Cog,
+  Settings,
+  Package,
+  Box,
+  Hammer,
+  Zap,
+  Wind,
+  Droplets,
+  Ruler,
+  Scissors,
+  Shield,
+  Star,
+  ShieldCheck,
+}
+
+// Types
+interface CategoryData {
+  id: string
+  name: string
+  slug: string
+  icon: string | null
+  color: string | null
+}
+
+interface ProductData {
+  id: string
+  name: string
+  slug: string
+  category: {
+    slug: string
+  }
+  brand: {
+    name: string
+  }
+}
+
+// Fallback categories data
+const fallbackCategories = [
   { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, keywords: ['belt', 'sanding', 'abrasive', 'hermes'] },
   { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, keywords: ['air', 'power', 'tool', 'pneumatic', 'drill'] },
   { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, keywords: ['belt', 'disc', 'sander', 'zat'] },
@@ -20,18 +65,6 @@ const categories = [
   { id: 'accessories', title: 'Accessories', icon: Settings, keywords: ['accessory', 'backup', 'pad', 'holder'] },
 ]
 
-// Sample products within categories
-const products = [
-  { name: 'Hermes RB515X Abrasive Belt', category: 'abrasive-belts', brand: 'Hermes' },
-  { name: 'Ceramic Grain Belt P80', category: 'abrasive-belts', brand: 'Hermes' },
-  { name: 'Zirconia Sanding Belt', category: 'abrasive-belts', brand: 'Hermes' },
-  { name: 'ZAT Pneumatic Belt Sander', category: 'belt-disc-sanders', brand: 'ZAT' },
-  { name: 'Eisenblatter Grinding Sleeve', category: 'grinding-sleeves', brand: 'Eisenblatter' },
-  { name: 'Flap Disc 4.5" Zirconia', category: 'abrasive-discs', brand: 'Sandwox' },
-  { name: 'Cutting Disc 115mm', category: 'cutting-discs', brand: 'Egeli' },
-  { name: 'Wire Brush Wheel', category: 'accessories', brand: 'Osborn' },
-]
-
 interface SearchDropdownProps {
   onClose?: () => void
 }
@@ -39,39 +72,96 @@ interface SearchDropdownProps {
 export default function SearchDropdown({ onClose }: SearchDropdownProps) {
   const [query, setQuery] = useState('')
   const [isOpen, setIsOpen] = useState(false)
+  const [categories, setCategories] = useState(fallbackCategories)
+  const [isLoading, setIsLoading] = useState(false)
   const [results, setResults] = useState<{
-    categories: typeof categories
-    products: typeof products
+    categories: typeof fallbackCategories
+    products: { name: string; category: string; brand: string; slug: string }[]
   }>({ categories: [], products: [] })
   const inputRef = useRef<HTMLInputElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Search logic
-  const performSearch = useCallback((searchQuery: string) => {
+  // Load categories from database on mount
+  useEffect(() => {
+    async function loadCategories() {
+      try {
+        const response = await fetch('/api/categories?active=true&limit=50')
+        if (!response.ok) return
+        const data = await response.json()
+        if (data.data && data.data.length > 0) {
+          const dbCategories = data.data
+            .filter((cat: CategoryData) => cat.slug) // Ensure slug exists
+            .map((cat: CategoryData) => ({
+              id: cat.slug,
+              title: cat.name,
+              icon: ICON_MAP[cat.icon || 'Layers'] || Layers,
+              keywords: [cat.name.toLowerCase(), cat.slug.toLowerCase()],
+            }))
+          if (dbCategories.length > 0) {
+            setCategories(dbCategories)
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load categories for search:', error)
+      }
+    }
+    loadCategories()
+  }, [])
+
+  // Search logic with debouncing and product API call
+  const performSearch = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
       setResults({ categories: [], products: [] })
+      setIsLoading(false)
       return
     }
 
     const q = searchQuery.toLowerCase()
 
-    // Search categories
+    // Search categories locally (instant)
     const matchedCategories = categories.filter(cat =>
       cat.title.toLowerCase().includes(q) ||
       cat.keywords.some(kw => kw.includes(q))
     ).slice(0, 4)
 
-    // Search products
-    const matchedProducts = products.filter(p =>
-      p.name.toLowerCase().includes(q) ||
-      p.brand.toLowerCase().includes(q)
-    ).slice(0, 4)
+    // Update categories immediately
+    setResults(prev => ({ ...prev, categories: matchedCategories }))
 
-    setResults({ categories: matchedCategories, products: matchedProducts })
-  }, [])
+    // Search products from API (debounced)
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current)
+    }
+
+    searchTimeoutRef.current = setTimeout(async () => {
+      setIsLoading(true)
+      try {
+        const response = await fetch(`/api/products?search=${encodeURIComponent(searchQuery)}&published=true&limit=5`)
+        if (response.ok) {
+          const data = await response.json()
+          const matchedProducts = (data.data || []).map((p: ProductData) => ({
+            name: p.name,
+            category: p.category?.slug || '',
+            brand: p.brand?.name || '',
+            slug: p.slug,
+          }))
+          setResults(prev => ({ ...prev, products: matchedProducts }))
+        }
+      } catch (error) {
+        console.error('Product search failed:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }, 300)
+  }, [categories])
 
   useEffect(() => {
     performSearch(query)
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current)
+      }
+    }
   }, [query, performSearch])
 
   // Handle click outside
@@ -121,7 +211,11 @@ export default function SearchDropdown({ onClose }: SearchDropdownProps) {
           className="w-44 pl-9 pr-8 py-2 text-sm rounded-lg border border-gray-200 focus:border-[#004D8B] focus:outline-none focus:ring-1 focus:ring-[#004D8B] transition-all"
           style={{ background: '#f8fafc' }}
         />
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        {isLoading ? (
+          <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+        ) : (
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        )}
         {query && (
           <button
             onClick={() => {
@@ -190,7 +284,7 @@ export default function SearchDropdown({ onClose }: SearchDropdownProps) {
                   {results.products.map((product, i) => (
                     <Link
                       key={i}
-                      href={`/products/${product.category}`}
+                      href={`/products/category/${product.category}/${product.slug}`}
                       onClick={handleResultClick}
                       className="flex items-center justify-between p-2 rounded-lg hover:bg-gray-50 transition-colors group"
                     >
@@ -220,15 +314,24 @@ export default function SearchDropdown({ onClose }: SearchDropdownProps) {
             </div>
           ) : (
             <div className="p-6 text-center">
-              <p className="text-sm text-gray-500 mb-2">No results found for &ldquo;{query}&rdquo;</p>
-              <Link
-                href="/products"
-                onClick={handleResultClick}
-                className="text-sm font-semibold"
-                style={{ color: '#004D8B' }}
-              >
-                Browse all products →
-              </Link>
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <Loader2 className="w-4 h-4 text-gray-400 animate-spin" />
+                  <span className="text-sm text-gray-500">Searching...</span>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-gray-500 mb-2">No results found for &ldquo;{query}&rdquo;</p>
+                  <Link
+                    href="/products"
+                    onClick={handleResultClick}
+                    className="text-sm font-semibold"
+                    style={{ color: '#004D8B' }}
+                  >
+                    Browse all products →
+                  </Link>
+                </>
+              )}
             </div>
           )}
         </div>

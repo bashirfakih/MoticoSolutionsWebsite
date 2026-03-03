@@ -74,6 +74,9 @@ export interface Category {
   slug: string;
   description: string | null;
   image: string | null;
+  icon: string | null; // Lucide icon name (e.g., "Layers", "Wrench", "Disc")
+  color: string | null; // Hex color for UI (e.g., "#bb0c15", "#004D8B")
+  featuredBrand: string | null; // Featured brand name to display
   parentId: string | null; // null for top-level categories
   sortOrder: number;
   isActive: boolean;
@@ -87,6 +90,9 @@ export interface CategoryInput {
   slug?: string;
   description?: string | null;
   image?: string | null;
+  icon?: string | null;
+  color?: string | null;
+  featuredBrand?: string | null;
   parentId?: string | null;
   sortOrder?: number;
   isActive?: boolean;

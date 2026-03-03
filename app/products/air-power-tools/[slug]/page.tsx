@@ -3,8 +3,22 @@
 import { useParams } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ArrowLeft, Phone, MessageCircle, Check, ChevronLeft, ChevronRight } from 'lucide-react'
+
+// Database product type
+interface DbProduct {
+  id: string
+  name: string
+  slug: string
+  description: string | null
+  shortDescription: string | null
+  features: string[]
+  images: { url: string; alt: string | null }[]
+  specifications: { key: string; value: string }[]
+  brand: { name: string } | null
+  category: { name: string; slug: string } | null
+}
 
 // Product data for Air & Power Tools
 const productData: Record<string, {
@@ -497,9 +511,41 @@ const defaultProduct = {
 export default function ProductDetailPage() {
   const params = useParams()
   const slug = params.slug as string
-  const product = productData[slug] || defaultProduct
+  const hardcodedProduct = productData[slug]
 
+  const [dbProduct, setDbProduct] = useState<DbProduct | null>(null)
+  const [loading, setLoading] = useState(!hardcodedProduct)
   const [selectedImage, setSelectedImage] = useState(0)
+
+  // Fetch from database if not in hardcoded products
+  useEffect(() => {
+    if (!hardcodedProduct && slug) {
+      setLoading(true)
+      fetch(`/api/products/slug/${slug}`)
+        .then(res => res.ok ? res.json() : null)
+        .then(data => {
+          setDbProduct(data)
+          setLoading(false)
+        })
+        .catch(() => setLoading(false))
+    }
+  }, [slug, hardcodedProduct])
+
+  // Convert database product to display format
+  const product = hardcodedProduct || (dbProduct ? {
+    title: dbProduct.name,
+    subtitle: dbProduct.shortDescription || 'Industrial Quality',
+    description: dbProduct.shortDescription || dbProduct.description || '',
+    longDescription: dbProduct.description || 'Contact us for detailed product specifications.',
+    images: dbProduct.images.length > 0
+      ? dbProduct.images.map(img => img.url)
+      : ['/product-air-power-tools.png'],
+    features: dbProduct.features || ['Premium quality', 'Industrial grade'],
+    technicalData: dbProduct.specifications.map(spec => ({ label: spec.key, value: spec.value })),
+    applications: ['Contact us for applications'],
+    brands: dbProduct.brand ? [dbProduct.brand.name] : ['Multiple brands available'],
+    relatedProducts: [],
+  } : defaultProduct)
 
   const nextImage = () => {
     setSelectedImage((prev) => (prev + 1) % product.images.length)
@@ -507,6 +553,18 @@ export default function ProductDetailPage() {
 
   const prevImage = () => {
     setSelectedImage((prev) => (prev - 1 + product.images.length) % product.images.length)
+  }
+
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-800 mx-auto mb-4"></div>
+          <p className="text-gray-500">Loading product...</p>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -158,17 +158,20 @@ model Brand {
 // ═══════════════════════════════════════════════════════════════
 
 model Category {
-  id           String   @id @default(cuid())
-  name         String
-  slug         String   @unique
-  description  String?
-  image        String?
-  parentId     String?
-  sortOrder    Int      @default(0)
-  isActive     Boolean  @default(true)
-  productCount Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  image         String?
+  icon          String?  // Lucide icon name (e.g., "Layers", "Wrench", "Disc")
+  color         String?  // Hex color for UI (e.g., "#bb0c15", "#004D8B")
+  featuredBrand String?  // Featured brand name to display
+  parentId      String?
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+  productCount  Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Self-referential relation for hierarchy
   parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id])

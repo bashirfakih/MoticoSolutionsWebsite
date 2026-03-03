@@ -294,8 +294,9 @@ export default function CategoryProductsPage() {
           ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredProducts.map((product) => (
-                <div
+                <Link
                   key={product.id}
+                  href={`/products/category/${categorySlug}/${product.slug}`}
                   className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl border border-gray-100 transition-all duration-300 hover:-translate-y-1 flex flex-col"
                 >
                   {/* Image */}
@@ -358,18 +359,12 @@ export default function CategoryProductsPage() {
 
                     {/* CTA */}
                     <div className="mt-4">
-                      <a
-                        href={`https://wa.me/9613741565?text=Hello!%20I'm%20interested%20in%20${encodeURIComponent(product.name)}%20(${product.sku}).`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-green-500 hover:bg-green-400 text-white font-semibold rounded-lg transition-colors text-sm"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                        Inquire Now
-                      </a>
+                      <span className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#004D8B] group-hover:bg-[#003a6a] text-white font-semibold rounded-lg transition-colors text-sm">
+                        View Details &rarr;
+                      </span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (
