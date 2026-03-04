@@ -140,7 +140,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       'minStockLevel', 'trackInventory', 'allowBackorder', 'isPublished',
       'isFeatured', 'isNew', 'metaTitle', 'metaDescription',
       // Quick Specs
-      'showDimensions', 'dimensions', 'showSizes', 'sizes', 'showGrits', 'grits'
+      'showDimensions', 'dimensions', 'showSizes', 'sizes', 'showGrits', 'grits',
+      // Packaging
+      'showPackaging', 'packagingUnit', 'packagingOptions'
     ];
 
     for (const field of simpleFields) {

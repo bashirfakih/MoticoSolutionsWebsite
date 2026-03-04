@@ -57,6 +57,10 @@ interface Product {
   sizes?: string | null
   showGrits?: boolean
   grits?: string | null
+  // Packaging
+  showPackaging?: boolean
+  packagingUnit?: string | null
+  packagingOptions?: string | null
 }
 
 const DEFAULT_IMAGE = '/images/slides/slide-1.png'
@@ -273,7 +277,7 @@ export default function ProductDetailPage() {
             </p>
 
             {/* Quick Specs - Dropdown Selectors */}
-            {(product.showDimensions || product.showSizes || product.showGrits) && (
+            {(product.showDimensions || product.showSizes || product.showGrits || product.showPackaging) && (
               <div className="mb-8 space-y-4">
                 {product.showDimensions && product.dimensions && (
                   <div>
@@ -321,6 +325,23 @@ export default function ProductDetailPage() {
                       {product.grits.split(',').map((grit, idx) => (
                         <option key={idx} value={grit.trim()}>
                           {grit.trim()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {product.showPackaging && product.packagingOptions && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      {product.packagingUnit || 'Quantity'}:
+                    </label>
+                    <select
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
+                      defaultValue={product.packagingOptions.split(',')[0]?.trim()}
+                    >
+                      {product.packagingOptions.split(',').map((option, idx) => (
+                        <option key={idx} value={option.trim()}>
+                          {option.trim()}
                         </option>
                       ))}
                     </select>

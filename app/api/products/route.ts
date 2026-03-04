@@ -253,6 +253,10 @@ export async function POST(request: NextRequest) {
         sizes: body.showSizes ? (body.sizes || null) : null,
         showGrits: body.showGrits ?? false,
         grits: body.showGrits ? (body.grits || null) : null,
+        // Packaging
+        showPackaging: body.showPackaging ?? false,
+        packagingUnit: body.showPackaging ? (body.packagingUnit || null) : null,
+        packagingOptions: body.showPackaging ? (body.packagingOptions || null) : null,
         // Create related images
         images: body.images?.length > 0 ? {
           create: body.images.map((img: { url: string; alt: string; sortOrder?: number; isPrimary?: boolean }, index: number) => ({

@@ -222,6 +222,11 @@ model Product {
   showGrits        Boolean     @default(false)
   grits            String?     // e.g., "36", "60, 80, 120"
 
+  // Packaging/Quantity (optional, admin-activated per product)
+  showPackaging    Boolean     @default(false)
+  packagingUnit    String?     // e.g., "Piece", "Pack", "Box", "Set", "Roll"
+  packagingOptions String?     // e.g., "1, 5, 10, 25" or "1 Pack (10 pcs), 1 Box (50 pcs)"
+
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
   publishedAt      DateTime?

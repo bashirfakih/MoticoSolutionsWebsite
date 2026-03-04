@@ -65,6 +65,10 @@ interface FormData {
   sizes: string;
   showGrits: boolean;
   grits: string;
+  // Packaging
+  showPackaging: boolean;
+  packagingUnit: string;
+  packagingOptions: string;
 }
 
 export default function AdminNewProductPage() {
@@ -113,6 +117,10 @@ export default function AdminNewProductPage() {
     sizes: '',
     showGrits: false,
     grits: '',
+    // Packaging
+    showPackaging: false,
+    packagingUnit: '',
+    packagingOptions: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -269,6 +277,10 @@ export default function AdminNewProductPage() {
         sizes: formData.showSizes ? formData.sizes || null : null,
         showGrits: formData.showGrits,
         grits: formData.showGrits ? formData.grits || null : null,
+        // Packaging
+        showPackaging: formData.showPackaging,
+        packagingUnit: formData.showPackaging ? formData.packagingUnit || null : null,
+        packagingOptions: formData.showPackaging ? formData.packagingOptions || null : null,
       };
 
       const response = await fetch('/api/products', {
@@ -683,6 +695,56 @@ export default function AdminNewProductPage() {
                       }`}
                     />
                     <p className="text-xs text-gray-400 mt-1">Available grit options (separate multiple with commas)</p>
+                  </div>
+                </div>
+
+                {/* Packaging */}
+                <div className="flex items-start gap-3 pt-3 border-t border-gray-200">
+                  <label className="flex items-center gap-2 cursor-pointer min-w-[120px] pt-2">
+                    <input
+                      type="checkbox"
+                      name="showPackaging"
+                      checked={formData.showPackaging}
+                      onChange={handleChange}
+                      className="w-4 h-4 rounded border-gray-300 text-[#004D8B] focus:ring-[#004D8B]"
+                    />
+                    <span className="text-sm text-gray-700">Packaging</span>
+                  </label>
+                  <div className="flex-1 space-y-2">
+                    <div>
+                      <select
+                        name="packagingUnit"
+                        value={formData.packagingUnit}
+                        onChange={handleChange}
+                        disabled={!formData.showPackaging}
+                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] text-sm ${
+                          !formData.showPackaging ? 'bg-gray-100 text-gray-400' : ''
+                        }`}
+                      >
+                        <option value="">Select unit type</option>
+                        <option value="Piece">Piece</option>
+                        <option value="Pack">Pack</option>
+                        <option value="Box">Box</option>
+                        <option value="Set">Set</option>
+                        <option value="Roll">Roll</option>
+                        <option value="Pair">Pair</option>
+                      </select>
+                      <p className="text-xs text-gray-400 mt-1">How this product is sold</p>
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="packagingOptions"
+                        value={formData.packagingOptions}
+                        onChange={handleChange}
+                        disabled={!formData.showPackaging}
+                        placeholder="e.g., 1, 5, 10, 25 or 1 Pack (10 pcs), 1 Box (50 pcs)"
+                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] text-sm ${
+                          !formData.showPackaging ? 'bg-gray-100 text-gray-400' : ''
+                        }`}
+                      />
+                      <p className="text-xs text-gray-400 mt-1">Available quantities (separate multiple with commas)</p>
+                    </div>
                   </div>
                 </div>
               </div>

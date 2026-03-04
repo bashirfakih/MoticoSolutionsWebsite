@@ -75,6 +75,10 @@ interface FormData {
   sizes: string;
   showGrits: boolean;
   grits: string;
+  // Packaging
+  showPackaging: boolean;
+  packagingUnit: string;
+  packagingOptions: string;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -128,6 +132,10 @@ export default function AdminProductEditPage() {
     sizes: '',
     showGrits: false,
     grits: '',
+    // Packaging
+    showPackaging: false,
+    packagingUnit: '',
+    packagingOptions: '',
   });
 
   // Error state
@@ -229,6 +237,10 @@ export default function AdminProductEditPage() {
             sizes: product.sizes || '',
             showGrits: product.showGrits ?? false,
             grits: product.grits || '',
+            // Packaging
+            showPackaging: product.showPackaging ?? false,
+            packagingUnit: product.packagingUnit || '',
+            packagingOptions: product.packagingOptions || '',
           });
           setIsLoading(false);
         }
@@ -382,6 +394,10 @@ export default function AdminProductEditPage() {
         sizes: formData.showSizes ? (formData.sizes || null) : null,
         showGrits: formData.showGrits,
         grits: formData.showGrits ? (formData.grits || null) : null,
+        // Packaging
+        showPackaging: formData.showPackaging,
+        packagingUnit: formData.showPackaging ? (formData.packagingUnit || null) : null,
+        packagingOptions: formData.showPackaging ? (formData.packagingOptions || null) : null,
       };
 
       if (isNew) {
@@ -865,6 +881,60 @@ export default function AdminProductEditPage() {
                     <p className="mt-1 text-xs text-gray-500">
                       Available grit values, separated by commas
                     </p>
+                  </div>
+                </div>
+
+                {/* Packaging */}
+                <div className="flex items-start gap-4 pt-3 border-t border-gray-100">
+                  <label className="flex items-center gap-2 cursor-pointer min-w-[120px] pt-2">
+                    <input
+                      type="checkbox"
+                      name="showPackaging"
+                      checked={formData.showPackaging}
+                      onChange={handleChange}
+                      className="w-4 h-4 rounded border-gray-300 text-[#004D8B] focus:ring-[#004D8B]"
+                    />
+                    <span className="text-sm text-gray-700">Packaging</span>
+                  </label>
+                  <div className="flex-1 space-y-3">
+                    <div>
+                      <select
+                        name="packagingUnit"
+                        value={formData.packagingUnit}
+                        onChange={handleChange}
+                        disabled={!formData.showPackaging}
+                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] ${
+                          !formData.showPackaging ? 'bg-gray-100 text-gray-400' : ''
+                        }`}
+                      >
+                        <option value="">Select unit type</option>
+                        <option value="Piece">Piece</option>
+                        <option value="Pack">Pack</option>
+                        <option value="Box">Box</option>
+                        <option value="Set">Set</option>
+                        <option value="Roll">Roll</option>
+                        <option value="Pair">Pair</option>
+                      </select>
+                      <p className="mt-1 text-xs text-gray-500">
+                        How this product is sold
+                      </p>
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="packagingOptions"
+                        value={formData.packagingOptions}
+                        onChange={handleChange}
+                        disabled={!formData.showPackaging}
+                        placeholder="e.g. 1, 5, 10, 25 or 1 Pack (10 pcs), 1 Box (50 pcs)"
+                        className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] ${
+                          !formData.showPackaging ? 'bg-gray-100 text-gray-400' : ''
+                        }`}
+                      />
+                      <p className="mt-1 text-xs text-gray-500">
+                        Available quantities, separated by commas
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
