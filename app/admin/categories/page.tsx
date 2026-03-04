@@ -42,6 +42,7 @@ import {
   Shield,
   type LucideIcon,
 } from 'lucide-react';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 
 // Common Lucide icons for category selection
 const CATEGORY_ICONS: { name: string; icon: LucideIcon }[] = [
@@ -380,19 +381,27 @@ function CategoryForm({ category, parentId, onSave, onCancel, isSaving }: Catego
               <p className="text-xs text-gray-500 mt-1">Brand name shown on the homepage card</p>
             </div>
 
-            {/* Image URL */}
+            {/* Category Image */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Image URL
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category Image
               </label>
-              <input
-                type="text"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-                placeholder="/category-image.jpg"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+              <ImageUpload
+                type="category-image"
+                currentImage={image}
+                onUploadComplete={(url) => setImage(url)}
+                onRemove={() => setImage('')}
+                maxSize={5}
               />
-              <p className="text-xs text-gray-500 mt-1">Path to category image (e.g., /product-grinding-sleeve.jpg)</p>
+              <div className="mt-2 p-3 bg-gray-50 rounded-lg">
+                <p className="text-xs font-medium text-gray-700 mb-1">Recommended:</p>
+                <ul className="text-xs text-gray-500 space-y-0.5">
+                  <li>• Size: 1920 x 1080 px (16:9 landscape)</li>
+                  <li>• Format: JPG, PNG, or WebP</li>
+                  <li>• Max file size: 5MB</li>
+                  <li>• Keep important content centered for mobile cropping</li>
+                </ul>
+              </div>
             </div>
 
             <label className="flex items-center gap-2 cursor-pointer">

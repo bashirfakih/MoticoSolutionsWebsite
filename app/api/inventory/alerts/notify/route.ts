@@ -23,8 +23,8 @@ export async function POST(request: NextRequest) {
     const settings = await prisma.siteSettings.findUnique({
       where: { id: 'default' },
       select: {
-        orderNotificationEmail: true,
-        lowStockAlertThreshold: true,
+        emailOrderNotification: true,
+        lowStockThreshold: true,
         enableEmailNotifications: true,
       },
     });
@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const notificationEmail = settings.orderNotificationEmail;
+    const notificationEmail = settings.emailOrderNotification;
     if (!notificationEmail) {
       return NextResponse.json({
         success: false,
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    const threshold = settings.lowStockAlertThreshold || 10;
+    const threshold = settings.lowStockThreshold || 10;
 
     // Get critical and warning products
     const products = await prisma.product.findMany({

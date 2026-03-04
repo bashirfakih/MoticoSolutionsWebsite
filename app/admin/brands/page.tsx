@@ -15,6 +15,7 @@ import { Brand, BrandInput, generateSlug } from '@/lib/data/types';
 import DataTable, { Column } from '@/components/admin/DataTable';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { useToast } from '@/components/ui/Toast';
+import { ImageUpload } from '@/components/admin/ImageUpload';
 import {
   Plus,
   Edit,
@@ -41,6 +42,7 @@ interface BrandFormProps {
 function BrandForm({ brand, onSave, onCancel, isSaving }: BrandFormProps) {
   const [name, setName] = useState(brand?.name || '');
   const [slug, setSlug] = useState(brand?.slug || '');
+  const [logo, setLogo] = useState(brand?.logo || '');
   const [description, setDescription] = useState(brand?.description || '');
   const [website, setWebsite] = useState(brand?.website || '');
   const [countryOfOrigin, setCountryOfOrigin] = useState(brand?.countryOfOrigin || '');
@@ -54,6 +56,7 @@ function BrandForm({ brand, onSave, onCancel, isSaving }: BrandFormProps) {
     const input: BrandInput = {
       name,
       slug: slug || generateSlug(name),
+      logo: logo || null,
       description: description || null,
       website: website || null,
       countryOfOrigin: countryOfOrigin || null,
@@ -112,6 +115,15 @@ function BrandForm({ brand, onSave, onCancel, isSaving }: BrandFormProps) {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
               />
             </div>
+
+            <ImageUpload
+              type="brand-logo"
+              currentImage={logo}
+              onUploadComplete={(url) => setLogo(url)}
+              onRemove={() => setLogo('')}
+              label="Brand Logo"
+              aspectRatio="1/1"
+            />
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">

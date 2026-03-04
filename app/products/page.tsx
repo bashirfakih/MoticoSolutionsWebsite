@@ -18,7 +18,7 @@ interface Category {
 }
 
 // Default placeholder image for categories without images
-const DEFAULT_CATEGORY_IMAGE = '/slide-1-grinding.png'
+const DEFAULT_CATEGORY_IMAGE = '/images/slides/slide-1.png'
 
 // Alternating colors for category cards
 const CARD_COLORS = ['#004D8B', '#bb0c15']
@@ -80,7 +80,7 @@ export default function ProductsPage() {
             Back to Home
           </Link>
           <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-4">
-            <Image src="/logo-motico-solutions.png" alt="Motico Solutions" width={180} height={54} className="h-24 w-auto" />
+            <Image src="/images/logos/company/logo-motico-solutions.png" alt="Motico Solutions" width={180} height={54} className="h-24 w-auto" />
           </Link>
           <a
             href="tel:+9613741565"
@@ -104,7 +104,7 @@ export default function ProductsPage() {
       {/* Hero Section */}
       <section className="relative w-full h-[320px] flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#004D8B] to-[#002d52]">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{ backgroundImage: 'url(/slide-1.png)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          <div className="absolute inset-0" style={{ backgroundImage: 'url(/images/slides/slide-1.png)', backgroundSize: 'cover', backgroundPosition: 'center' }} />
         </div>
         <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
           <span className="inline-flex items-center gap-2 bg-red-600 text-white text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4">

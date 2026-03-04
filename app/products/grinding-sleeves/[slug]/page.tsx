@@ -45,9 +45,9 @@ const products: Record<string, {
     description: 'High-quality zircon fabric for removing deep scratches, rust, scale and weld seams.',
     longDescription: 'Abrasive sleeves made of high-quality zircon fabric for removing deep scratches, rust, scale and weld seams. These professional-grade grinding sleeves deliver a strong line finish and are ideal for stainless steel and steel applications. Only to be used with suitable expansion roller.',
     images: [
-      '/product-zirconium-grinding-sleeve-1.jpg',
-      '/product-zirconium-grinding-sleeve-2.jpg',
-      '/product-zirconium-grinding-sleeve-3.jpg',
+      '/images/products/items/product-zirconium-grinding-sleeve-1.jpg',
+      '/images/products/items/product-zirconium-grinding-sleeve-2.jpg',
+      '/images/products/items/product-zirconium-grinding-sleeve-3.jpg',
     ],
     features: [
       'High-tech zircon fabric construction',
@@ -76,8 +76,8 @@ const products: Record<string, {
     ],
     brands: ['Eisenblätter POLY PTX'],
     relatedProducts: [
-      { slug: 'trizact-sleeve', title: 'Trizact™ Sleeve', image: '/product-trizact-sleeve-1.jpg' },
-      { slug: 'sc-fleece-sleeves', title: 'SC Fleece Sleeves', image: '/product-sc-fleece-sleeves-1.jpg' },
+      { slug: 'trizact-sleeve', title: 'Trizact™ Sleeve', image: '/images/products/items/product-trizact-sleeve-1.jpg' },
+      { slug: 'sc-fleece-sleeves', title: 'SC Fleece Sleeves', image: '/images/products/items/product-sc-fleece-sleeves-1.jpg' },
     ],
   },
   'trizact-sleeve': {
@@ -86,9 +86,9 @@ const products: Record<string, {
     description: 'Pyramid-shaped grain structure for high material removal with very fine grinding.',
     longDescription: 'Saves several work steps thanks to high material removal with very fine grinding and simultaneous removal of scratches and weld spots. The ideal start for a later mirror polish. Features abrasive cloth with pyramid-shaped grain structure and additional heat-insulating layer.',
     images: [
-      '/product-trizact-sleeve-1.jpg',
-      '/product-trizact-sleeve-2.jpg',
-      '/product-trizact-sleeve-3.jpg',
+      '/images/products/items/product-trizact-sleeve-1.jpg',
+      '/images/products/items/product-trizact-sleeve-2.jpg',
+      '/images/products/items/product-trizact-sleeve-3.jpg',
     ],
     features: [
       'Pyramid-shaped grain structure',
@@ -112,8 +112,8 @@ const products: Record<string, {
     ],
     brands: ['Eisenblätter POLY PTX'],
     relatedProducts: [
-      { slug: 'zirconium-grinding-sleeve', title: 'Zirconium Grinding Sleeve', image: '/product-zirconium-grinding-sleeve-1.jpg' },
-      { slug: 'superpolish-polishing-sleeve', title: 'SuperPolish Sleeve', image: '/product-superpolish-sleeve-1.jpg' },
+      { slug: 'zirconium-grinding-sleeve', title: 'Zirconium Grinding Sleeve', image: '/images/products/items/product-zirconium-grinding-sleeve-1.jpg' },
+      { slug: 'superpolish-polishing-sleeve', title: 'SuperPolish Sleeve', image: '/images/products/items/product-superpolish-sleeve-1.jpg' },
     ],
   },
   'sc-fleece-sleeves': {
@@ -122,9 +122,9 @@ const products: Record<string, {
     description: 'Technical fleece for removing oxide layers, deburring, fine grinding, and decorative satin finishing.',
     longDescription: 'Technical surface conditioning fleece ideally suited for removing oxide layers, deburring and fine grinding. Also excellent for decorative satin and longitudinal sanding while removing slight scratches. High-quality SC fleece material with reinforcing fabric for extremely long service life.',
     images: [
-      '/product-sc-fleece-sleeves-1.jpg',
-      '/product-sc-fleece-sleeves-2.jpg',
-      '/product-sc-fleece-sleeves-3.jpg',
+      '/images/products/items/product-sc-fleece-sleeves-1.jpg',
+      '/images/products/items/product-sc-fleece-sleeves-2.jpg',
+      '/images/products/items/product-sc-fleece-sleeves-3.jpg',
     ],
     features: [
       'Surface conditioning (SC) fleece material',
@@ -149,8 +149,8 @@ const products: Record<string, {
     ],
     brands: ['Eisenblätter POLY PTX'],
     relatedProducts: [
-      { slug: 'superpolish-polishing-sleeve', title: 'SuperPolish Sleeve', image: '/product-superpolish-sleeve-1.jpg' },
-      { slug: 'eco-smart-fleece-wheel', title: 'Eco Smart Fleece Wheel', image: '/product-eco-smart-fleece-wheel-1.jpg' },
+      { slug: 'superpolish-polishing-sleeve', title: 'SuperPolish Sleeve', image: '/images/products/items/product-superpolish-sleeve-1.jpg' },
+      { slug: 'eco-smart-fleece-wheel', title: 'Eco Smart Fleece Wheel', image: '/images/products/items/product-eco-smart-fleece-wheel-1.jpg' },
     ],
   },
   'superpolish-polishing-sleeve': {
@@ -159,8 +159,8 @@ const products: Record<string, {
     description: 'Revolutionary special fleece achieving brilliant mirror shine on stainless steel and non-ferrous metals.',
     longDescription: 'Revolutionary special fleece. In combination with polishing pastes and creams, achieves a brilliant mirror shine on VA and non-ferrous metals without streaks and shadows. Ideal for use with polishing machines and hand-held longitudinal sanders. Always use an extra sleeve for each paste/cream to avoid mixing grain sizes.',
     images: [
-      '/product-superpolish-sleeve-1.jpg',
-      '/product-superpolish-sleeve-2.jpg',
+      '/images/products/items/product-superpolish-sleeve-1.jpg',
+      '/images/products/items/product-superpolish-sleeve-2.jpg',
     ],
     features: [
       'Revolutionary special fleece',
@@ -185,8 +185,8 @@ const products: Record<string, {
     ],
     brands: ['Eisenblätter POLY PTX'],
     relatedProducts: [
-      { slug: 'cotton-polishing-rings', title: 'Cotton Polishing Rings', image: '/product-cotton-polishing-rings-1.jpg' },
-      { slug: 'trizact-sleeve', title: 'Trizact™ Sleeve', image: '/product-trizact-sleeve-1.jpg' },
+      { slug: 'cotton-polishing-rings', title: 'Cotton Polishing Rings', image: '/images/products/items/product-cotton-polishing-rings-1.jpg' },
+      { slug: 'trizact-sleeve', title: 'Trizact™ Sleeve', image: '/images/products/items/product-trizact-sleeve-1.jpg' },
     ],
   },
   'cotton-polishing-rings': {
@@ -195,9 +195,9 @@ const products: Record<string, {
     description: 'Buffing discs for high-gloss polishing with pastes and creams on flat and uneven surfaces.',
     longDescription: 'High-quality polishing rings (buffing discs) for high-gloss polishing with polishing pastes and creams on flat and uneven surfaces without scratches and streaks. Cotton rings (impregnated) are ideal for main polishing of non-ferrous metals; mirror finish rings for stainless steel and final mirror finish.',
     images: [
-      '/product-cotton-polishing-rings-1.jpg',
-      '/product-cotton-polishing-rings-2.jpg',
-      '/product-cotton-polishing-rings-3.jpg',
+      '/images/products/items/product-cotton-polishing-rings-1.jpg',
+      '/images/products/items/product-cotton-polishing-rings-2.jpg',
+      '/images/products/items/product-cotton-polishing-rings-3.jpg',
     ],
     features: [
       'High-quality cotton (impregnated)',
@@ -223,8 +223,8 @@ const products: Record<string, {
     ],
     brands: ['Eisenblätter POLY PTX'],
     relatedProducts: [
-      { slug: 'superpolish-polishing-sleeve', title: 'SuperPolish Sleeve', image: '/product-superpolish-sleeve-1.jpg' },
-      { slug: 'eco-smart-fleece-wheel', title: 'Eco Smart Fleece Wheel', image: '/product-eco-smart-fleece-wheel-1.jpg' },
+      { slug: 'superpolish-polishing-sleeve', title: 'SuperPolish Sleeve', image: '/images/products/items/product-superpolish-sleeve-1.jpg' },
+      { slug: 'eco-smart-fleece-wheel', title: 'Eco Smart Fleece Wheel', image: '/images/products/items/product-eco-smart-fleece-wheel-1.jpg' },
     ],
   },
   'eco-smart-flap-wheel': {
@@ -233,7 +233,7 @@ const products: Record<string, {
     description: 'Elastic abrasive flap wheel for removing rust, oxide layers, paint, scratches and strong structuring.',
     longDescription: 'Elastic abrasive flap wheel (flap sander) with quick-release mount for removing rust, oxide layers, paint, scratches and for strong structuring and satin finishing of metals. High-quality aluminum oxide fabric for high removal rate and long service life.',
     images: [
-      '/product-eco-smart-flap-wheel-1.jpg',
+      '/images/products/items/product-eco-smart-flap-wheel-1.jpg',
     ],
     features: [
       'High-quality aluminum oxide fabric',
@@ -260,8 +260,8 @@ const products: Record<string, {
     ],
     brands: ['Eisenblätter POLY PTX'],
     relatedProducts: [
-      { slug: 'eco-smart-combi-fleece-wheel', title: 'Eco Smart Combi Wheel', image: '/product-eco-smart-combi-wheel-1.jpg' },
-      { slug: 'eco-smart-fleece-wheel', title: 'Eco Smart Fleece Wheel', image: '/product-eco-smart-fleece-wheel-1.jpg' },
+      { slug: 'eco-smart-combi-fleece-wheel', title: 'Eco Smart Combi Wheel', image: '/images/products/items/product-eco-smart-combi-wheel-1.jpg' },
+      { slug: 'eco-smart-fleece-wheel', title: 'Eco Smart Fleece Wheel', image: '/images/products/items/product-eco-smart-fleece-wheel-1.jpg' },
     ],
   },
   'eco-smart-combi-fleece-wheel': {
@@ -270,7 +270,7 @@ const products: Record<string, {
     description: 'Nylon fleece with corundum abrasive for matting, satin finishing, and surface smoothing on metal and wood.',
     longDescription: 'Versatile wheel for both metal and wood applications. Metal: Matting, satin finishing, removal of light scratches, rust, oxide. Wood: Smoothing surfaces, removing old paint and dirt. High-quality nylon fleece with corundum abrasive fabric for even use over entire service life.',
     images: [
-      '/product-eco-smart-combi-wheel-1.jpg',
+      '/images/products/items/product-eco-smart-combi-wheel-1.jpg',
     ],
     features: [
       'Nylon fleece with corundum abrasive',
@@ -297,8 +297,8 @@ const products: Record<string, {
     ],
     brands: ['Eisenblätter POLY PTX'],
     relatedProducts: [
-      { slug: 'eco-smart-flap-wheel', title: 'Eco Smart Flap Wheel', image: '/product-eco-smart-flap-wheel-1.jpg' },
-      { slug: 'eco-smart-fleece-wheel', title: 'Eco Smart Fleece Wheel', image: '/product-eco-smart-fleece-wheel-1.jpg' },
+      { slug: 'eco-smart-flap-wheel', title: 'Eco Smart Flap Wheel', image: '/images/products/items/product-eco-smart-flap-wheel-1.jpg' },
+      { slug: 'eco-smart-fleece-wheel', title: 'Eco Smart Fleece Wheel', image: '/images/products/items/product-eco-smart-fleece-wheel-1.jpg' },
     ],
   },
   'eco-smart-fleece-wheel': {
@@ -307,8 +307,8 @@ const products: Record<string, {
     description: 'Shadow-free industrial finish for matting, satin finishing, pre-polishing and surface smoothing.',
     longDescription: 'Generates a shadow-free industrial finish (matting, satin finishing). Also for pre-polishing, removing oxide layers, aligning pre-ground sheets and smoothing surfaces. Very high quality non-woven fabric for particularly long service life.',
     images: [
-      '/product-eco-smart-fleece-wheel-1.jpg',
-      '/product-eco-smart-fleece-wheel-2.jpg',
+      '/images/products/items/product-eco-smart-fleece-wheel-1.jpg',
+      '/images/products/items/product-eco-smart-fleece-wheel-2.jpg',
     ],
     features: [
       'Very high quality non-woven fabric',
@@ -334,8 +334,8 @@ const products: Record<string, {
     ],
     brands: ['Eisenblätter POLY PTX'],
     relatedProducts: [
-      { slug: 'eco-smart-flap-wheel', title: 'Eco Smart Flap Wheel', image: '/product-eco-smart-flap-wheel-1.jpg' },
-      { slug: 'sc-fleece-sleeves', title: 'SC Fleece Sleeves', image: '/product-sc-fleece-sleeves-1.jpg' },
+      { slug: 'eco-smart-flap-wheel', title: 'Eco Smart Flap Wheel', image: '/images/products/items/product-eco-smart-flap-wheel-1.jpg' },
+      { slug: 'sc-fleece-sleeves', title: 'SC Fleece Sleeves', image: '/images/products/items/product-sc-fleece-sleeves-1.jpg' },
     ],
   },
 }
@@ -346,7 +346,7 @@ const defaultProduct = {
   subtitle: 'Industrial Quality',
   description: 'High-quality grinding sleeve for industrial applications.',
   longDescription: 'Contact us for detailed product specifications.',
-  images: ['/product-grinding-sleeve-wheels.png'],
+  images: ['/images/products/categories/product-grinding-sleeve-wheels.png'],
   features: ['Premium quality', 'Industrial grade'],
   technicalData: [{ label: 'Contact us', value: 'for specifications' }],
   applications: ['Contact us for applications'],
@@ -386,7 +386,7 @@ export default function GrindingSleeveProductPage() {
     longDescription: dbProduct.description || 'Contact us for detailed product specifications.',
     images: dbProduct.images.length > 0
       ? dbProduct.images.map(img => img.url)
-      : ['/product-grinding-sleeves.png'],
+      : ['/images/products/categories/product-grinding-sleeve-wheels.png'],
     features: dbProduct.features || ['Premium quality', 'Industrial grade'],
     technicalData: dbProduct.specifications.map(spec => ({ label: spec.key, value: spec.value })),
     applications: ['Contact us for applications'],
@@ -431,7 +431,7 @@ export default function GrindingSleeveProductPage() {
           </Link>
           <Link href="/">
             <Image
-              src="/logo-motico-solutions.png"
+              src="/images/logos/company/logo-motico-solutions.png"
               alt="Motico Solutions"
               width={200}
               height={60}

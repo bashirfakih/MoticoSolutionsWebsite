@@ -19,7 +19,7 @@ export default function TermsPage() {
             Back to Home
           </Link>
           <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Image src="/logo-motico-solutions.png" alt="Motico Solutions" width={150} height={45} className="h-16 w-auto" />
+            <Image src="/images/logos/company/logo-motico-solutions.png" alt="Motico Solutions" width={150} height={45} className="h-16 w-auto" />
           </Link>
         </div>
       </header>

@@ -70,6 +70,11 @@ export default function AdminNewProductPage() {
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
 
+  // Brand creation modal state
+  const [showBrandModal, setShowBrandModal] = useState(false);
+  const [newBrandName, setNewBrandName] = useState('');
+  const [isCreatingBrand, setIsCreatingBrand] = useState(false);
+
   const [formData, setFormData] = useState<FormData>({
     sku: '',
     name: '',
@@ -257,12 +262,50 @@ export default function AdminNewProductPage() {
       }
 
       const product = await response.json();
-      toast.success('Product created');
-      router.push(`/admin/products/${product.id}`);
+      toast.success('Product created successfully');
+      router.push('/admin/products');
     } catch (error: unknown) {
       toast.error(error instanceof Error ? error.message : 'Failed to create product');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Create new brand inline
+  const handleCreateBrand = async () => {
+    if (!newBrandName.trim()) {
+      toast.error('Brand name is required');
+      return;
+    }
+
+    setIsCreatingBrand(true);
+    try {
+      const slug = newBrandName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const response = await fetch('/api/brands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newBrandName.trim(),
+          slug,
+          isActive: true,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create brand');
+      }
+
+      const newBrand = await response.json();
+      setBrands(prev => [...prev, newBrand].sort((a, b) => a.name.localeCompare(b.name)));
+      setFormData(prev => ({ ...prev, brandId: newBrand.id }));
+      setShowBrandModal(false);
+      setNewBrandName('');
+      toast.success(`Brand "${newBrand.name}" created`);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'Failed to create brand');
+    } finally {
+      setIsCreatingBrand(false);
     }
   };
 
@@ -420,19 +463,29 @@ export default function AdminNewProductPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Brand <span className="text-red-500">*</span>
                 </label>
-                <select
-                  name="brandId"
-                  value={formData.brandId}
-                  onChange={handleChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] ${
-                    errors.brandId ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                >
-                  <option value="">Select brand</option>
-                  {brands.map(brand => (
-                    <option key={brand.id} value={brand.id}>{brand.name}</option>
-                  ))}
-                </select>
+                <div className="flex gap-2">
+                  <select
+                    name="brandId"
+                    value={formData.brandId}
+                    onChange={handleChange}
+                    className={`flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] ${
+                      errors.brandId ? 'border-red-300' : 'border-gray-300'
+                    }`}
+                  >
+                    <option value="">Select brand</option>
+                    {brands.map(brand => (
+                      <option key={brand.id} value={brand.id}>{brand.name}</option>
+                    ))}
+                  </select>
+                  <button
+                    type="button"
+                    onClick={() => setShowBrandModal(true)}
+                    className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-1"
+                    title="Add new brand"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                </div>
                 {errors.brandId && <p className="mt-1 text-sm text-red-600">{errors.brandId}</p>}
               </div>
             </div>
@@ -829,6 +882,63 @@ export default function AdminNewProductPage() {
           </div>
         )}
       </div>
+
+      {/* Brand Creation Modal */}
+      {showBrandModal && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="fixed inset-0 bg-black/50" onClick={() => setShowBrandModal(false)} />
+          <div className="flex min-h-full items-center justify-center p-4">
+            <div className="relative bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Add New Brand</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Brand Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={newBrandName}
+                    onChange={(e) => setNewBrandName(e.target.value)}
+                    placeholder="e.g., Klingspor"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                    autoFocus
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleCreateBrand();
+                      }
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 mt-1">
+                    You can add logo and details later in Brands management
+                  </p>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowBrandModal(false);
+                      setNewBrandName('');
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCreateBrand}
+                    disabled={isCreatingBrand || !newBrandName.trim()}
+                    className="flex-1 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003a6a] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isCreatingBrand && <Loader2 className="w-4 h-4 animate-spin" />}
+                    Create
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

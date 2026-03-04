@@ -75,6 +75,7 @@ async function main() {
       create: {
         name: 'Hermes Abrasives',
         slug: 'hermes',
+        logo: '/images/logos/brands/logo-hermes.png',
         description: 'Premium German-engineered abrasive solutions for industrial applications.',
         website: 'https://www.hermes-abrasives.com',
         countryOfOrigin: 'Germany',
@@ -88,6 +89,7 @@ async function main() {
       create: {
         name: 'DCA Power Tools',
         slug: 'dca',
+        logo: '/images/logos/brands/logo-dca.png',
         description: 'Professional-grade power tools for demanding industrial applications.',
         website: 'https://www.dcapowertools.com',
         countryOfOrigin: 'China',
@@ -101,6 +103,7 @@ async function main() {
       create: {
         name: 'VSM Abrasives',
         slug: 'vsm',
+        logo: '/images/logos/brands/logo-3m.png',
         description: 'High-performance abrasive solutions from Germany.',
         website: 'https://www.vsm-abrasives.com',
         countryOfOrigin: 'Germany',
@@ -114,6 +117,7 @@ async function main() {
       create: {
         name: 'SIA Abrasives',
         slug: 'sia',
+        logo: '/images/logos/brands/logo-sandwox.png',
         description: 'Swiss precision in abrasive technology.',
         website: 'https://www.sia-abrasives.com',
         countryOfOrigin: 'Switzerland',
@@ -127,6 +131,7 @@ async function main() {
       create: {
         name: 'Klingspor',
         slug: 'klingspor',
+        logo: '/images/logos/brands/logo-hoffmann.png',
         description: 'German manufacturer of coated and bonded abrasives.',
         website: 'https://www.klingspor.com',
         countryOfOrigin: 'Germany',
@@ -370,7 +375,12 @@ async function main() {
   // ═══════════════════════════════════════════════════════════════
   console.log('Creating orders...');
 
-  const order1 = await prisma.order.create({
+  // Check if orders already exist to avoid duplicate errors
+  const existingOrder1 = await prisma.order.findUnique({
+    where: { orderNumber: 'ORD-2026-001' },
+  });
+
+  const order1 = existingOrder1 || await prisma.order.create({
     data: {
       orderNumber: 'ORD-2026-001',
       customerId: customers[0].id,
@@ -420,7 +430,11 @@ async function main() {
     },
   });
 
-  const order2 = await prisma.order.create({
+  const existingOrder2 = await prisma.order.findUnique({
+    where: { orderNumber: 'ORD-2026-002' },
+  });
+
+  const order2 = existingOrder2 || await prisma.order.create({
     data: {
       orderNumber: 'ORD-2026-002',
       customerId: customers[1].id,
@@ -467,7 +481,12 @@ async function main() {
   // ═══════════════════════════════════════════════════════════════
   console.log('Creating quotes...');
 
-  await prisma.quote.create({
+  const existingQuote = await prisma.quote.findUnique({
+    where: { quoteNumber: 'QUO-2026-001' },
+  });
+
+  if (!existingQuote) {
+    await prisma.quote.create({
     data: {
       quoteNumber: 'QUO-2026-001',
       customerId: customers[2].id,
@@ -489,8 +508,9 @@ async function main() {
       },
     },
   });
+  }
 
-  console.log(`  ✓ Created 1 quote`);
+  console.log(`  ✓ Created quotes`);
 
   // ═══════════════════════════════════════════════════════════════
   // MESSAGES
@@ -544,22 +564,193 @@ async function main() {
     update: {},
     create: {
       id: 'default',
-      siteName: 'Motico Solutions',
-      siteDescription: 'Premium Industrial Abrasives & Power Tools',
-      contactEmail: 'info@moticosolutions.com',
-      contactPhone: '+961 1 234 567',
-      address: 'Sin El Fil Industrial Zone, Beirut, Lebanon',
+      companyName: 'Motico Solutions',
+      companyDescription: 'Premium Industrial Abrasives & Power Tools',
+      companyEmail: 'info@moticosolutions.com',
+      companyPhone: '+961 3 741 565',
+      companyAddress: 'Sin El Fil Industrial Zone',
+      companyCity: 'Beirut',
+      companyCountry: 'Lebanon',
+      companyWebsite: 'https://moticosolutions.com',
+      primaryColor: '#004D8B',
+      secondaryColor: '#bb0c15',
       currency: 'USD',
       taxRate: 0,
       shippingFee: 15.00,
       freeShippingThreshold: 500.00,
-      orderNotificationEmail: 'orders@moticosolutions.com',
-      lowStockAlertThreshold: 10,
+      emailOrderNotification: 'orders@moticosolutions.com',
+      lowStockThreshold: 10,
       enableEmailNotifications: true,
     },
   });
 
   console.log(`  ✓ Created site settings`);
+
+  // ═══════════════════════════════════════════════════════════════
+  // CMS CONTENT
+  // ═══════════════════════════════════════════════════════════════
+  console.log('\nCreating CMS content...');
+
+  // Hero Slides
+  const heroSlidesData = [
+    {
+      title: 'The first hand-held linear grinder',
+      subtitle: 'The All-in-One Solution for Flat Surface Finishing on Stainless steel.',
+      tag: 'GRINDING SOLUTIONS',
+      image: '/images/slides/slide-1.png',
+      ctaText: 'Learn More',
+      ctaLink: '/products',
+      accentColor: '#bb0c15',
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      title: 'Premium Wood Abrasives',
+      subtitle: 'Custom-converted wide belts tailored to your specific machinery and wood finishing requirements.',
+      tag: 'ABRASIVE BELTS',
+      image: '/images/slides/slide-2-belt.png',
+      ctaText: 'Shop Now',
+      ctaLink: '/products/abrasive-belts',
+      accentColor: '#004D8B',
+      sortOrder: 1,
+      isActive: true,
+    },
+    {
+      title: 'Power Built for Industry',
+      subtitle: 'Professional belt sanders, disc grinders and machines by ZAT.',
+      tag: 'POWER TOOLS',
+      image: '/images/slides/slide-3-disc.png',
+      ctaText: 'Explore',
+      ctaLink: '/products/power-tools',
+      accentColor: '#bb0c15',
+      sortOrder: 2,
+      isActive: true,
+    },
+    {
+      title: 'Surface Finishing Perfected',
+      subtitle: 'High-performance sanding belts in all grits, widths and lengths.',
+      tag: 'WIRE BRUSHES',
+      image: '/images/slides/slide-4.png',
+      ctaText: 'View Products',
+      ctaLink: '/products/wire-brushes',
+      accentColor: '#004D8B',
+      sortOrder: 3,
+      isActive: true,
+    },
+    {
+      title: 'Industrial Wire Solutions',
+      subtitle: 'High-performance wire wheels and brushes engineered for heavy-duty deburring, rust removal, and professional metal finishing',
+      tag: 'SPECIALTY ABRASIVES',
+      image: '/images/slides/slide-5.png',
+      ctaText: 'Discover',
+      ctaLink: '/products/specialty-abrasives',
+      accentColor: '#bb0c15',
+      sortOrder: 4,
+      isActive: true,
+    },
+  ];
+
+  for (const slideData of heroSlidesData) {
+    await prisma.heroSlide.upsert({
+      where: { id: `slide-${slideData.sortOrder}` },
+      update: slideData,
+      create: {
+        id: `slide-${slideData.sortOrder}`,
+        ...slideData,
+      },
+    });
+  }
+
+  console.log(`  ✓ Created ${heroSlidesData.length} hero slides`);
+
+  // Testimonials
+  const testimonialsData = [
+    {
+      customerName: 'Ahmad Khalil',
+      role: 'Production Manager',
+      company: 'Beirut Steel Works',
+      quote: 'Motico Solutions has been our trusted partner for 8 years. Their Hermes belts outlast any competitor by 40%, and the technical support is unmatched.',
+      rating: 5,
+      sortOrder: 0,
+      isActive: true,
+    },
+    {
+      customerName: 'Hassan Mansour',
+      role: 'Operations Director',
+      company: 'Gulf Metal Industries',
+      quote: 'Switching to Motico cut our abrasive costs by 25% while improving finish quality. Their team understands industrial needs like no other.',
+      rating: 5,
+      sortOrder: 1,
+      isActive: true,
+    },
+    {
+      customerName: 'Karim El-Masri',
+      role: 'Workshop Owner',
+      company: 'El-Masri Fabrication',
+      quote: 'Fast delivery, premium products, expert advice. Motico is the gold standard for industrial abrasives in Lebanon.',
+      rating: 5,
+      sortOrder: 2,
+      isActive: true,
+    },
+    {
+      customerName: 'Nabil Haddad',
+      role: 'Maintenance Supervisor',
+      company: 'Arabian Manufacturing Co.',
+      quote: 'We have been working with Motico for over 5 years. Their product quality and consistent supply chain have made them indispensable to our operations.',
+      rating: 5,
+      sortOrder: 3,
+      isActive: true,
+    },
+    {
+      customerName: 'Omar Farouk',
+      role: 'Procurement Manager',
+      company: 'West Africa Metals Ltd.',
+      quote: 'Excellent range of products and competitive pricing. The team goes above and beyond to ensure we get exactly what we need for our projects.',
+      rating: 5,
+      sortOrder: 4,
+      isActive: true,
+    },
+  ];
+
+  for (const testimonialData of testimonialsData) {
+    await prisma.testimonial.upsert({
+      where: { id: `testimonial-${testimonialData.sortOrder}` },
+      update: testimonialData,
+      create: {
+        id: `testimonial-${testimonialData.sortOrder}`,
+        ...testimonialData,
+      },
+    });
+  }
+
+  console.log(`  ✓ Created ${testimonialsData.length} testimonials`);
+
+  // Partner Logos
+  const partnerLogosData = [
+    { name: 'Hermes', logo: '/images/logos/brands/logo-hermes.png', website: null, sortOrder: 0, isActive: true },
+    { name: 'Eisenblätter', logo: '/images/logos/brands/logo-eisenblaetter.png', website: null, sortOrder: 1, isActive: true },
+    { name: 'Hoffmann', logo: '/images/logos/brands/logo-hoffmann.png', website: null, sortOrder: 2, isActive: true },
+    { name: 'Osborn', logo: '/images/logos/brands/logo-osborn.png', website: null, sortOrder: 3, isActive: true },
+    { name: '3M', logo: '/images/logos/brands/logo-3m.png', website: null, sortOrder: 4, isActive: true },
+    { name: 'ZAT (OEM)', logo: '/images/logos/brands/logo-zat.jpg', website: null, sortOrder: 5, isActive: true },
+    { name: 'Sandwox', logo: '/images/logos/brands/logo-sandwox.png', website: null, sortOrder: 6, isActive: true },
+    { name: 'DCA', logo: '/images/logos/brands/logo-dca.png', website: null, sortOrder: 7, isActive: true },
+    { name: 'Egeli', logo: '/images/logos/brands/logo-egeli.png', website: null, sortOrder: 8, isActive: true },
+    { name: 'NS', logo: '/images/logos/brands/logo-ns.png', website: null, sortOrder: 9, isActive: true },
+  ];
+
+  for (const logoData of partnerLogosData) {
+    await prisma.partnerLogo.upsert({
+      where: { id: `logo-${logoData.sortOrder}` },
+      update: logoData,
+      create: {
+        id: `logo-${logoData.sortOrder}`,
+        ...logoData,
+      },
+    });
+  }
+
+  console.log(`  ✓ Created ${partnerLogosData.length} partner logos`);
 
   console.log('\n✅ Database seeded successfully!');
   console.log('\n📝 Test Credentials:');

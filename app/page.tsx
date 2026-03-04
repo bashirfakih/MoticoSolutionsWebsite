@@ -56,14 +56,7 @@ import NewsletterForm from '@/components/ui/NewsletterForm'
 import FloatingActions from '@/components/ui/FloatingActions'
 import ThemeToggle from '@/components/ui/ThemeToggle'
 import NavAuthButton from '@/components/auth/NavAuthButton'
-
-/* ─── Social Media Links ─────────────────────────────────── */
-const socialLinks = {
-  facebook: 'https://facebook.com/moticosolutions',
-  instagram: 'https://instagram.com/moticosolutions',
-  linkedin: 'https://linkedin.com/company/motico-solutions',
-  youtube: 'https://youtube.com/@moticosolutions',
-}
+import { useSettings } from '@/lib/hooks/useSettings'
 
 /* ─── Hooks ─────────────────────────────────────────────── */
 function useScrolled(threshold = 60) {
@@ -78,18 +71,18 @@ function useScrolled(threshold = 60) {
 
 /* ─── Fallback Product Categories (used if database fetch fails) ─── */
 const fallbackCategories = [
-  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/product-abrasive-belts.png', brand: 'Hermes', productCount: '150+' },
-  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B', bg: '/product-air-power-tools.png', brand: 'DCA', productCount: '80+' },
-  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/product-belt-disc-sander.png', brand: 'ZAT', productCount: '45+' },
-  { id: 'stationary-machines', title: 'Stationary Machines', icon: Package, color: '#004D8B', bg: '/product-stationery-machines.png', brand: 'Hoffmann', productCount: '30+' },
-  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/product-grinding-sleeve-wheels.png', brand: 'Eisenblätter', productCount: '120+' },
-  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004D8B', bg: '/product-abrasive-discs.png', brand: 'Sandwox', productCount: '90+' },
-  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/product-cutting-discs.png', brand: 'Egeli', productCount: '60+' },
-  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B', bg: '/product-points-burrs.png', brand: 'NS', productCount: '40+' },
-  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15', bg: '/product-hand-finishing-products.png', brand: '3M', productCount: '55+' },
-  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004D8B', bg: '/product-polish-care-products.png', brand: '3M', productCount: '35+' },
-  { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/product-welding.png', brand: 'Sandwox', productCount: '25+' },
-  { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004D8B', bg: '/product-accessories.png', brand: 'Osborn', productCount: '70+' },
+  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15', bg: '/images/products/categories/product-abrasive-belts.png', brand: 'Hermes', productCount: '150+' },
+  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B', bg: '/images/products/categories/product-air-power-tools.png', brand: 'DCA', productCount: '80+' },
+  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15', bg: '/images/products/categories/product-belt-disc-sander.png', brand: 'ZAT', productCount: '45+' },
+  { id: 'stationary-machines', title: 'Stationary Machines', icon: Package, color: '#004D8B', bg: '/images/products/categories/product-stationery-machines.png', brand: 'Hoffmann', productCount: '30+' },
+  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15', bg: '/images/products/categories/product-grinding-sleeve-wheels.png', brand: 'Eisenblätter', productCount: '120+' },
+  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004D8B', bg: '/images/products/categories/product-abrasive-discs.png', brand: 'Sandwox', productCount: '90+' },
+  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15', bg: '/images/products/categories/product-cutting-discs.png', brand: 'Egeli', productCount: '60+' },
+  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B', bg: '/images/products/categories/product-points-burrs.png', brand: 'NS', productCount: '40+' },
+  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15', bg: '/images/products/categories/product-hand-finishing-products.png', brand: '3M', productCount: '55+' },
+  { id: 'polish-care', title: 'Polish & Care Products', icon: ShieldCheck, color: '#004D8B', bg: '/images/products/categories/product-polish-care-products.png', brand: '3M', productCount: '35+' },
+  { id: 'welding', title: 'Welding', icon: Zap, color: '#bb0c15', bg: '/images/products/categories/product-welding.png', brand: 'Sandwox', productCount: '25+' },
+  { id: 'accessories', title: 'Accessories', icon: Settings, color: '#004D8B', bg: '/images/products/categories/product-accessories.png', brand: 'Osborn', productCount: '70+' },
 ]
 
 // Transform database category to UI format
@@ -101,7 +94,7 @@ function mapCategoryToUI(cat: CategoryData, index: number) {
     title: cat.name,
     icon: IconComponent,
     color: cat.color || (index % 2 === 0 ? '#bb0c15' : '#004D8B'),
-    bg: cat.image || `/product-${cat.slug}.png`,
+    bg: cat.image || `/images/products/categories/product-${cat.slug}.png`,
     brand: cat.featuredBrand || 'Premium',
     productCount: cat.productCount > 0 ? `${cat.productCount}+` : '0',
   }
@@ -141,24 +134,24 @@ const features = [
   },
 ]
 
-/* ─── Brands ─────────────────────────────────────────────── */
-const brands = [
-  { name: 'Hermes', logo: '/logo-hermes.png' },
-  { name: 'Eisenblätter', logo: '/logo-eisenblaetter.png' },
-  { name: 'Hoffmann', logo: '/logo-hoffmann.png' },
-  { name: 'Osborn', logo: '/logo-osborn.png' },
-  { name: '3M', logo: '/logo-3m.png' },
-  { name: 'ZAT (OEM)', logo: '/logo-zat.jpg' },
-  { name: 'Sandwox', logo: '/logo-sandwox.png' },
-  { name: 'DCA', logo: '/logo-dca.png' },
-  { name: 'Egeli', logo: '/logo-egeli.png' },
-  { name: 'NS', logo: '/logo-ns.png' },
+/* ─── Fallback Brands (used if database fetch fails) ─────── */
+const fallbackBrands = [
+  { name: 'Hermes', logo: '/images/logos/brands/logo-hermes.png' },
+  { name: 'Eisenblätter', logo: '/images/logos/brands/logo-eisenblaetter.png' },
+  { name: 'Hoffmann', logo: '/images/logos/brands/logo-hoffmann.png' },
+  { name: 'Osborn', logo: '/images/logos/brands/logo-osborn.png' },
+  { name: '3M', logo: '/images/logos/brands/logo-3m.png' },
+  { name: 'ZAT (OEM)', logo: '/images/logos/brands/logo-zat.jpg' },
+  { name: 'Sandwox', logo: '/images/logos/brands/logo-sandwox.png' },
+  { name: 'DCA', logo: '/images/logos/brands/logo-dca.png' },
+  { name: 'Egeli', logo: '/images/logos/brands/logo-egeli.png' },
+  { name: 'NS', logo: '/images/logos/brands/logo-ns.png' },
 ]
 
-/* ─── Hero Slides ───────────────────────────────────────── */
-const heroSlides = [
+/* ─── Fallback Hero Slides (used if database fetch fails) ─── */
+const fallbackHeroSlides = [
   {
-    image: '/slide-1.png',
+    image: '/images/slides/slide-1.png',
     tag: 'GRINDING SOLUTIONS',
     headline: ['The first hand-held', ' linear grinder'],
     tagline: 'The All-in-One Solution for Flat Surface Finishing on Stainless steel.',
@@ -166,7 +159,7 @@ const heroSlides = [
     accentSecondary: '#004D8B',
   },
   {
-    image: '/slide-2-belt.png',
+    image: '/images/slides/slide-2-belt.png',
     tag: 'ABRASIVE BELTS',
     headline: ['Premium Wood', 'Abrasives'],
     tagline: 'Custom-converted wide belts tailored to your specific machinery and wood finishing requirements.',
@@ -174,7 +167,7 @@ const heroSlides = [
     accentSecondary: '#bb0c15',
   },
   {
-    image: '/slide-3-disc.png',
+    image: '/images/slides/slide-3-disc.png',
     tag: 'POWER TOOLS',
     headline: ['Power', 'Built for', 'Industry.'],
     tagline: 'Professional belt sanders, disc grinders and machines by ZAT.',
@@ -182,7 +175,7 @@ const heroSlides = [
     accentSecondary: '#004D8B',
   },
   {
-    image: '/slide-4.png',
+    image: '/images/slides/slide-4.png',
     tag: 'WIRE BRUSHES',
     headline: ['Surface', 'Finishing', 'Perfected'],
     tagline: 'High-performance sanding belts in all grits, widths and lengths.',
@@ -190,7 +183,7 @@ const heroSlides = [
     accentSecondary: '#bb0c15',
   },
   {
-    image: '/slide-5.png',
+    image: '/images/slides/slide-5.png',
     tag: 'SPECIALTY ABRASIVES',
     headline: ['Industrial Wire Solutions'],
     tagline: 'High-performance wire wheels and brushes engineered for heavy-duty deburring, rust removal, and professional metal finishing',
@@ -199,8 +192,8 @@ const heroSlides = [
   },
 ]
 
-/* ─── Testimonials ───────────────────────────────────────── */
-const testimonials = [
+/* ─── Fallback Testimonials (used if database fetch fails) ── */
+const fallbackTestimonials = [
   {
     name: 'Ahmad Khalil',
     role: 'Production Manager',
@@ -258,6 +251,7 @@ const testimonials = [
 ═══════════════════════════════════════════════════════════ */
 export default function Home() {
   const scrolled = useScrolled(60)
+  const { settings, loading: settingsLoading } = useSettings()
   const [menuOpen, setMenuOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [activeFeature, setActiveFeature] = useState(0)
@@ -268,6 +262,9 @@ export default function Home() {
   const [testimonialHovered, setTestimonialHovered] = useState(false)
   const [categories, setCategories] = useState(fallbackCategories)
   const [categoriesLoading, setCategoriesLoading] = useState(true)
+  const [heroSlides, setHeroSlides] = useState(fallbackHeroSlides)
+  const [testimonials, setTestimonials] = useState(fallbackTestimonials)
+  const [brands, setBrands] = useState(fallbackBrands)
   const heroRef = useRef<HTMLDivElement>(null)
   const featureRefs = useRef<(HTMLDivElement | null)[]>([])
   const productsMenuRef = useRef<HTMLDivElement>(null)
@@ -299,6 +296,91 @@ export default function Home() {
       }
     }
     loadCategories()
+  }, [])
+
+  /* Fetch hero slides from CMS */
+  useEffect(() => {
+    async function loadHeroSlides() {
+      try {
+        const response = await fetch('/api/cms/hero-slides')
+        if (!response.ok) throw new Error('Failed to load hero slides')
+        const data = await response.json()
+        if (data && data.length > 0) {
+          // Map database structure to UI structure
+          const mappedSlides = data.map((slide: any) => ({
+            image: slide.image,
+            tag: slide.tag || '',
+            headline: slide.title ? [slide.title] : [''],
+            tagline: slide.subtitle || '',
+            accent: slide.accentColor || '#bb0c15',
+            accentSecondary: slide.accentColor === '#bb0c15' ? '#004D8B' : '#bb0c15',
+            ctaText: slide.ctaText,
+            ctaLink: slide.ctaLink,
+          }))
+          setHeroSlides(mappedSlides)
+        }
+      } catch (error) {
+        console.error('Failed to load hero slides:', error)
+        // Keep fallback slides on error
+      }
+    }
+    loadHeroSlides()
+  }, [])
+
+  /* Fetch testimonials from CMS */
+  useEffect(() => {
+    async function loadTestimonials() {
+      try {
+        const response = await fetch('/api/cms/testimonials')
+        if (!response.ok) throw new Error('Failed to load testimonials')
+        const data = await response.json()
+        if (data && data.length > 0) {
+          // Map database structure to UI structure with visual variety
+          const gradients = [
+            { gradient: 'from-blue-500 to-cyan-500', shadow: 'shadow-blue-500/40', emoji: '🏭' },
+            { gradient: 'from-cyan-500 to-teal-500', shadow: 'shadow-cyan-500/40', emoji: '⚙️' },
+            { gradient: 'from-teal-500 to-emerald-500', shadow: 'shadow-teal-500/40', emoji: '🔧' },
+            { gradient: 'from-emerald-500 to-green-500', shadow: 'shadow-emerald-500/40', emoji: '🛠️' },
+            { gradient: 'from-green-500 to-lime-500', shadow: 'shadow-green-500/40', emoji: '📦' },
+          ]
+          const mappedTestimonials = data.map((testimonial: any, index: number) => {
+            const style = gradients[index % gradients.length]
+            return {
+              name: testimonial.customerName,
+              role: testimonial.role,
+              company: testimonial.company,
+              quote: testimonial.quote,
+              rating: testimonial.rating || 5,
+              ...style,
+            }
+          })
+          setTestimonials(mappedTestimonials)
+        }
+      } catch (error) {
+        console.error('Failed to load testimonials:', error)
+        // Keep fallback testimonials on error
+      }
+    }
+    loadTestimonials()
+  }, [])
+
+  /* Fetch brands from database */
+  useEffect(() => {
+    async function loadBrands() {
+      try {
+        const response = await fetch('/api/brands')
+        if (!response.ok) throw new Error('Failed to load brands')
+        const result = await response.json()
+        const data = result.data || result
+        if (data && data.length > 0) {
+          setBrands(data.filter((brand: any) => brand.isActive))
+        }
+      } catch (error) {
+        console.error('Failed to load brands:', error)
+        // Keep fallback brands on error
+      }
+    }
+    loadBrands()
   }, [])
 
   /* Auto-advance hero slider */
@@ -358,35 +440,39 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
             {/* Contact info */}
             <div className="flex items-center gap-5">
-              <a
-                href="tel:+9613741565"
-                className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors"
-              >
-                <Phone className="w-3.5 h-3.5 text-white/40" />
-                +961 3 741 565
-              </a>
-              <a
-                href="mailto:info@moticosolutions.com"
-                className="hidden sm:flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors"
-              >
-                <Mail className="w-3.5 h-3.5 text-white/40" />
-                info@moticosolutions.com
-              </a>
+              {settings?.companyPhone && (
+                <a
+                  href={`tel:${settings.companyPhone.replace(/\s/g, '')}`}
+                  className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5 text-white/40" />
+                  {settings.companyPhone}
+                </a>
+              )}
+              {settings?.companyEmail && (
+                <a
+                  href={`mailto:${settings.companyEmail}`}
+                  className="hidden sm:flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors"
+                >
+                  <Mail className="w-3.5 h-3.5 text-white/40" />
+                  {settings.companyEmail}
+                </a>
+              )}
             </div>
             {/* Social icons + language */}
             <div className="flex items-center gap-2">
               {[
-                { Icon: Facebook, label: 'Facebook', href: socialLinks.facebook },
-                { Icon: Instagram, label: 'Instagram', href: socialLinks.instagram },
-                { Icon: Linkedin, label: 'LinkedIn', href: socialLinks.linkedin },
-                { Icon: Youtube, label: 'YouTube', href: socialLinks.youtube },
-              ].map(({ Icon, label, href }) => (
+                settings?.socialFacebook && { Icon: Facebook, label: 'Facebook', href: settings.socialFacebook },
+                settings?.socialInstagram && { Icon: Instagram, label: 'Instagram', href: settings.socialInstagram },
+                settings?.socialLinkedIn && { Icon: Linkedin, label: 'LinkedIn', href: settings.socialLinkedIn },
+                settings?.socialYouTube && { Icon: Youtube, label: 'YouTube', href: settings.socialYouTube },
+              ].filter(Boolean).map((item: any) => item && (
                 <a
-                  key={label}
-                  href={href}
+                  key={item.label}
+                  href={item.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={label}
+                  aria-label={item.label}
                   className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
                   style={{
                     background: 'rgba(255,255,255,0.08)',
@@ -394,7 +480,7 @@ export default function Home() {
                   onMouseEnter={e => (e.currentTarget.style.background = '#bb0c15')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
                 >
-                  <Icon className="w-3.5 h-3.5 text-white" />
+                  <item.Icon className="w-3.5 h-3.5 text-white" />
                 </a>
               ))}
               <span className="text-white/20 text-xs ml-1">|</span>
@@ -421,8 +507,8 @@ export default function Home() {
             <Link href="/" className="flex-shrink-0 mt-4">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/logo-motico-solutions.png"
-                alt="Motico Solutions"
+                src={settings?.logo || '/images/logos/company/logo-motico-solutions.png'}
+                alt={settings?.companyName || 'Motico Solutions'}
                 className="h-24 w-auto object-contain"
               />
             </Link>
@@ -448,7 +534,7 @@ export default function Home() {
                         style={{ transform: productsMenuOpen ? 'rotate(180deg)' : 'rotate(0)' }}
                       />
                     </button>
-                    {/* Mega Menu */}
+                    {/* Mega Menu - Elegant List View */}
                     <div
                       className="absolute top-full left-1/2 pt-3 transition-all duration-200"
                       style={{
@@ -459,43 +545,65 @@ export default function Home() {
                       }}
                     >
                       <div
-                        className="rounded-2xl p-6 grid grid-cols-3 gap-3"
+                        className="rounded-2xl overflow-hidden"
                         style={{
                           background: 'white',
                           boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)',
                           border: '1px solid #e5e7eb',
-                          width: 520,
+                          width: 380,
                         }}
                       >
-                        {categories.slice(0, 9).map(cat => {
-                          const Icon = cat.icon
-                          return (
-                            <Link
-                              key={cat.id}
-                              href={`/products/${cat.id}`}
-                              className="flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-gray-50 group"
-                              onClick={() => setProductsMenuOpen(false)}
-                            >
-                              <div
-                                className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                                style={{ background: cat.color }}
+                        {/* Header */}
+                        <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50">
+                          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Product Categories
+                          </h3>
+                        </div>
+
+                        {/* Categories List */}
+                        <div className="max-h-[400px] overflow-y-auto">
+                          {categories.map((cat, index) => {
+                            const Icon = cat.icon
+                            return (
+                              <Link
+                                key={cat.id}
+                                href={`/products/${cat.id}`}
+                                className="flex items-center gap-4 px-5 py-3 transition-all hover:bg-gradient-to-r hover:from-gray-50 hover:to-transparent group border-b border-gray-50 last:border-0"
+                                onClick={() => setProductsMenuOpen(false)}
                               >
-                                <Icon className="w-4 h-4 text-white" />
-                              </div>
-                              <span className="text-sm font-medium text-gray-700 group-hover:text-[#004D8B]">
-                                {cat.title}
-                              </span>
-                            </Link>
-                          )
-                        })}
-                        <Link
-                          href="/products"
-                          className="col-span-3 mt-2 pt-3 flex items-center justify-center gap-2 text-sm font-semibold transition-colors"
-                          style={{ borderTop: '1px solid #e5e7eb', color: '#bb0c15' }}
-                          onClick={() => setProductsMenuOpen(false)}
-                        >
-                          View All Products <ArrowRight className="w-4 h-4" />
-                        </Link>
+                                <div
+                                  className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 transition-transform group-hover:scale-110"
+                                  style={{ background: `${cat.color}15` }}
+                                >
+                                  <Icon className="w-4 h-4" style={{ color: cat.color }} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <span className="text-sm font-medium text-gray-800 group-hover:text-[#004D8B] transition-colors">
+                                    {cat.title}
+                                  </span>
+                                  {cat.productCount !== '0' && (
+                                    <span className="ml-2 text-xs text-gray-400">
+                                      {cat.productCount}
+                                    </span>
+                                  )}
+                                </div>
+                                <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-[#004D8B] group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                              </Link>
+                            )
+                          })}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="border-t border-gray-100 bg-gradient-to-r from-gray-50/80 to-white">
+                          <Link
+                            href="/products"
+                            className="flex items-center justify-center gap-2 px-5 py-3.5 text-sm font-semibold transition-all hover:gap-3"
+                            style={{ color: '#bb0c15' }}
+                            onClick={() => setProductsMenuOpen(false)}
+                          >
+                            Browse All Products <ArrowRight className="w-4 h-4" />
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1322,7 +1430,7 @@ export default function Home() {
               <RevealOnScroll>
                 <div className="relative rounded-2xl overflow-hidden mb-8 aspect-[4/3]">
                   <Image
-                    src="/slide-1.png"
+                    src="/images/slides/slide-1.png"
                     alt="Industrial Excellence"
                     fill
                     className="object-cover"
@@ -1522,22 +1630,24 @@ export default function Home() {
               >
                 Request Quote <ArrowRight className="w-5 h-5" />
               </button>
-              <a
-                href="tel:+9613741565"
-                className="inline-flex items-center justify-center gap-2 px-10 py-5 rounded-full font-semibold text-lg active:scale-95 transition-all"
-                style={{
-                  background: 'white',
-                  color: '#004D8B',
-                }}
-                onMouseEnter={e => {
-                  e.currentTarget.style.background = '#f1f5f9'
-                }}
-                onMouseLeave={e => {
-                  e.currentTarget.style.background = 'white'
-                }}
-              >
-                Contact Sales
-              </a>
+              {settings?.companyPhone && (
+                <a
+                  href={`tel:${settings.companyPhone.replace(/\s/g, '')}`}
+                  className="inline-flex items-center justify-center gap-2 px-10 py-5 rounded-full font-semibold text-lg active:scale-95 transition-all"
+                  style={{
+                    background: 'white',
+                    color: '#004D8B',
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.background = '#f1f5f9'
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.background = 'white'
+                  }}
+                >
+                  Contact Sales
+                </a>
+              )}
             </div>
           </RevealOnScroll>
           <RevealOnScroll delay={400}>
@@ -1689,6 +1799,7 @@ export default function Home() {
       {/* ════════════════════════════════════════
           KNOWLEDGE BASE / BLOG SECTION
       ════════════════════════════════════════ */}
+      {settings?.enableBlog && (
       <section
         id="resources"
         className="py-16"
@@ -1734,7 +1845,7 @@ export default function Home() {
                 excerpt: 'A comprehensive guide to selecting grinding wheels based on material, application, and finish requirements.',
                 category: 'Guides',
                 readTime: '5 min read',
-                image: '/slide-1.png',
+                image: '/images/slides/slide-1.png',
               },
               {
                 title: 'Ceramic vs Zirconia Abrasives Explained',
@@ -1742,7 +1853,7 @@ export default function Home() {
                 excerpt: 'Understanding the differences between ceramic and zirconia abrasives and when to use each type.',
                 category: 'Technical',
                 readTime: '7 min read',
-                image: '/slide-5.png',
+                image: '/images/slides/slide-5.png',
               },
               {
                 title: 'Extending Belt Life: Pro Tips',
@@ -1750,7 +1861,7 @@ export default function Home() {
                 excerpt: 'Industry secrets to maximize the lifespan of your abrasive belts and reduce operational costs.',
                 category: 'Tips',
                 readTime: '4 min read',
-                image: '/slide-2-belt.png',
+                image: '/images/slides/slide-2-belt.png',
               },
             ].map((article, i) => (
               <RevealOnScroll key={article.title} delay={i * 100}>
@@ -1820,6 +1931,7 @@ export default function Home() {
           </RevealOnScroll>
         </div>
       </section>
+      )}
 
       {/* ════════════════════════════════════════
           FOOTER
@@ -1856,63 +1968,61 @@ export default function Home() {
             <div className="col-span-2 md:col-span-3 lg:col-span-1">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/logo-moticosolutions-white.png"
-                alt="Motico Solutions"
+                src={settings?.logo || '/images/logos/company/logo-moticosolutions-white.png'}
+                alt={settings?.companyName || 'Motico Solutions'}
                 className="h-8 w-auto object-contain mb-4"
               />
               <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
-                Premium industrial abrasives &amp; tools distributor. Serving MENA since 2004.
+                {settings?.companyDescription || 'Premium industrial abrasives & tools distributor. Serving MENA since 2004.'}
               </p>
               <div className="flex flex-col gap-3 mb-6">
-                <a
-                  href="tel:+9613741565"
-                  className="flex items-center gap-2.5 text-xs transition-colors hover:text-white"
-                  style={{ color: 'rgba(255,255,255,0.5)' }}
-                >
-                  <Smartphone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
-                  +961 3 741 565
-                </a>
-                <a
-                  href="tel:+9611558174"
-                  className="flex items-center gap-2.5 text-xs transition-colors hover:text-white"
-                  style={{ color: 'rgba(255,255,255,0.5)' }}
-                >
-                  <Phone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
-                  +961 1 558 174
-                </a>
-                <a
-                  href="mailto:info@moticosolutions.com"
-                  className="flex items-center gap-2.5 text-xs transition-colors hover:text-white"
-                  style={{ color: 'rgba(255,255,255,0.5)' }}
-                >
-                  <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
-                  info@moticosolutions.com
-                </a>
-                <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                  <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
-                  Beirut, Lebanon
-                </div>
+                {settings?.companyPhone && (
+                  <a
+                    href={`tel:${settings.companyPhone.replace(/\s/g, '')}`}
+                    className="flex items-center gap-2.5 text-xs transition-colors hover:text-white"
+                    style={{ color: 'rgba(255,255,255,0.5)' }}
+                  >
+                    <Smartphone className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
+                    {settings.companyPhone}
+                  </a>
+                )}
+                {settings?.companyEmail && (
+                  <a
+                    href={`mailto:${settings.companyEmail}`}
+                    className="flex items-center gap-2.5 text-xs transition-colors hover:text-white"
+                    style={{ color: 'rgba(255,255,255,0.5)' }}
+                  >
+                    <Mail className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
+                    {settings.companyEmail}
+                  </a>
+                )}
+                {(settings?.companyCity || settings?.companyCountry) && (
+                  <div className="flex items-center gap-2.5 text-xs" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    <MapPin className="w-3.5 h-3.5 flex-shrink-0" style={{ color: '#bb0c15' }} />
+                    {[settings.companyCity, settings.companyCountry].filter(Boolean).join(', ')}
+                  </div>
+                )}
               </div>
               {/* Social icons */}
               <div className="flex gap-2">
                 {[
-                  { Icon: Facebook, label: 'Facebook', href: socialLinks.facebook },
-                  { Icon: Instagram, label: 'Instagram', href: socialLinks.instagram },
-                  { Icon: Linkedin, label: 'LinkedIn', href: socialLinks.linkedin },
-                  { Icon: Youtube, label: 'YouTube', href: socialLinks.youtube },
-                ].map(({ Icon, label, href }) => (
+                  settings?.socialFacebook && { Icon: Facebook, label: 'Facebook', href: settings.socialFacebook },
+                  settings?.socialInstagram && { Icon: Instagram, label: 'Instagram', href: settings.socialInstagram },
+                  settings?.socialLinkedIn && { Icon: Linkedin, label: 'LinkedIn', href: settings.socialLinkedIn },
+                  settings?.socialYouTube && { Icon: Youtube, label: 'YouTube', href: settings.socialYouTube },
+                ].filter(Boolean).map((item: any) => item && (
                   <a
-                    key={label}
-                    href={href}
+                    key={item.label}
+                    href={item.href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={label}
+                    aria-label={item.label}
                     className="w-9 h-9 rounded-lg flex items-center justify-center transition-colors"
                     style={{ background: 'rgba(255,255,255,0.08)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = '#bb0c15')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
                   >
-                    <Icon className="w-4 h-4 text-white" />
+                    <item.Icon className="w-4 h-4 text-white" />
                   </a>
                 ))}
               </div>
@@ -1946,7 +2056,7 @@ export default function Home() {
                 heading: 'Company',
                 links: [
                   { label: 'About Us', href: '/about' },
-                  { label: 'Blog', href: '/blog' },
+                  ...(settings?.enableBlog ? [{ label: 'Blog', href: '/blog' }] : []),
                   { label: 'Our History', href: '/about' },
                   { label: 'Contact Us', href: '/#cta' },
                 ],

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -9,26 +9,16 @@ import {
   Facebook, Instagram, Linkedin, Youtube, Globe,
   Layers, Wrench, Settings, Package, Disc, Scissors, Star,
 } from 'lucide-react'
+import { useSettings } from '@/lib/hooks/useSettings'
+import * as LucideIcons from 'lucide-react'
 
-/* ─── Product Categories Data ───────────────────────────── */
-const categories = [
-  { id: 'abrasive-belts', title: 'Abrasive Belts', icon: Layers, color: '#bb0c15' },
-  { id: 'air-power-tools', title: 'Air & Power Tools', icon: Wrench, color: '#004D8B' },
-  { id: 'belt-disc-sanders', title: 'Belt & Disc Sanders', icon: Settings, color: '#bb0c15' },
-  { id: 'stationary-machines', title: 'Stationary Machines', icon: Package, color: '#004D8B' },
-  { id: 'grinding-sleeves', title: 'Grinding Sleeves & Wheels', icon: Disc, color: '#bb0c15' },
-  { id: 'abrasive-discs', title: 'Abrasive Discs', icon: Disc, color: '#004D8B' },
-  { id: 'cutting-discs', title: 'Cutting Discs', icon: Scissors, color: '#bb0c15' },
-  { id: 'mounted-points', title: 'Mounted Point & Burrs', icon: Star, color: '#004D8B' },
-  { id: 'hand-finishing', title: 'Hand Finishing Products', icon: Layers, color: '#bb0c15' },
-]
-
-/* ─── Social Links ───────────────────────────────────────── */
-const socialLinks = {
-  facebook: 'https://facebook.com/moticosolutions',
-  instagram: 'https://instagram.com/moticosolutions',
-  linkedin: 'https://linkedin.com/company/motico-solutions',
-  youtube: 'https://youtube.com/@moticosolutions',
+/* ─── Category Interface ───────────────────────────── */
+interface Category {
+  id: string
+  name: string
+  slug: string
+  icon: string | null
+  color: string | null
 }
 
 export default function ContactPage() {
@@ -42,6 +32,39 @@ export default function ContactPage() {
     subject: '',
     message: '',
   })
+  const [categories, setCategories] = useState<Category[]>([])
+  const { settings, loading: settingsLoading } = useSettings()
+
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch('/api/categories')
+        if (response.ok) {
+          const data = await response.json()
+          // Filter to get only parent categories
+          const parentCategories = data.filter((cat: Category) => !cat.id.includes('-'))
+          setCategories(parentCategories)
+        }
+      } catch (error) {
+        console.error('Failed to fetch categories:', error)
+      }
+    }
+    fetchCategories()
+  }, [])
+
+  // Helper to get icon component from string name
+  const getIconComponent = (iconName: string | null) => {
+    if (!iconName) return Layers
+    const Icon = (LucideIcons as any)[iconName]
+    return Icon || Layers
+  }
+
+  // Helper to get color with fallback
+  const getColor = (index: number) => {
+    if (!settings) return index % 2 === 0 ? '#004D8B' : '#bb0c15'
+    return index % 2 === 0 ? settings.primaryColor : settings.secondaryColor
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -75,34 +98,38 @@ export default function ContactPage() {
       {/* Header */}
       <header className="sticky top-0 z-50">
         {/* Top bar */}
-        <div style={{ background: '#004D8B' }} className="py-2">
+        <div style={{ background: settings?.primaryColor || '#004D8B' }} className="py-2">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
             <div className="flex items-center gap-5">
-              <a href="tel:+9613741565" className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors">
-                <Phone className="w-3.5 h-3.5 text-white/40" />
-                +961 3 741 565
-              </a>
-              <a href="mailto:info@moticosolutions.com" className="hidden sm:flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors">
-                <Mail className="w-3.5 h-3.5 text-white/40" />
-                info@moticosolutions.com
-              </a>
+              {settings?.companyPhone && (
+                <a href={`tel:${settings.companyPhone.replace(/\s/g, '')}`} className="flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors">
+                  <Phone className="w-3.5 h-3.5 text-white/40" />
+                  {settings.companyPhone}
+                </a>
+              )}
+              {settings?.companyEmail && (
+                <a href={`mailto:${settings.companyEmail}`} className="hidden sm:flex items-center gap-1.5 text-xs text-white/60 hover:text-white transition-colors">
+                  <Mail className="w-3.5 h-3.5 text-white/40" />
+                  {settings.companyEmail}
+                </a>
+              )}
             </div>
             <div className="flex items-center gap-2">
               {[
-                { Icon: Facebook, label: 'Facebook', href: socialLinks.facebook },
-                { Icon: Instagram, label: 'Instagram', href: socialLinks.instagram },
-                { Icon: Linkedin, label: 'LinkedIn', href: socialLinks.linkedin },
-                { Icon: Youtube, label: 'YouTube', href: socialLinks.youtube },
-              ].map(({ Icon, label, href }) => (
+                { Icon: Facebook, label: 'Facebook', href: settings?.socialFacebook },
+                { Icon: Instagram, label: 'Instagram', href: settings?.socialInstagram },
+                { Icon: Linkedin, label: 'LinkedIn', href: settings?.socialLinkedIn },
+                { Icon: Youtube, label: 'YouTube', href: settings?.socialYouTube },
+              ].filter(({ href }) => href).map(({ Icon, label, href }) => (
                 <a
                   key={label}
-                  href={href}
+                  href={href!}
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
                   className="w-7 h-7 rounded-full flex items-center justify-center transition-colors"
                   style={{ background: 'rgba(255,255,255,0.08)' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = '#bb0c15')}
+                  onMouseEnter={e => (e.currentTarget.style.background = settings?.secondaryColor || '#bb0c15')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
                 >
                   <Icon className="w-3.5 h-3.5 text-white" />
@@ -110,7 +137,7 @@ export default function ContactPage() {
               ))}
               <span className="text-white/20 text-xs ml-1">|</span>
               <span className="text-xs text-white/40 flex items-center gap-1 ml-1">
-                <Globe className="w-3 h-3" /> EN
+                <Globe className="w-3 h-3" /> {settings?.defaultLanguage?.toUpperCase() || 'EN'}
               </span>
             </div>
           </div>
@@ -127,7 +154,11 @@ export default function ContactPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0 mt-4">
-              <img src="/logo-motico-solutions.png" alt="Motico Solutions" className="h-24 w-auto object-contain" />
+              <img
+                src={settings?.logo || '/images/logos/company/logo-motico-solutions.png'}
+                alt={settings?.companyName || 'Company Logo'}
+                className="h-24 w-auto object-contain"
+              />
             </Link>
 
             {/* Desktop nav links */}
@@ -142,7 +173,7 @@ export default function ContactPage() {
                   >
                     <button
                       className="nav-link text-sm font-medium pb-0.5 flex items-center gap-1"
-                      style={{ color: productsMenuOpen ? '#004D8B' : '#4b5563' }}
+                      style={{ color: productsMenuOpen ? (settings?.primaryColor || '#004D8B') : '#4b5563' }}
                     >
                       {link.label}
                       <ChevronDown
@@ -169,23 +200,23 @@ export default function ContactPage() {
                           width: 520,
                         }}
                       >
-                        {categories.map(cat => {
-                          const Icon = cat.icon
+                        {categories.map((cat, index) => {
+                          const Icon = getIconComponent(cat.icon)
                           return (
                             <Link
                               key={cat.id}
-                              href={`/products/${cat.id}`}
+                              href={`/products/${cat.slug}`}
                               className="flex items-center gap-3 p-3 rounded-xl transition-all hover:bg-gray-50 group"
                               onClick={() => setProductsMenuOpen(false)}
                             >
                               <div
                                 className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-                                style={{ background: cat.color }}
+                                style={{ background: cat.color || getColor(index) }}
                               >
                                 <Icon className="w-4 h-4 text-white" />
                               </div>
-                              <span className="text-sm font-medium text-gray-700 group-hover:text-[#004D8B]">
-                                {cat.title}
+                              <span className="text-sm font-medium text-gray-700" style={{ color: undefined }}>
+                                {cat.name}
                               </span>
                             </Link>
                           )
@@ -193,7 +224,7 @@ export default function ContactPage() {
                         <Link
                           href="/products"
                           className="col-span-3 mt-2 pt-3 flex items-center justify-center gap-2 text-sm font-semibold transition-colors"
-                          style={{ borderTop: '1px solid #e5e7eb', color: '#bb0c15' }}
+                          style={{ borderTop: '1px solid #e5e7eb', color: settings?.secondaryColor || '#bb0c15' }}
                           onClick={() => setProductsMenuOpen(false)}
                         >
                           View All Products <ArrowRight className="w-4 h-4" />
@@ -206,7 +237,7 @@ export default function ContactPage() {
                     key={link.label}
                     href={link.href}
                     className="nav-link text-sm font-medium pb-0.5"
-                    style={{ color: link.href === '/contact' ? '#004D8B' : '#4b5563' }}
+                    style={{ color: link.href === '/contact' ? (settings?.primaryColor || '#004D8B') : '#4b5563' }}
                   >
                     {link.label}
                   </Link>
@@ -229,7 +260,7 @@ export default function ContactPage() {
               <Link
                 href="/#cta"
                 className="btn-shimmer text-sm font-semibold px-5 py-2 rounded-lg text-white active:scale-95 transition-transform"
-                style={{ background: '#bb0c15', boxShadow: '0 4px 14px rgba(220,38,38,0.3)' }}
+                style={{ background: settings?.secondaryColor || '#bb0c15', boxShadow: '0 4px 14px rgba(220,38,38,0.3)' }}
               >
                 Get Quote
               </Link>
@@ -238,7 +269,7 @@ export default function ContactPage() {
             {/* Mobile hamburger */}
             <button
               className="md:hidden p-2 rounded-lg"
-              style={{ color: '#004D8B' }}
+              style={{ color: settings?.primaryColor || '#004D8B' }}
               onClick={() => setMenuOpen(!menuOpen)}
               aria-label="Toggle menu"
             >
@@ -257,7 +288,7 @@ export default function ContactPage() {
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
                   className="text-xl font-semibold py-3 border-b"
-                  style={{ color: '#004D8B', borderColor: '#f1f5f9' }}
+                  style={{ color: settings?.primaryColor || '#004D8B', borderColor: '#f1f5f9' }}
                 >
                   {link.label}
                 </Link>
@@ -266,7 +297,7 @@ export default function ContactPage() {
                 href="/#cta"
                 onClick={() => setMenuOpen(false)}
                 className="mt-4 text-center py-3 rounded-lg text-white font-semibold"
-                style={{ background: '#bb0c15' }}
+                style={{ background: settings?.secondaryColor || '#bb0c15' }}
               >
                 Get Quote
               </Link>
@@ -278,11 +309,11 @@ export default function ContactPage() {
       {/* Main Content */}
       <main id="main-content">
         {/* Hero Section */}
-        <section className="relative py-20 overflow-hidden" style={{ background: '#004D8B' }}>
+        <section className="relative py-20 overflow-hidden" style={{ background: settings?.primaryColor || '#004D8B' }}>
           <div className="absolute inset-0 dot-grid opacity-10" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 text-center">
             <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
-              Get in <span style={{ color: '#bb0c15' }}>Touch</span>
+              Get in <span style={{ color: settings?.secondaryColor || '#bb0c15' }}>Touch</span>
             </h1>
             <p className="text-lg text-white/60 max-w-2xl mx-auto">
               Have questions about our products or need a custom quote? Our team is here to help.
@@ -299,45 +330,53 @@ export default function ContactPage() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
 
                 <div className="space-y-6 mb-10">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#bb0c15' }}>
-                      <Phone className="w-5 h-5 text-white" />
+                  {settings?.companyPhone && (
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: settings?.secondaryColor || '#bb0c15' }}>
+                        <Phone className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Phone</h3>
+                        <a href={`tel:${settings.companyPhone.replace(/\s/g, '')}`} className="text-gray-600 transition-colors block" style={{ color: undefined }}>
+                          {settings.companyPhone}
+                        </a>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Phone</h3>
-                      <a href="tel:+9613741565" className="text-gray-600 hover:text-[#004D8B] transition-colors block">
-                        +961 3 741 565 (Mobile)
-                      </a>
-                      <a href="tel:+9611558174" className="text-gray-600 hover:text-[#004D8B] transition-colors block">
-                        +961 1 558 174 (Office)
-                      </a>
+                  )}
+
+                  {settings?.companyEmail && (
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: settings?.primaryColor || '#004D8B' }}>
+                        <Mail className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Email</h3>
+                        <a href={`mailto:${settings.companyEmail}`} className="text-gray-600 transition-colors">
+                          {settings.companyEmail}
+                        </a>
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {(settings?.companyCity || settings?.companyCountry) && (
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: settings?.secondaryColor || '#bb0c15' }}>
+                        <MapPin className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-900">Location</h3>
+                        <p className="text-gray-600">
+                          {[settings?.companyCity, settings?.companyCountry].filter(Boolean).join(', ')}
+                        </p>
+                        {settings?.companyAddress && (
+                          <p className="text-gray-600 text-sm">{settings.companyAddress}</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#004D8B' }}>
-                      <Mail className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Email</h3>
-                      <a href="mailto:info@moticosolutions.com" className="text-gray-600 hover:text-[#004D8B] transition-colors">
-                        info@moticosolutions.com
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#bb0c15' }}>
-                      <MapPin className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Location</h3>
-                      <p className="text-gray-600">Beirut, Lebanon</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#004D8B' }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: settings?.primaryColor || '#004D8B' }}>
                       <Clock className="w-5 h-5 text-white" />
                     </div>
                     <div>
@@ -362,9 +401,9 @@ export default function ContactPage() {
                     WhatsApp Us
                   </a>
                   <a
-                    href="tel:+9613741565"
+                    href={`tel:${settings?.companyPhone?.replace(/\s/g, '') || ''}`}
                     className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-white transition-all hover:scale-105 active:scale-95"
-                    style={{ background: '#004D8B' }}
+                    style={{ background: settings?.primaryColor || '#004D8B' }}
                   >
                     <Phone className="w-5 h-5" />
                     Call Now
@@ -414,7 +453,7 @@ export default function ContactPage() {
                             required
                             value={formData.name}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-transparent transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-2 focus:border-transparent transition-all"
                             placeholder="John Doe"
                           />
                         </div>
@@ -429,7 +468,7 @@ export default function ContactPage() {
                             required
                             value={formData.email}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-transparent transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-2 focus:border-transparent transition-all"
                             placeholder="john@company.com"
                           />
                         </div>
@@ -446,7 +485,7 @@ export default function ContactPage() {
                             name="phone"
                             value={formData.phone}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-transparent transition-all"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-2 focus:border-transparent transition-all"
                             placeholder="+961 3 123 456"
                           />
                         </div>
@@ -460,7 +499,7 @@ export default function ContactPage() {
                             required
                             value={formData.subject}
                             onChange={handleChange}
-                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-transparent transition-all bg-white"
+                            className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-2 focus:border-transparent transition-all bg-white"
                           >
                             <option value="">Select a subject...</option>
                             <option value="quote">Request a Quote</option>
@@ -484,7 +523,7 @@ export default function ContactPage() {
                           rows={5}
                           value={formData.message}
                           onChange={handleChange}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-transparent transition-all resize-none"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-2 focus:border-transparent transition-all resize-none"
                           placeholder="Tell us how we can help..."
                         />
                       </div>
@@ -493,7 +532,7 @@ export default function ContactPage() {
                         type="submit"
                         disabled={formState === 'submitting'}
                         className="w-full flex items-center justify-center gap-2 py-4 rounded-xl font-bold text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70"
-                        style={{ background: '#bb0c15', boxShadow: '0 4px 15px rgba(187,12,21,0.3)' }}
+                        style={{ background: settings?.secondaryColor || '#bb0c15', boxShadow: '0 4px 15px rgba(187,12,21,0.3)' }}
                       >
                         {formState === 'submitting' ? (
                           <>
@@ -523,11 +562,16 @@ export default function ContactPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <img src="/logo-moticosolutions-white.png" alt="Motico Solutions" className="h-8 w-auto" loading="lazy" />
-              <span className="text-xs text-white/40">Premium Industrial Abrasives & Tools</span>
+              <img
+                src={settings?.logo || '/images/logos/company/logo-moticosolutions-white.png'}
+                alt={settings?.companyName || 'Company Logo'}
+                className="h-8 w-auto brightness-0 invert"
+                loading="lazy"
+              />
+              <span className="text-xs text-white/40">{settings?.companyDescription || 'Premium Industrial Products'}</span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-xs text-white/30">© 2026 Motico Solutions. All rights reserved.</span>
+              <span className="text-xs text-white/30">© {new Date().getFullYear()} {settings?.companyName || 'Company'}. All rights reserved.</span>
             </div>
           </div>
         </div>

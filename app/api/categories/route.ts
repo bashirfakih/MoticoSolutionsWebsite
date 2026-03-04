@@ -7,6 +7,23 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { toUrlPath } from '@/lib/utils/imageOptimizer';
+
+// Category image mapping for legacy seed data paths
+const categoryImageMap: Record<string, string> = {
+  '/categories/abrasive-belts.jpg': '/images/products/categories/product-abrasive-belts.png',
+  '/categories/grinding-wheels.jpg': '/images/products/categories/product-abrasive-discs.png',
+  '/categories/grinding-sleeves.jpg': '/images/products/categories/product-grinding-sleeve-wheels.png',
+  '/categories/sanding-sheets.jpg': '/images/products/categories/product-hand-finishing-products.png',
+  '/categories/flap-discs.jpg': '/images/products/categories/product-abrasive-discs.png',
+  '/categories/air-power-tools.jpg': '/images/products/categories/product-air-power-tools.png',
+  '/categories/surface-finishing.jpg': '/images/products/categories/product-hand-finishing-products.png',
+  '/categories/polishing.jpg': '/images/products/categories/product-polish-care-products.png',
+  '/categories/safety.jpg': '/images/products/categories/product-accessories.png',
+  '/categories/machines.jpg': '/images/products/categories/product-stationery-machines.png',
+  '/categories/accessories.jpg': '/images/products/categories/product-accessories.png',
+  '/categories/hand-tools.jpg': '/images/products/categories/product-hand-finishing-products.png',
+};
 
 // Force dynamic - never cache this route
 export const dynamic = 'force-dynamic';
@@ -66,7 +83,36 @@ export async function GET(request: NextRequest) {
         orderBy: { sortOrder: 'asc' },
       });
 
-      return NextResponse.json({ data: categories, total: categories.length });
+      // Helper function to convert category image paths recursively
+      const convertCategoryPaths = (cat: any): any => {
+        let image = cat.image;
+        if (image) {
+          // Check if we have a mapped image for legacy paths
+          if (categoryImageMap[image]) {
+            image = categoryImageMap[image];
+          } else {
+            image = toUrlPath(image);
+            // If image starts with /categories/, convert to proper path
+            if (image.startsWith('/categories/')) {
+              image = `/images/products${image}`;
+            }
+            // If image is just a filename, prepend categories path
+            else if (image.match(/^\/[^\/]+\.(png|jpg|jpeg|webp|svg)$/i)) {
+              image = `/images/products/categories${image}`;
+            }
+          }
+        }
+        return {
+          ...cat,
+          image,
+          children: cat.children?.map(convertCategoryPaths),
+        };
+      };
+
+      return NextResponse.json({
+        data: categories.map(convertCategoryPaths),
+        total: categories.length,
+      });
     }
 
     // Get total count
@@ -94,14 +140,35 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      data: categories.map(cat => ({
-        ...cat,
-        childrenCount: cat._count.children,
-        // Count only published products
-        productCount: cat.products.length,
-        products: undefined, // Don't send the full products array
-        _count: undefined,
-      })),
+      data: categories.map(cat => {
+        let image = cat.image;
+        if (image) {
+          // Check if we have a mapped image for legacy paths
+          if (categoryImageMap[image]) {
+            image = categoryImageMap[image];
+          } else {
+            // Convert to URL path
+            image = toUrlPath(image);
+            // If image starts with /categories/, convert to proper path
+            if (image.startsWith('/categories/')) {
+              image = `/images/products${image}`;
+            }
+            // If image is just a filename, prepend categories path
+            else if (image.match(/^\/[^\/]+\.(png|jpg|jpeg|webp|svg)$/i)) {
+              image = `/images/products/categories${image}`;
+            }
+          }
+        }
+        return {
+          ...cat,
+          image,
+          childrenCount: cat._count.children,
+          // Count only published products
+          productCount: cat.products.length,
+          products: undefined, // Don't send the full products array
+          _count: undefined,
+        };
+      }),
       total,
       page,
       limit,

@@ -26,7 +26,7 @@ export default function UnauthorizedPage() {
         <div className="max-w-7xl mx-auto">
           <Link href="/" className="inline-block">
             <Image
-              src="/logo-motico-solutions.png"
+              src="/images/logos/company/logo-motico-solutions.png"
               alt="Motico Solutions"
               width={180}
               height={54}

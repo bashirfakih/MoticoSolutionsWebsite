@@ -146,7 +146,7 @@ export default function ForgotPasswordPage() {
           <div
             className="absolute inset-0"
             style={{
-              backgroundImage: 'url(/slide-1.png)',
+              backgroundImage: 'url(/images/slides/slide-1.png)',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}
@@ -158,7 +158,7 @@ export default function ForgotPasswordPage() {
           {/* Logo */}
           <Link href="/" className="inline-block">
             <Image
-              src="/logo-motico-solutions.png"
+              src="/images/logos/company/logo-motico-solutions.png"
               alt="Motico Solutions"
               width={180}
               height={54}
@@ -192,7 +192,7 @@ export default function ForgotPasswordPage() {
         <div className="lg:hidden bg-white border-b border-gray-200 p-4">
           <Link href="/" className="inline-block">
             <Image
-              src="/logo-motico-solutions.png"
+              src="/images/logos/company/logo-motico-solutions.png"
               alt="Motico Solutions"
               width={140}
               height={42}

@@ -19,7 +19,7 @@ const articles: Record<string, {
     excerpt: 'A comprehensive guide to selecting grinding wheels based on material, application, and finish requirements.',
     category: 'Guides',
     readTime: '5 min read',
-    image: '/slide-1.png',
+    image: '/images/slides/slide-1.png',
     date: 'February 15, 2025',
     content: [
       'Selecting the right grinding wheel is crucial for achieving optimal performance, surface finish, and tool life. This guide will help you understand the key factors to consider when choosing a grinding wheel for your application.',
@@ -59,7 +59,7 @@ const articles: Record<string, {
     excerpt: 'Understanding the differences between ceramic and zirconia abrasives and when to use each type.',
     category: 'Technical',
     readTime: '7 min read',
-    image: '/slide-5.png',
+    image: '/images/slides/slide-5.png',
     date: 'February 10, 2025',
     content: [
       'When it comes to high-performance abrasives, ceramic and zirconia alumina are two of the most popular choices for demanding industrial applications. Understanding their differences will help you select the right abrasive for your specific needs.',
@@ -107,7 +107,7 @@ const articles: Record<string, {
     excerpt: 'Industry secrets to maximize the lifespan of your abrasive belts and reduce operational costs.',
     category: 'Tips',
     readTime: '4 min read',
-    image: '/slide-2-belt.png',
+    image: '/images/slides/slide-2-belt.png',
     date: 'February 5, 2025',
     content: [
       'Abrasive belts represent a significant consumable cost in metal fabrication and finishing operations. With proper techniques and maintenance, you can dramatically extend belt life and reduce costs. Here are proven tips from our technical experts.',
@@ -203,7 +203,7 @@ export default async function BlogArticlePage({ params }: Props) {
             Back to Blog
           </Link>
           <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Image src="/logo-motico-solutions.png" alt="Motico Solutions" width={150} height={45} className="h-16 w-auto" />
+            <Image src="/images/logos/company/logo-motico-solutions.png" alt="Motico Solutions" width={150} height={45} className="h-16 w-auto" />
           </Link>
         </div>
       </header>

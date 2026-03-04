@@ -15,6 +15,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { AdminRoute } from '@/components/auth/ProtectedRoute';
 import { useAuth } from '@/lib/auth/AuthContext';
+import { useSettings } from '@/lib/hooks/useSettings';
 import CommandPalette from '@/components/admin/CommandPalette';
 import NotificationBell from '@/components/admin/NotificationBell';
 import {
@@ -32,6 +33,10 @@ import {
   MessageSquare,
   HelpCircle,
   Search,
+  UserCog,
+  Layers,
+  Award,
+  FileImage,
 } from 'lucide-react';
 
 // Badge counts interface
@@ -71,6 +76,24 @@ const navigation = [
     badgeKey: null,
   },
   {
+    name: 'Categories',
+    href: '/admin/categories',
+    icon: Layers,
+    badgeKey: null,
+  },
+  {
+    name: 'Brands',
+    href: '/admin/brands',
+    icon: Award,
+    badgeKey: null,
+  },
+  {
+    name: 'Content',
+    href: '/admin/content',
+    icon: FileImage,
+    badgeKey: null,
+  },
+  {
     name: 'Quotes',
     href: '/admin/quotes',
     icon: FileText,
@@ -92,6 +115,11 @@ const navigation = [
 
 const secondaryNavigation = [
   {
+    name: 'Users',
+    href: '/admin/users',
+    icon: UserCog,
+  },
+  {
     name: 'Settings',
     href: '/admin/settings',
     icon: Settings,
@@ -111,10 +139,14 @@ function Sidebar({
   isOpen,
   onClose,
   badgeCounts,
+  primaryColor = '#004D8B',
+  sidebarBg = '#001f3f',
 }: {
   isOpen: boolean;
   onClose: () => void;
   badgeCounts: BadgeCounts;
+  primaryColor?: string;
+  sidebarBg?: string;
 }) {
   const pathname = usePathname();
   const { user, logout } = useAuth();
@@ -139,17 +171,18 @@ function Sidebar({
       {/* Sidebar */}
       <aside
         className={`
-          fixed top-0 left-0 z-50 h-full w-64 bg-[#001f3f] transform transition-transform duration-300 ease-in-out
+          fixed top-0 left-0 z-50 h-full w-64 transform transition-transform duration-300 ease-in-out
           lg:translate-x-0 lg:static lg:z-auto
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
+        style={{ backgroundColor: sidebarBg }}
       >
         <div className="flex flex-col h-full">
           {/* Logo Section */}
           <div className="h-16 flex items-center justify-between px-4 border-b border-white/10">
             <Link href="/admin/dashboard" className="flex items-center gap-2">
               <Image
-                src="/logo-motico-solutions.png"
+                src="/images/logos/company/logo-motico-solutions.png"
                 alt="Motico Solutions"
                 width={140}
                 height={42}
@@ -179,9 +212,10 @@ function Sidebar({
                     className={`
                       flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
                       ${active
-                        ? 'bg-[#004D8B] text-white'
+                        ? 'text-white'
                         : 'text-white/70 hover:bg-white/10 hover:text-white'}
                     `}
+                    style={active ? { backgroundColor: primaryColor } : undefined}
                   >
                     <Icon className="w-5 h-5 flex-shrink-0" />
                     <span className="flex-1">{item.name}</span>
@@ -212,9 +246,10 @@ function Sidebar({
                       className={`
                         flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
                         ${active
-                          ? 'bg-[#004D8B] text-white'
+                          ? 'text-white'
                           : 'text-white/70 hover:bg-white/10 hover:text-white'}
                       `}
+                      style={active ? { backgroundColor: primaryColor } : undefined}
                     >
                       <Icon className="w-5 h-5 flex-shrink-0" />
                       <span>{item.name}</span>
@@ -228,7 +263,7 @@ function Sidebar({
           {/* User Section */}
           <div className="p-4 border-t border-white/10">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-full bg-[#004D8B] flex items-center justify-center text-white font-semibold">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold" style={{ backgroundColor: primaryColor }}>
                 {user?.name?.charAt(0).toUpperCase() || 'A'}
               </div>
               <div className="flex-1 min-w-0">
@@ -323,6 +358,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
     pendingQuotes: 0,
     unreadMessages: 0,
   });
+  const { settings, loading } = useSettings();
 
   // Fetch badge counts from API
   const fetchBadgeCounts = useCallback(async () => {
@@ -351,12 +387,25 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   }, [fetchBadgeCounts]);
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div
+      className="min-h-screen bg-gray-100 flex"
+      style={{
+        '--admin-primary': settings?.primaryColor || '#004D8B',
+        '--admin-secondary': settings?.secondaryColor || '#bb0c15',
+        '--admin-sidebar-bg': '#001f3f',
+      } as React.CSSProperties}
+    >
       {/* Command Palette */}
       <CommandPalette isOpen={commandPaletteOpen} onOpenChange={setCommandPaletteOpen} />
 
       {/* Sidebar */}
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} badgeCounts={badgeCounts} />
+      <Sidebar
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        badgeCounts={badgeCounts}
+        primaryColor={settings?.primaryColor || '#004D8B'}
+        sidebarBg="#001f3f"
+      />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">

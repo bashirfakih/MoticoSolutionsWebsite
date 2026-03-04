@@ -183,7 +183,7 @@ export default function AboutPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between h-18">
             {/* Logo */}
             <Link href="/" className="flex-shrink-0 mt-4">
-              <img src="/logo-motico-solutions.png" alt="Motico Solutions" className="h-24 w-auto object-contain" />
+              <img src="/images/logos/company/logo-motico-solutions.png" alt="Motico Solutions" className="h-24 w-auto object-contain" />
             </Link>
 
             {/* Desktop nav links */}
@@ -326,7 +326,7 @@ export default function AboutPage() {
         {/* Background Image */}
         <div className="absolute inset-0">
           <Image
-            src="/slide-2-belt.png"
+            src="/images/slides/slide-2-belt.png"
             alt="About Motico Solutions"
             fill
             className="object-cover"
@@ -518,7 +518,7 @@ export default function AboutPage() {
                   <div className="space-y-4">
                     <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-lg">
                       <Image
-                        src="/slide-1.png"
+                        src="/images/slides/slide-1.png"
                         alt="Industrial grinding"
                         fill
                         className="object-cover hover:scale-105 transition-transform duration-600"
@@ -527,7 +527,7 @@ export default function AboutPage() {
                     </div>
                     <div className="relative aspect-square rounded-2xl overflow-hidden shadow-lg">
                       <Image
-                        src="/slide-5.png"
+                        src="/images/slides/slide-5.png"
                         alt="Abrasive products"
                         fill
                         className="object-cover hover:scale-105 transition-transform duration-500"
@@ -538,7 +538,7 @@ export default function AboutPage() {
                   <div className="space-y-4 pt-8">
                     <div className="relative aspect-square rounded-2xl overflow-hidden shadow-lg">
                       <Image
-                        src="/slide-3-disc.png"
+                        src="/images/slides/slide-3-disc.png"
                         alt="Disc sanders"
                         fill
                         className="object-cover hover:scale-105 transition-transform duration-500"
@@ -547,7 +547,7 @@ export default function AboutPage() {
                     </div>
                     <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-lg">
                       <Image
-                        src="/slide-4.png"
+                        src="/images/slides/slide-4.png"
                         alt="Surface finishing"
                         fill
                         className="object-cover hover:scale-105 transition-transform duration-500"
@@ -588,7 +588,7 @@ export default function AboutPage() {
           <div
             className="absolute inset-0"
             style={{
-              backgroundImage: 'url("/slide-4.png")',
+              backgroundImage: 'url("/images/slides/slide-4.png")',
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}
@@ -679,7 +679,7 @@ export default function AboutPage() {
                 {/* Main Image */}
                 <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/slide-3-disc.png"
+                    src="/images/slides/slide-3-disc.png"
                     alt="Our heritage in industrial excellence"
                     fill
                     className="object-cover"
@@ -867,7 +867,7 @@ export default function AboutPage() {
               <div className="relative">
                 <div className="aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl">
                   <Image
-                    src="/slide-2-belt.png"
+                    src="/images/slides/slide-2-belt.png"
                     alt="Wood industry solutions"
                     fill
                     className="object-cover"
@@ -1138,7 +1138,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
             {/* Col 1 — Brand */}
             <div className="col-span-2 md:col-span-3 lg:col-span-1">
-              <img src="/logo-moticosolutions-white.png" alt="Motico Solutions" className="h-8 w-auto object-contain mb-4" loading="lazy" />
+              <img src="/images/logos/company/logo-moticosolutions-white.png" alt="Motico Solutions" className="h-8 w-auto object-contain mb-4" loading="lazy" />
               <p className="text-xs leading-relaxed mb-6" style={{ color: 'rgba(255,255,255,0.4)' }}>
                 Premium industrial abrasives &amp; tools distributor. Serving MENA since 2004.
               </p>

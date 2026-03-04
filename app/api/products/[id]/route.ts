@@ -154,6 +154,47 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       updateData.publishedAt = null;
     }
 
+    // Handle images if provided
+    if (body.images !== undefined) {
+      // Delete existing images
+      await prisma.productImage.deleteMany({
+        where: { productId: id },
+      });
+
+      // Create new images
+      if (body.images && body.images.length > 0) {
+        await prisma.productImage.createMany({
+          data: body.images.map((img: { url: string; alt?: string; sortOrder?: number; isPrimary?: boolean }, index: number) => ({
+            productId: id,
+            url: img.url,
+            alt: img.alt || '',
+            sortOrder: img.sortOrder ?? index,
+            isPrimary: img.isPrimary ?? index === 0,
+          })),
+        });
+      }
+    }
+
+    // Handle specifications if provided
+    if (body.specifications !== undefined) {
+      // Delete existing specifications
+      await prisma.productSpecification.deleteMany({
+        where: { productId: id },
+      });
+
+      // Create new specifications
+      if (body.specifications && body.specifications.length > 0) {
+        await prisma.productSpecification.createMany({
+          data: body.specifications.map((spec: { key: string; label: string; value: string }) => ({
+            productId: id,
+            key: spec.key,
+            label: spec.label,
+            value: spec.value,
+          })),
+        });
+      }
+    }
+
     // Update product
     const product = await prisma.product.update({
       where: { id },

@@ -8,6 +8,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
+import { toUrlPath } from '@/lib/utils/imageOptimizer';
+
+// Convert product image path
+function convertProductImage(url: string | null): string | null {
+  if (!url) return null;
+  let converted = toUrlPath(url);
+  // Already has full path with /images/
+  if (converted.startsWith('/images/')) {
+    return converted;
+  }
+  // Paths starting with /products/ are served from /public/products/ - keep as-is
+  if (converted.startsWith('/products/')) {
+    return converted;
+  }
+  // Extract just the filename for analysis
+  const filename = converted.split('/').pop() || converted;
+  // Files starting with "product-" are category images
+  const isCategoryImage = filename.startsWith('product-');
+
+  // If image is just a filename (starts with / but no directory)
+  if (converted.match(/^\/[^\/]+\.(png|jpg|jpeg|webp|svg)$/i)) {
+    converted = isCategoryImage
+      ? `/images/products/categories${converted}`
+      : `/images/products/items${converted}`;
+  }
+  return converted;
+}
 
 // Force dynamic - never cache this route
 export const dynamic = 'force-dynamic';
@@ -99,6 +126,11 @@ export async function GET(request: NextRequest) {
         ...prod,
         price: prod.price ? Number(prod.price) : null,
         compareAtPrice: prod.compareAtPrice ? Number(prod.compareAtPrice) : null,
+        // Convert image paths
+        images: prod.images.map(img => ({
+          ...img,
+          url: convertProductImage(img.url) || img.url,
+        })),
         variantCount: prod._count.variants,
         _count: undefined,
       })),

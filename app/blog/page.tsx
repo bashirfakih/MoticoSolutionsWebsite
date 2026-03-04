@@ -15,7 +15,7 @@ const articles = [
     excerpt: 'A comprehensive guide to selecting grinding wheels based on material, application, and finish requirements. Learn the key factors that determine grinding wheel performance.',
     category: 'Guides',
     readTime: '5 min read',
-    image: '/slide-1.png',
+    image: '/images/slides/slide-1.png',
     date: 'February 15, 2025',
   },
   {
@@ -24,7 +24,7 @@ const articles = [
     excerpt: 'Understanding the differences between ceramic and zirconia abrasives and when to use each type. A detailed comparison for industrial applications.',
     category: 'Technical',
     readTime: '7 min read',
-    image: '/slide-5.png',
+    image: '/images/slides/slide-5.png',
     date: 'February 10, 2025',
   },
   {
@@ -33,7 +33,7 @@ const articles = [
     excerpt: 'Industry secrets to maximize the lifespan of your abrasive belts and reduce operational costs. Practical tips from our technical experts.',
     category: 'Tips',
     readTime: '4 min read',
-    image: '/slide-2-belt.png',
+    image: '/images/slides/slide-2-belt.png',
     date: 'February 5, 2025',
   },
 ]
@@ -49,7 +49,7 @@ export default function BlogPage() {
             Back to Home
           </Link>
           <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Image src="/logo-motico-solutions.png" alt="Motico Solutions" width={150} height={45} className="h-16 w-auto" />
+            <Image src="/images/logos/company/logo-motico-solutions.png" alt="Motico Solutions" width={150} height={45} className="h-16 w-auto" />
           </Link>
         </div>
       </header>

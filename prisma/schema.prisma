@@ -465,28 +465,142 @@ model Message {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SETTINGS (Single row table)
+// SETTINGS (Single row table for white-label configuration)
 // ═══════════════════════════════════════════════════════════════
 
 model SiteSettings {
-  id                       String   @id @default("default")
-  siteName                 String   @default("Motico Solutions")
-  siteDescription          String   @default("")
-  contactEmail             String   @default("")
-  contactPhone             String   @default("")
-  address                  String   @default("")
-  currency                 Currency @default(USD)
-  taxRate                  Decimal  @default(0) @db.Decimal(5, 2)
-  shippingFee              Decimal  @default(0) @db.Decimal(10, 2)
-  freeShippingThreshold    Decimal? @db.Decimal(10, 2)
-  orderNotificationEmail   String   @default("")
-  lowStockAlertThreshold   Int      @default(10)
-  enableEmailNotifications Boolean  @default(true)
-  socialFacebook           String?
-  socialInstagram          String?
-  socialLinkedIn           String?
-  socialYouTube            String?
-  updatedAt                DateTime @updatedAt
+  id String @id @default("default")
+
+  // ─── Company Information ────────────────────────────────
+  companyName        String  @default("Motico Solutions")
+  companyEmail       String  @default("info@example.com")
+  companyPhone       String  @default("")
+  companyAddress     String  @default("")
+  companyCity        String  @default("")
+  companyCountry     String  @default("Lebanon")
+  companyWebsite     String  @default("")
+  companyTaxId       String  @default("")
+  companyDescription String  @default("")
+
+  // ─── Branding ───────────────────────────────────────────
+  logo             String? // URL to logo image
+  favicon          String? // URL to favicon
+  primaryColor     String  @default("#004D8B") // Hex color
+  secondaryColor   String  @default("#bb0c15") // Hex color
+  accentColor      String? // Optional accent color
+  fontFamily       String  @default("Inter") // Font name
+
+  // ─── Localization ───────────────────────────────────────
+  defaultLanguage String   @default("en")
+  timezone        String   @default("Asia/Beirut")
+  currency        Currency @default(USD)
+  currencySymbol  String   @default("$")
+  dateFormat      String   @default("MM/DD/YYYY")
+  timeFormat      String   @default("12h") // 12h or 24h
+
+  // ─── Email Settings ─────────────────────────────────────
+  emailFromName               String  @default("")
+  emailFromAddress            String  @default("")
+  emailOrderNotification      String  @default("") // Where to send order notifications
+  emailQuoteNotification      String  @default("") // Where to send quote notifications
+  enableEmailNotifications    Boolean @default(true)
+  enableOrderConfirmationEmail Boolean @default(true)
+  enableShippingNotificationEmail Boolean @default(true)
+
+  // ─── Social Media ───────────────────────────────────────
+  socialFacebook  String?
+  socialInstagram String?
+  socialLinkedIn  String?
+  socialYouTube   String?
+  socialTwitter   String?
+  socialTikTok    String?
+
+  // ─── Inventory Settings ─────────────────────────────────
+  lowStockThreshold    Int     @default(10)
+  trackInventory       Boolean @default(true)
+  allowBackorders      Boolean @default(false)
+  outOfStockBehavior   String  @default("show") // show, hide, backorder
+
+  // ─── Pricing & Tax ──────────────────────────────────────
+  taxRate               Decimal  @default(0) @db.Decimal(5, 2)
+  taxLabel              String   @default("VAT") // VAT, GST, Tax, etc.
+  pricesIncludeTax      Boolean  @default(false)
+  showPricesWithTax     Boolean  @default(true)
+
+  // ─── Shipping ───────────────────────────────────────────
+  shippingFee           Decimal  @default(0) @db.Decimal(10, 2)
+  freeShippingThreshold Decimal? @db.Decimal(10, 2)
+  enableLocalPickup     Boolean  @default(false)
+
+  // ─── Features ───────────────────────────────────────────
+  enableQuotes          Boolean @default(true)
+  enableReviews         Boolean @default(false)
+  enableWishlist        Boolean @default(false)
+  enableCompare         Boolean @default(false)
+  enableBlog            Boolean @default(false)
+
+  // ─── SEO ────────────────────────────────────────────────
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+
+  // ─── Maintenance ────────────────────────────────────────
+  maintenanceMode    Boolean @default(false)
+  maintenanceMessage String  @default("We are currently performing maintenance. Please check back soon.")
+
+  // ─── Timestamps ─────────────────────────────────────────
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("site_settings")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// HOMEPAGE CONTENT (CMS for white-label customization)
+// ═══════════════════════════════════════════════════════════════
+
+model HeroSlide {
+  id        String   @id @default(cuid())
+  title     String   // Main headline
+  subtitle  String?  // Optional subtitle/tagline
+  tag       String?  // Small tag above headline (e.g., "GRINDING SOLUTIONS")
+  image     String   // Hero image URL
+  ctaText   String?  // Call-to-action button text
+  ctaLink   String?  // Call-to-action button link
+  accentColor String @default("#bb0c15") // Accent color for this slide
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("hero_slides")
+}
+
+model Testimonial {
+  id           String   @id @default(cuid())
+  customerName String
+  role         String   // e.g., "Production Manager"
+  company      String   // e.g., "Beirut Steel Works"
+  quote        String   @db.Text // The testimonial text
+  image        String?  // Customer photo URL
+  rating       Int      @default(5) // 1-5 star rating
+  sortOrder    Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("testimonials")
+}
+
+model PartnerLogo {
+  id        String   @id @default(cuid())
+  name      String   // Brand/partner name
+  logo      String   // Logo image URL
+  website   String?  // Optional partner website
+  sortOrder Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("partner_logos")
 }

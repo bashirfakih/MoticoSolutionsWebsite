@@ -44,7 +44,7 @@ const products: Record<string, {
     subtitle: 'Maximum Material Removal',
     description: 'Self-sharpening ceramic grains for aggressive stock removal on hardened steels and exotic alloys.',
     longDescription: 'Our premium ceramic grain abrasive belts feature advanced self-sharpening technology that continuously exposes fresh cutting edges during use. This results in consistent cutting performance and significantly longer belt life compared to conventional abrasives. Ideal for high-pressure grinding operations on difficult-to-machine materials including hardened steels, stainless steel, titanium, and nickel-based superalloys.',
-    images: ['/slide-1-grinding.png', '/slide-2-belt.png', '/product-abrasive-belts.png'],
+    images: ['/images/slides/slide-1.png', '/images/slides/slide-2-belt.png', '/images/products/categories/product-abrasive-belts.png'],
     features: [
       'Self-sharpening ceramic grain technology',
       'Up to 3x longer life than conventional belts',
@@ -76,8 +76,8 @@ const products: Record<string, {
     brands: ['Hermes', '3M Cubitron II', 'Norton Blaze'],
     datasheetUrl: '/datasheets/ceramic-grain-belts.pdf',
     relatedProducts: [
-      { slug: 'zirconia-alumina', title: 'Zirconia Alumina Belts', image: '/slide-2-belt.png' },
-      { slug: 'compact-grain', title: 'Compact Grain Belts', image: '/slide-3-disc.png' },
+      { slug: 'zirconia-alumina', title: 'Zirconia Alumina Belts', image: '/images/slides/slide-2-belt.png' },
+      { slug: 'compact-grain', title: 'Compact Grain Belts', image: '/images/slides/slide-3-disc.png' },
     ],
   },
   'zirconia-alumina': {
@@ -85,7 +85,7 @@ const products: Record<string, {
     subtitle: 'Versatile Performance',
     description: 'Ideal balance of cut rate and belt life for stainless steel, carbon steel, and aluminum.',
     longDescription: 'Zirconia alumina abrasive belts offer an excellent balance between aggressive cutting action and extended belt life. The tough, self-sharpening zirconia grains fracture during use to expose fresh cutting points, maintaining consistent performance. These versatile belts are the workhorse of metal fabrication shops, suitable for a wide range of materials and applications.',
-    images: ['/slide-2-belt.png', '/slide-1-grinding.png', '/product-abrasive-belts.png'],
+    images: ['/images/slides/slide-2-belt.png', '/images/slides/slide-1.png', '/images/products/categories/product-abrasive-belts.png'],
     features: [
       'Self-sharpening zirconia alumina grains',
       'Excellent heat dissipation',
@@ -117,8 +117,8 @@ const products: Record<string, {
     brands: ['Hermes', 'VSM', 'Klingspor'],
     datasheetUrl: '/datasheets/zirconia-alumina-belts.pdf',
     relatedProducts: [
-      { slug: 'ceramic-grain', title: 'Ceramic Grain Belts', image: '/slide-1-grinding.png' },
-      { slug: 'aluminum-oxide', title: 'Aluminum Oxide Belts', image: '/slide-5-abrasiv.png' },
+      { slug: 'ceramic-grain', title: 'Ceramic Grain Belts', image: '/images/slides/slide-1.png' },
+      { slug: 'aluminum-oxide', title: 'Aluminum Oxide Belts', image: '/images/slides/slide-5.png' },
     ],
   },
   'aluminum-oxide': {
@@ -126,7 +126,7 @@ const products: Record<string, {
     subtitle: 'Precision Finishing',
     description: 'Consistent scratch patterns for fine finishing and surface preparation.',
     longDescription: 'Aluminum oxide abrasive belts are the industry standard for precision finishing applications. Available in a wide range of grits from coarse to ultra-fine, these belts produce consistent, uniform scratch patterns essential for achieving specified surface finishes. Ideal for applications where surface appearance and Ra values are critical.',
-    images: ['/slide-5-abrasiv.png', '/slide-2-belt.png', '/product-abrasive-belts.png'],
+    images: ['/images/slides/slide-5.png', '/images/slides/slide-2-belt.png', '/images/products/categories/product-abrasive-belts.png'],
     features: [
       'Precision-graded aluminum oxide grains',
       'Consistent scratch pattern',
@@ -158,8 +158,8 @@ const products: Record<string, {
     brands: ['Hermes', '3M', 'Mirka'],
     datasheetUrl: '/datasheets/aluminum-oxide-belts.pdf',
     relatedProducts: [
-      { slug: 'surface-conditioning', title: 'Surface Conditioning Belts', image: '/slide-4-brush.png' },
-      { slug: 'film-backed', title: 'Film-Backed Belts', image: '/product-abrasive-belts.png' },
+      { slug: 'surface-conditioning', title: 'Surface Conditioning Belts', image: '/images/slides/slide-4.png' },
+      { slug: 'film-backed', title: 'Film-Backed Belts', image: '/images/products/categories/product-abrasive-belts.png' },
     ],
   },
   'compact-grain': {
@@ -167,7 +167,7 @@ const products: Record<string, {
     subtitle: 'Extreme Durability',
     description: '3D grain structure for unmatched longevity on demanding production runs.',
     longDescription: 'Compact grain technology features multiple layers of abrasive grains bonded together in a three-dimensional structure. As the top layer wears, fresh grains beneath are exposed, providing consistent cutting action throughout the belt life. These belts excel in high-production environments where belt change frequency significantly impacts productivity.',
-    images: ['/slide-3-disc.png', '/slide-1-grinding.png', '/product-abrasive-belts.png'],
+    images: ['/images/slides/slide-3-disc.png', '/images/slides/slide-1.png', '/images/products/categories/product-abrasive-belts.png'],
     features: [
       '3D multi-layer grain structure',
       'Up to 5x longer life than standard belts',
@@ -198,8 +198,8 @@ const products: Record<string, {
     brands: ['Hermes', '3M Trizact', 'VSM Compactgrain'],
     datasheetUrl: '/datasheets/compact-grain-belts.pdf',
     relatedProducts: [
-      { slug: 'ceramic-grain', title: 'Ceramic Grain Belts', image: '/slide-1-grinding.png' },
-      { slug: 'zirconia-alumina', title: 'Zirconia Alumina Belts', image: '/slide-2-belt.png' },
+      { slug: 'ceramic-grain', title: 'Ceramic Grain Belts', image: '/images/slides/slide-1.png' },
+      { slug: 'zirconia-alumina', title: 'Zirconia Alumina Belts', image: '/images/slides/slide-2-belt.png' },
     ],
   },
   'surface-conditioning': {
@@ -207,7 +207,7 @@ const products: Record<string, {
     subtitle: 'Non-Woven Excellence',
     description: 'Perfect for deburring, blending, and creating uniform surface textures.',
     longDescription: 'Surface conditioning belts utilize non-woven abrasive technology, combining synthetic fibers with abrasive grains to create a flexible, conformable product. These belts excel at blending, deburring, and finishing operations where maintaining part geometry is critical. They produce a consistent, uniform surface texture without removing significant material.',
-    images: ['/slide-4-brush.png', '/slide-2-belt.png', '/product-abrasive-belts.png'],
+    images: ['/images/slides/slide-4.png', '/images/slides/slide-2-belt.png', '/images/products/categories/product-abrasive-belts.png'],
     features: [
       'Non-woven construction',
       'Conformable to part geometry',
@@ -239,8 +239,8 @@ const products: Record<string, {
     brands: ['3M Scotch-Brite', 'Hermes', 'Norton Bear-Tex'],
     datasheetUrl: '/datasheets/surface-conditioning-belts.pdf',
     relatedProducts: [
-      { slug: 'aluminum-oxide', title: 'Aluminum Oxide Belts', image: '/slide-5-abrasiv.png' },
-      { slug: 'film-backed', title: 'Film-Backed Belts', image: '/product-abrasive-belts.png' },
+      { slug: 'aluminum-oxide', title: 'Aluminum Oxide Belts', image: '/images/slides/slide-5.png' },
+      { slug: 'film-backed', title: 'Film-Backed Belts', image: '/images/products/categories/product-abrasive-belts.png' },
     ],
   },
   'film-backed': {
@@ -248,7 +248,7 @@ const products: Record<string, {
     subtitle: 'Ultra-Fine Finishing',
     description: 'Precision micro-graded abrasives for mirror-finish applications.',
     longDescription: 'Film-backed abrasive belts represent the pinnacle of precision finishing technology. Featuring micro-graded abrasives on a dimensionally stable polyester film backing, these belts produce extremely consistent, fine finishes. They are essential for applications requiring specific Ra values or mirror-like surface appearances.',
-    images: ['/product-abrasive-belts.png', '/slide-5-abrasiv.png', '/slide-2-belt.png'],
+    images: ['/images/products/categories/product-abrasive-belts.png', '/images/slides/slide-5.png', '/images/slides/slide-2-belt.png'],
     features: [
       'Micro-graded precision abrasives',
       'Dimensionally stable film backing',
@@ -280,8 +280,8 @@ const products: Record<string, {
     brands: ['3M', 'Hermes', 'Mirka'],
     datasheetUrl: '/datasheets/film-backed-belts.pdf',
     relatedProducts: [
-      { slug: 'aluminum-oxide', title: 'Aluminum Oxide Belts', image: '/slide-5-abrasiv.png' },
-      { slug: 'surface-conditioning', title: 'Surface Conditioning Belts', image: '/slide-4-brush.png' },
+      { slug: 'aluminum-oxide', title: 'Aluminum Oxide Belts', image: '/images/slides/slide-5.png' },
+      { slug: 'surface-conditioning', title: 'Surface Conditioning Belts', image: '/images/slides/slide-4.png' },
     ],
   },
 }
@@ -292,7 +292,7 @@ const defaultProduct = {
   subtitle: 'Industrial Quality',
   description: 'High-quality abrasive belt for industrial applications.',
   longDescription: 'Contact us for detailed product specifications.',
-  images: ['/product-abrasive-belts.png'],
+  images: ['/images/products/categories/product-abrasive-belts.png'],
   features: ['Premium quality', 'Industrial grade'],
   technicalData: [{ label: 'Contact us', value: 'for specifications' }],
   applications: ['Contact us for applications'],
@@ -332,7 +332,7 @@ export default function BeltProductPage() {
     longDescription: dbProduct.description || 'Contact us for detailed product specifications.',
     images: dbProduct.images.length > 0
       ? dbProduct.images.map(img => img.url)
-      : ['/product-abrasive-belts.png'],
+      : ['/images/products/categories/product-abrasive-belts.png'],
     features: dbProduct.features || ['Premium quality', 'Industrial grade'],
     technicalData: dbProduct.specifications.map(spec => ({ label: spec.key, value: spec.value })),
     applications: ['Contact us for applications'],
@@ -377,7 +377,7 @@ export default function BeltProductPage() {
           </Link>
           <Link href="/">
             <Image
-              src="/logo-motico-solutions.png"
+              src="/images/logos/company/logo-motico-solutions.png"
               alt="Motico Solutions"
               width={200}
               height={60}

@@ -4,7 +4,7 @@
  * NavAuthButton Component
  *
  * Auth-aware navigation button that shows:
- * - Login/Register links for guests
+ * - Login link for guests
  * - User avatar with dropdown menu for authenticated users
  *
  * @module components/auth/NavAuthButton
@@ -75,22 +75,16 @@ export default function NavAuthButton({
     );
   }
 
-  // Guest state - show login/register
+  // Guest state - show login
   if (!isAuthenticated) {
     if (variant === 'mobile') {
       return (
         <div className={`flex flex-col gap-2 ${className}`}>
           <Link
             href="/login"
-            className="w-full px-4 py-2.5 text-center font-medium text-gray-700 hover:text-[#004D8B] border border-gray-300 rounded-lg hover:border-[#004D8B] transition-colors"
-          >
-            Sign In
-          </Link>
-          <Link
-            href="/register"
             className="w-full px-4 py-2.5 text-center font-medium text-white bg-[#004D8B] rounded-lg hover:bg-[#003a6a] transition-colors"
           >
-            Create Account
+            Sign In
           </Link>
         </div>
       );
@@ -109,20 +103,12 @@ export default function NavAuthButton({
     }
 
     return (
-      <div className={`flex items-center gap-3 ${className}`}>
-        <Link
-          href="/login"
-          className="px-4 py-2 font-medium text-gray-700 hover:text-[#004D8B] transition-colors"
-        >
-          Sign In
-        </Link>
-        <Link
-          href="/register"
-          className="px-4 py-2 font-medium text-white bg-[#004D8B] rounded-lg hover:bg-[#003a6a] transition-colors"
-        >
-          Register
-        </Link>
-      </div>
+      <Link
+        href="/login"
+        className={`px-4 py-2 font-medium text-white bg-[#004D8B] rounded-lg hover:bg-[#003a6a] transition-colors ${className}`}
+      >
+        Sign In
+      </Link>
     );
   }
 

@@ -39,16 +39,16 @@ const productData: Record<string, {
     description: 'The inventor of the hand-held linear grinding machine introduces a refinement with unmatched torque and performance.',
     longDescription: 'The POLY-PTX 802 HT (high torque) linear grinder offers a torque and performance profile that is unmatched. The newly developed planetary gear distributes traction across additional gear wheels in a sophisticated arrangement, greatly increasing all drive components\' resistance to wear and making it a continuous runner. The shaft handle features rubberised inserts for optimal grip during linear grinding, satin finishing, or polishing, ensuring uniform grinding results entirely free of shadows. The drive spindle is corrosion-free stainless steel with self-centring knurled screw attachment.',
     images: [
-      '/poly-ptx-802-ht-linear-grinder_01.jpg',
-      '/poly-ptx-802-ht-linear-grinder_02.jpg',
-      '/poly-ptx-802-ht-linear-grinder_03.jpg',
-      '/poly-ptx-802-ht-linear-grinder_04.jpg',
-      '/poly-ptx-802-ht-linear-grinder_05.jpg',
-      '/poly-ptx-802-ht-linear-grinder_06.jpg',
-      '/poly-ptx-802-ht-linear-grinder_07.jpg',
-      '/poly-ptx-802-ht-linear-grinder_08.jpg',
-      '/poly-ptx-802-ht-linear-grinder_09.jpg',
-      '/poly-ptx-802-ht-linear-grinder_10.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_01.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_02.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_03.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_04.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_05.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_06.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_07.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_08.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_09.jpg',
+      '/images/products/items/poly-ptx-802-ht-linear-grinder_10.jpg',
     ],
     features: [
       'New HT (High Torque) planetary gear technology',
@@ -78,8 +78,8 @@ const productData: Record<string, {
     ],
     brands: ['Eisenblätter'],
     relatedProducts: [
-      { slug: 'rohr-max-802-ht-belt-grinder', title: 'ROHR MAX 802 HT', image: '/rohr-max-802-ht-belt-grinder-for-pipe_01.jpg' },
-      { slug: 'mini-max-1100-multifunctional-grinder', title: 'MINI MAX 1100', image: '/mini-max-1100-multifunctional-grinder_01.jpg' },
+      { slug: 'rohr-max-802-ht-belt-grinder', title: 'ROHR MAX 802 HT', image: '/images/products/items/rohr-max-802-ht-belt-grinder-for-pipe_01.jpg' },
+      { slug: 'mini-max-1100-multifunctional-grinder', title: 'MINI MAX 1100', image: '/images/products/items/mini-max-1100-multifunctional-grinder_01.jpg' },
     ],
   },
   'rohr-max-802-ht-belt-grinder': {
@@ -88,12 +88,12 @@ const productData: Record<string, {
     description: 'Multifunctional, gas pressure-damped pipe belt sander for perfect sanding and polishing of pipe constructions.',
     longDescription: 'The ROHR MAX 802 HT is a multifunctional, gas pressure-damped pipe belt sander for perfect sanding and polishing of closed and open pipe constructions. From small to large pipe diameters, this machine delivers homogeneous, even results. Thanks to a newly developed planetary gear, the frictional connection is now distributed over three additional, cleverly arranged gears, dramatically increasing longevity and pulling power. The patented damping concept with gas pressure damper enables maximum "tube enclosure" of the grinding and polishing belts without great effort.',
     images: [
-      '/rohr-max-802-ht-belt-grinder-for-pipe_01.jpg',
-      '/rohr-max-802-ht-belt-grinder-for-pipe_02.jpg',
-      '/rohr-max-802-ht-belt-grinder-for-pipe_03.jpg',
-      '/rohr-max-802-ht-belt-grinder-for-pipe_04.jpg',
-      '/rohr-max-802-ht-belt-grinder-for-pipe_05.jpg',
-      '/rohr-max-802-ht-belt-grinder-for-pipe_06.jpg',
+      '/images/products/items/rohr-max-802-ht-belt-grinder-for-pipe_01.jpg',
+      '/images/products/items/rohr-max-802-ht-belt-grinder-for-pipe_02.jpg',
+      '/images/products/items/rohr-max-802-ht-belt-grinder-for-pipe_03.jpg',
+      '/images/products/items/rohr-max-802-ht-belt-grinder-for-pipe_04.jpg',
+      '/images/products/items/rohr-max-802-ht-belt-grinder-for-pipe_05.jpg',
+      '/images/products/items/rohr-max-802-ht-belt-grinder-for-pipe_06.jpg',
     ],
     features: [
       'Belt dimensions 40 x 780 mm',
@@ -124,8 +124,8 @@ const productData: Record<string, {
     ],
     brands: ['Eisenblätter'],
     relatedProducts: [
-      { slug: 'poly-ptx-802-ht-linear-grinder', title: 'POLY-PTX 802 HT', image: '/poly-ptx-802-ht-linear-grinder_01.jpg' },
-      { slug: 'gladius-1802-ht-grinding-sword', title: 'GLADIUS 1802 HT', image: '/gladius-1802-ht-multifunctional-grinding-sword_01.jpg' },
+      { slug: 'poly-ptx-802-ht-linear-grinder', title: 'POLY-PTX 802 HT', image: '/images/products/items/poly-ptx-802-ht-linear-grinder_01.jpg' },
+      { slug: 'gladius-1802-ht-grinding-sword', title: 'GLADIUS 1802 HT', image: '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_01.jpg' },
     ],
   },
   'gladius-1802-ht-grinding-sword': {
@@ -134,16 +134,16 @@ const productData: Record<string, {
     description: 'Unique grinding sword with universal grinding properties. Can be used handheld or as a stationary machine.',
     longDescription: 'The GLADIUS 1802 HT is a unique grinding sword with universal grinding properties and an attachable stop system for grinding precise angles and radii. It can be used either as a hand-held device or, thanks to the optional ball-and-socket joint holder, as a stationary machine. Grinding, smoothing, deburring, derusting, descaling, sharpening, and polishing are now possible with lightning speed. The extra-long work area enables one-sided or two-sided machining, even on workpieces that are difficult to access. Almost all metals, plastics, stone, and wood can be processed by simply changing the belt.',
     images: [
-      '/gladius-1802-ht-multifunctional-grinding-sword_01.jpg',
-      '/gladius-1802-ht-multifunctional-grinding-sword_02.jpg',
-      '/gladius-1802-ht-multifunctional-grinding-sword_03.jpg',
-      '/gladius-1802-ht-multifunctional-grinding-sword_04.jpg',
-      '/gladius-1802-ht-multifunctional-grinding-sword_05.jpg',
-      '/gladius-1802-ht-multifunctional-grinding-sword_06.jpg',
-      '/gladius-1802-ht-multifunctional-grinding-sword_07.jpg',
-      '/gladius-1802-ht-multifunctional-grinding-sword_08.jpg',
-      '/gladius-1802-ht-multifunctional-grinding-sword_09.jpg',
-      '/gladius-1802-ht-multifunctional-grinding-sword_10.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_01.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_02.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_03.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_04.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_05.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_06.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_07.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_08.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_09.jpg',
+      '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_10.jpg',
     ],
     features: [
       'Belt dimensions 40 x 780 mm',
@@ -173,8 +173,8 @@ const productData: Record<string, {
     ],
     brands: ['Eisenblätter'],
     relatedProducts: [
-      { slug: 'band-it-1100-power-file', title: 'BAND-IT 1100', image: '/band-it-1100-power-file_01.jpg' },
-      { slug: 'poly-ptx-802-ht-linear-grinder', title: 'POLY-PTX 802 HT', image: '/poly-ptx-802-ht-linear-grinder_01.jpg' },
+      { slug: 'band-it-1100-power-file', title: 'BAND-IT 1100', image: '/images/products/items/band-it-1100-power-file_01.jpg' },
+      { slug: 'poly-ptx-802-ht-linear-grinder', title: 'POLY-PTX 802 HT', image: '/images/products/items/poly-ptx-802-ht-linear-grinder_01.jpg' },
     ],
   },
   'band-it-1100-power-file': {
@@ -183,15 +183,15 @@ const productData: Record<string, {
     description: 'Compact belt file ideal for working in tight spaces - edges, folds and corners in railing and metal construction.',
     longDescription: 'The BAND-IT 1100 belt file has an even more robust drive for continuous professional use. Due to the compact, narrow design, it is ideal for working in tight spaces such as edges, folds, and corners. Particularly interesting for railing, apparatus, tool, and metal construction. Sanding and polishing belts are automatically guided and adjusted. The pre-tensioning can also be locked using a knurled screw for firmer contact pressure and precise work. Can be used mobile or stationary with table ball joint holder.',
     images: [
-      '/band-it-1100-power-file_01.jpg',
-      '/band-it-1100-power-file_02.jpg',
-      '/band-it-1100-power-file_03.jpg',
-      '/band-it-1100-power-file_04.jpg',
-      '/band-it-1100-power-file_05.jpg',
-      '/band-it-1100-power-file_06.jpg',
-      '/band-it-1100-power-file_07.jpg',
-      '/band-it-1100-power-file_08.jpg',
-      '/band-it-1100-power-file_09.jpg',
+      '/images/products/items/band-it-1100-power-file_01.jpg',
+      '/images/products/items/band-it-1100-power-file_02.jpg',
+      '/images/products/items/band-it-1100-power-file_03.jpg',
+      '/images/products/items/band-it-1100-power-file_04.jpg',
+      '/images/products/items/band-it-1100-power-file_05.jpg',
+      '/images/products/items/band-it-1100-power-file_06.jpg',
+      '/images/products/items/band-it-1100-power-file_07.jpg',
+      '/images/products/items/band-it-1100-power-file_08.jpg',
+      '/images/products/items/band-it-1100-power-file_09.jpg',
     ],
     features: [
       'Compact narrow design for tight spaces',
@@ -225,8 +225,8 @@ const productData: Record<string, {
     ],
     brands: ['Eisenblätter'],
     relatedProducts: [
-      { slug: 'gladius-1802-ht-grinding-sword', title: 'GLADIUS 1802 HT', image: '/gladius-1802-ht-multifunctional-grinding-sword_01.jpg' },
-      { slug: 'mini-max-1100-multifunctional-grinder', title: 'MINI MAX 1100', image: '/mini-max-1100-multifunctional-grinder_01.jpg' },
+      { slug: 'gladius-1802-ht-grinding-sword', title: 'GLADIUS 1802 HT', image: '/images/products/items/gladius-1802-ht-multifunctional-grinding-sword_01.jpg' },
+      { slug: 'mini-max-1100-multifunctional-grinder', title: 'MINI MAX 1100', image: '/images/products/items/mini-max-1100-multifunctional-grinder_01.jpg' },
     ],
   },
   'mini-max-1100-multifunctional-grinder': {
@@ -235,14 +235,14 @@ const productData: Record<string, {
     description: 'Versatile mini grinder with improved dust protection. Perfect longitudinal guidance for shadow-free surfaces.',
     longDescription: 'The MINI MAX 1100 promises significantly more power reserves for continuous professional use. In addition to the new powerful speed-controlled drive motor, it features improved dust protection and mechanics. The speed ranges have been expanded offering the ideal drive device for a variety of mini shaft tools (fleece, mop, polisher) with perfect longitudinal guidance for clean, shadow-free surfaces. Thanks to balanced weight distribution, you can work completely fatigue-free for many hours. Ideal for service, repair, assembly, motor vehicles, and painting workshops.',
     images: [
-      '/mini-max-1100-multifunctional-grinder_01.jpg',
-      '/mini-max-1100-multifunctional-grinder_02.jpg',
-      '/mini-max-1100-multifunctional-grinder_03.jpg',
-      '/mini-max-1100-multifunctional-grinder_04.jpg',
-      '/mini-max-1100-multifunctional-grinder_05.jpg',
-      '/mini-max-1100-multifunctional-grinder_06.jpg',
-      '/mini-max-1100-multifunctional-grinder_07.jpg',
-      '/mini-max-1100-multifunctional-grinder_08.jpg',
+      '/images/products/items/mini-max-1100-multifunctional-grinder_01.jpg',
+      '/images/products/items/mini-max-1100-multifunctional-grinder_02.jpg',
+      '/images/products/items/mini-max-1100-multifunctional-grinder_03.jpg',
+      '/images/products/items/mini-max-1100-multifunctional-grinder_04.jpg',
+      '/images/products/items/mini-max-1100-multifunctional-grinder_05.jpg',
+      '/images/products/items/mini-max-1100-multifunctional-grinder_06.jpg',
+      '/images/products/items/mini-max-1100-multifunctional-grinder_07.jpg',
+      '/images/products/items/mini-max-1100-multifunctional-grinder_08.jpg',
     ],
     features: [
       'Speed-controlled 1,100W drive motor',
@@ -274,8 +274,8 @@ const productData: Record<string, {
     ],
     brands: ['Eisenblätter'],
     relatedProducts: [
-      { slug: 'varilex-wsf-1100-angle-grinder', title: 'VARILEX WSF 1100', image: '/varilex-wsf-1100-compact-angle-grinder_01.jpg' },
-      { slug: 'poly-ptx-802-ht-linear-grinder', title: 'POLY-PTX 802 HT', image: '/poly-ptx-802-ht-linear-grinder_01.jpg' },
+      { slug: 'varilex-wsf-1100-angle-grinder', title: 'VARILEX WSF 1100', image: '/images/products/items/varilex-wsf-1100-compact-angle-grinder_01.jpg' },
+      { slug: 'poly-ptx-802-ht-linear-grinder', title: 'POLY-PTX 802 HT', image: '/images/products/items/poly-ptx-802-ht-linear-grinder_01.jpg' },
     ],
   },
   'varilex-wsf-1100-angle-grinder': {
@@ -284,14 +284,14 @@ const productData: Record<string, {
     description: 'Compact angle grinder with 1,100W variable speed. Smallest handle circumference in its class for fatigue-free grinding.',
     longDescription: 'The VARILEX WSF 1100 is a new, particularly handy compact angle grinder with 1,100 watts of power and variable speed. A robust slip clutch is integrated, preventing possible jamming of the discs for particularly safe work. The constant electronics ensure continuously variable speeds between 2,800 and 9,600 rpm. The smallest handle circumference in its performance class allows for fatigue-free grinding in perfect ergonomics. The "Marathon-Motor" offers 30% higher power reserves with up to 50% more torque compared to comparable devices.',
     images: [
-      '/varilex-wsf-1100-compact-angle-grinder_01.jpg',
-      '/varilex-wsf-1100-compact-angle-grinder_02.jpg',
-      '/varilex-wsf-1100-compact-angle-grinder_03.jpg',
-      '/varilex-wsf-1100-compact-angle-grinder_04.jpg',
-      '/varilex-wsf-1100-compact-angle-grinder_05.jpg',
-      '/varilex-wsf-1100-compact-angle-grinder_06.jpg',
-      '/varilex-wsf-1100-compact-angle-grinder_07.jpg',
-      '/varilex-wsf-1100-compact-angle-grinder_08.jpg',
+      '/images/products/items/varilex-wsf-1100-compact-angle-grinder_01.jpg',
+      '/images/products/items/varilex-wsf-1100-compact-angle-grinder_02.jpg',
+      '/images/products/items/varilex-wsf-1100-compact-angle-grinder_03.jpg',
+      '/images/products/items/varilex-wsf-1100-compact-angle-grinder_04.jpg',
+      '/images/products/items/varilex-wsf-1100-compact-angle-grinder_05.jpg',
+      '/images/products/items/varilex-wsf-1100-compact-angle-grinder_06.jpg',
+      '/images/products/items/varilex-wsf-1100-compact-angle-grinder_07.jpg',
+      '/images/products/items/varilex-wsf-1100-compact-angle-grinder_08.jpg',
     ],
     features: [
       'Smallest handle circumference in class',
@@ -321,8 +321,8 @@ const productData: Record<string, {
     ],
     brands: ['Eisenblätter'],
     relatedProducts: [
-      { slug: 'mini-max-1100-multifunctional-grinder', title: 'MINI MAX 1100', image: '/mini-max-1100-multifunctional-grinder_01.jpg' },
-      { slug: 'band-it-1100-power-file', title: 'BAND-IT 1100', image: '/band-it-1100-power-file_01.jpg' },
+      { slug: 'mini-max-1100-multifunctional-grinder', title: 'MINI MAX 1100', image: '/images/products/items/mini-max-1100-multifunctional-grinder_01.jpg' },
+      { slug: 'band-it-1100-power-file', title: 'BAND-IT 1100', image: '/images/products/items/band-it-1100-power-file_01.jpg' },
     ],
   },
   // DCA Power Tools
@@ -332,8 +332,8 @@ const productData: Record<string, {
     description: '1400W sander polisher with adjustable speed and electronic constant speed control.',
     longDescription: 'The DCA ASN100 is a powerful 1400W sander polisher designed for professional use. It features adjustable speed ranging from 690-3800 r/min, allowing precise control for different materials and applications. The electronic constant speed control maintains consistent speed under load, ensuring uniform finishing results. With a wheel size of Φ120x100mm and weighing 4.7kg, this tool offers an excellent balance of power and maneuverability for demanding sanding and polishing tasks.',
     images: [
-      '/dca-asn100_01.jpg',
-      '/dca-asn100_02.jpg',
+      '/images/products/items/dca-asn100_01.jpg',
+      '/images/products/items/dca-asn100_02.jpg',
     ],
     features: [
       'Adjustable speed 690-3800 r/min',
@@ -362,8 +362,8 @@ const productData: Record<string, {
     ],
     brands: ['DCA'],
     relatedProducts: [
-      { slug: 'dca-ass150', title: 'DCA ASS150', image: '/dca-ass150_01.jpg' },
-      { slug: 'dca-asm04-125', title: 'DCA ASM04-125', image: '/dca-asm04-125_01.png' },
+      { slug: 'dca-ass150', title: 'DCA ASS150', image: '/images/products/items/dca-ass150_01.jpg' },
+      { slug: 'dca-asm04-125', title: 'DCA ASM04-125', image: '/images/products/items/dca-asm04-125_01.png' },
     ],
   },
   'dca-ass150': {
@@ -372,8 +372,8 @@ const productData: Record<string, {
     description: '1020W stone polisher with adjustable speed and water flow control for wet polishing applications.',
     longDescription: 'The DCA ASS150 is a specialized stone polisher engineered for professional stone finishing work. With 1020W of power and adjustable speed from 1000-3800 r/min, it provides excellent control for various stone types. The electronic constant speed control maintains consistent performance under load, while the water flow control (1.5L/min) enables efficient wet polishing to minimize dust and achieve superior finishes. The M14 spindle thread accepts standard polishing pads up to Φ150mm diameter.',
     images: [
-      '/dca-ass150_01.jpg',
-      '/dca-ass150_02.jpg',
+      '/images/products/items/dca-ass150_01.jpg',
+      '/images/products/items/dca-ass150_02.jpg',
     ],
     features: [
       'Adjustable speed 1000-3800 r/min',
@@ -404,8 +404,8 @@ const productData: Record<string, {
     ],
     brands: ['DCA'],
     relatedProducts: [
-      { slug: 'dca-asn100', title: 'DCA ASN100', image: '/dca-asn100_01.jpg' },
-      { slug: 'dca-asm04-125', title: 'DCA ASM04-125', image: '/dca-asm04-125_01.png' },
+      { slug: 'dca-asn100', title: 'DCA ASN100', image: '/images/products/items/dca-asn100_01.jpg' },
+      { slug: 'dca-asm04-125', title: 'DCA ASM04-125', image: '/images/products/items/dca-asm04-125_01.png' },
     ],
   },
   'dca-asm18-115': {
@@ -414,8 +414,8 @@ const productData: Record<string, {
     description: 'Ultra-slim 860W angle grinder with only 178mm grip circumference for comfortable control.',
     longDescription: 'The DCA ASM18-115 is an ultra-slim angle grinder featuring a remarkably compact design with only 178mm circumference of grip portion for comfortable hold and easy control. Powered by a robust 860W motor delivering 11800 r/min, it offers optimum performance for demanding grinding tasks. The compact gear housing with high-strength gears ensures durability and extended lifetime. Ideal for applications requiring precision and maneuverability in tight spaces.',
     images: [
-      '/dca-asm18-115_01.png',
-      '/dca-asm18-115_02.png',
+      '/images/products/items/dca-asm18-115_01.png',
+      '/images/products/items/dca-asm18-115_02.png',
     ],
     features: [
       'Ultra-slim body design',
@@ -446,8 +446,8 @@ const productData: Record<string, {
     ],
     brands: ['DCA'],
     relatedProducts: [
-      { slug: 'dca-asm04-125', title: 'DCA ASM04-125', image: '/dca-asm04-125_01.png' },
-      { slug: 'varilex-wsf-1100-angle-grinder', title: 'VARILEX WSF 1100', image: '/varilex-wsf-1100-compact-angle-grinder_01.jpg' },
+      { slug: 'dca-asm04-125', title: 'DCA ASM04-125', image: '/images/products/items/dca-asm04-125_01.png' },
+      { slug: 'varilex-wsf-1100-angle-grinder', title: 'VARILEX WSF 1100', image: '/images/products/items/varilex-wsf-1100-compact-angle-grinder_01.jpg' },
     ],
   },
   'dca-asm04-125': {
@@ -456,8 +456,8 @@ const productData: Record<string, {
     description: '1020W high power angle grinder with adjustable speed and constant output power under load.',
     longDescription: 'The DCA ASM04-125 is a high-performance angle grinder featuring 1020W of power with adjustable speed ranging from 4200-11800 r/min. The constant output power technology maintains consistent performance even under heavy load conditions. Equipped with spindle lock for easy disc changes and a convenient slide switch for comfortable operation. The M14 spindle thread accepts standard grinding and cutting discs up to Φ125mm diameter, making it versatile for various industrial applications.',
     images: [
-      '/dca-asm04-125_01.png',
-      '/dca-asm04-125_02.png',
+      '/images/products/items/dca-asm04-125_01.png',
+      '/images/products/items/dca-asm04-125_02.png',
     ],
     features: [
       '1020W high power motor',
@@ -488,8 +488,8 @@ const productData: Record<string, {
     ],
     brands: ['DCA'],
     relatedProducts: [
-      { slug: 'dca-asm18-115', title: 'DCA ASM18-115', image: '/dca-asm18-115_01.png' },
-      { slug: 'varilex-wsf-1100-angle-grinder', title: 'VARILEX WSF 1100', image: '/varilex-wsf-1100-compact-angle-grinder_01.jpg' },
+      { slug: 'dca-asm18-115', title: 'DCA ASM18-115', image: '/images/products/items/dca-asm18-115_01.png' },
+      { slug: 'varilex-wsf-1100-angle-grinder', title: 'VARILEX WSF 1100', image: '/images/products/items/varilex-wsf-1100-compact-angle-grinder_01.jpg' },
     ],
   },
 }
@@ -500,7 +500,7 @@ const defaultProduct = {
   subtitle: 'Industrial Quality',
   description: 'High-quality power tool for industrial applications.',
   longDescription: 'Contact us for detailed product specifications.',
-  images: ['/product-air-power-tools.png'],
+  images: ['/images/products/categories/product-air-power-tools.png'],
   features: ['Professional grade', 'Industrial quality', 'German engineering'],
   technicalData: [{ label: 'Category', value: 'Power Tools' }],
   applications: ['Industrial grinding', 'Surface finishing'],
@@ -539,7 +539,7 @@ export default function ProductDetailPage() {
     longDescription: dbProduct.description || 'Contact us for detailed product specifications.',
     images: dbProduct.images.length > 0
       ? dbProduct.images.map(img => img.url)
-      : ['/product-air-power-tools.png'],
+      : ['/images/products/categories/product-air-power-tools.png'],
     features: dbProduct.features || ['Premium quality', 'Industrial grade'],
     technicalData: dbProduct.specifications.map(spec => ({ label: spec.key, value: spec.value })),
     applications: ['Contact us for applications'],
@@ -577,7 +577,7 @@ export default function ProductDetailPage() {
             Back to Power Tools
           </Link>
           <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-4">
-            <Image src="/logo-motico-solutions.png" alt="Motico Solutions" width={180} height={54} className="h-24 w-auto" />
+            <Image src="/images/logos/company/logo-motico-solutions.png" alt="Motico Solutions" width={180} height={54} className="h-24 w-auto" />
           </Link>
           <a
             href="tel:+9613741565"

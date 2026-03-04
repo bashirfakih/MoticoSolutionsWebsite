@@ -31,7 +31,7 @@ const badgeColorMap: Record<string, string> = {
 }
 
 // Default image
-const DEFAULT_PRODUCT_IMAGE = '/slide-1-grinding.png'
+const DEFAULT_PRODUCT_IMAGE = '/images/slides/slide-1.png'
 
 export default function AbrasiveBeltsPage() {
   const [products, setProducts] = useState<Product[]>([])
@@ -93,7 +93,7 @@ export default function AbrasiveBeltsPage() {
             Back to Products
           </Link>
           <Link href="/" className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 mt-4">
-            <Image src="/logo-motico-solutions.png" alt="Motico Solutions" width={180} height={54} className="h-24 w-auto" />
+            <Image src="/images/logos/company/logo-motico-solutions.png" alt="Motico Solutions" width={180} height={54} className="h-24 w-auto" />
           </Link>
           <a
             href="tel:+9613741565"
@@ -119,7 +119,7 @@ export default function AbrasiveBeltsPage() {
       {/* Hero Section */}
       <section className="relative w-full h-[420px] flex items-center justify-center overflow-hidden">
         <Image
-          src="/product-abrasive-belts.png"
+          src="/images/products/categories/product-abrasive-belts.png"
           alt="Abrasive Belts"
           fill
           className="object-cover object-center"

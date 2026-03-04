@@ -44,9 +44,9 @@ export async function GET(request: NextRequest) {
     // Get settings for threshold
     const settings = await prisma.siteSettings.findUnique({
       where: { id: 'default' },
-      select: { lowStockAlertThreshold: true },
+      select: { lowStockThreshold: true },
     });
-    const globalThreshold = settings?.lowStockAlertThreshold || 10;
+    const globalThreshold = settings?.lowStockThreshold || 10;
 
     // Build query
     const conditions: string[] = [

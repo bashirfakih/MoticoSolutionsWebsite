@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generateSlug } from '@/lib/data/types';
+import { toUrlPath } from '@/lib/utils/imageOptimizer';
 
 export async function GET(request: NextRequest) {
   try {
@@ -45,8 +46,25 @@ export async function GET(request: NextRequest) {
       prisma.brand.count({ where }),
     ]);
 
+    // Convert logo paths to URL paths
+    const brandsWithConvertedPaths = brands.map(brand => {
+      let logo = brand.logo;
+      if (logo) {
+        // Convert to URL path
+        logo = toUrlPath(logo);
+        // If logo is just a filename (starts with / but no directory), prepend brands path
+        if (logo.startsWith('/logo-') || (logo.match(/^\/[^\/]+\.(png|jpg|jpeg|webp|svg)$/i))) {
+          logo = `/images/logos/brands${logo}`;
+        }
+      }
+      return {
+        ...brand,
+        logo,
+      };
+    });
+
     return NextResponse.json({
-      data: brands,
+      data: brandsWithConvertedPaths,
       total,
       page,
       limit,

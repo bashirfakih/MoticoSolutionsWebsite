@@ -127,7 +127,7 @@ function Sidebar({
           <div className="h-16 flex items-center justify-between px-4 border-b border-gray-200">
             <Link href="/" className="flex items-center gap-2">
               <Image
-                src="/logo-motico-solutions.png"
+                src="/images/logos/company/logo-motico-solutions.png"
                 alt="Motico Solutions"
                 width={140}
                 height={42}

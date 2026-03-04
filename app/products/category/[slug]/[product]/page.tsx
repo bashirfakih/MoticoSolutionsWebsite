@@ -52,7 +52,7 @@ interface Product {
   category: Category | null
 }
 
-const DEFAULT_IMAGE = '/slide-1-grinding.png'
+const DEFAULT_IMAGE = '/images/slides/slide-1.png'
 
 export default function ProductDetailPage() {
   const params = useParams()
@@ -159,7 +159,7 @@ export default function ProductDetailPage() {
           </Link>
           <Link href="/">
             <Image
-              src="/logo-motico-solutions.png"
+              src="/images/logos/company/logo-motico-solutions.png"
               alt="Motico Solutions"
               width={200}
               height={60}
