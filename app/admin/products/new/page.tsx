@@ -58,6 +58,13 @@ interface FormData {
   isNew: boolean;
   metaTitle: string;
   metaDescription: string;
+  // Quick Specs
+  showDimensions: boolean;
+  dimensions: string;
+  showSizes: boolean;
+  sizes: string;
+  showGrits: boolean;
+  grits: string;
 }
 
 export default function AdminNewProductPage() {
@@ -99,6 +106,13 @@ export default function AdminNewProductPage() {
     isNew: true,
     metaTitle: '',
     metaDescription: '',
+    // Quick Specs
+    showDimensions: false,
+    dimensions: '',
+    showSizes: false,
+    sizes: '',
+    showGrits: false,
+    grits: '',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -248,6 +262,13 @@ export default function AdminNewProductPage() {
         isNew: formData.isNew,
         metaTitle: formData.metaTitle || null,
         metaDescription: formData.metaDescription || null,
+        // Quick Specs
+        showDimensions: formData.showDimensions,
+        dimensions: formData.showDimensions ? formData.dimensions || null : null,
+        showSizes: formData.showSizes,
+        sizes: formData.showSizes ? formData.sizes || null : null,
+        showGrits: formData.showGrits,
+        grits: formData.showGrits ? formData.grits || null : null,
       };
 
       const response = await fetch('/api/products', {
@@ -569,6 +590,102 @@ export default function AdminNewProductPage() {
                 placeholder="Brief product summary for listings"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
               />
+            </div>
+
+            {/* Quick Specs Section */}
+            <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h4 className="text-sm font-medium text-gray-900">Quick Specs</h4>
+                  <p className="text-xs text-gray-500">Enable and fill in the specs relevant to this product</p>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {/* Dimensions */}
+                <div className="flex items-start gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer min-w-[120px] pt-2">
+                    <input
+                      type="checkbox"
+                      name="showDimensions"
+                      checked={formData.showDimensions}
+                      onChange={handleChange}
+                      className="w-4 h-4 rounded border-gray-300 text-[#004D8B] focus:ring-[#004D8B]"
+                    />
+                    <span className="text-sm text-gray-700">Dimensions</span>
+                  </label>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      name="dimensions"
+                      value={formData.dimensions}
+                      onChange={handleChange}
+                      disabled={!formData.showDimensions}
+                      placeholder="e.g., 90x100 mm, 150x200x10 mm"
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] text-sm ${
+                        !formData.showDimensions ? 'bg-gray-100 text-gray-400' : ''
+                      }`}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Length × Width or L × W × H</p>
+                  </div>
+                </div>
+
+                {/* Sizes */}
+                <div className="flex items-start gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer min-w-[120px] pt-2">
+                    <input
+                      type="checkbox"
+                      name="showSizes"
+                      checked={formData.showSizes}
+                      onChange={handleChange}
+                      className="w-4 h-4 rounded border-gray-300 text-[#004D8B] focus:ring-[#004D8B]"
+                    />
+                    <span className="text-sm text-gray-700">Sizes</span>
+                  </label>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      name="sizes"
+                      value={formData.sizes}
+                      onChange={handleChange}
+                      disabled={!formData.showSizes}
+                      placeholder="e.g., 115 mm, 125 mm, 150 mm"
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] text-sm ${
+                        !formData.showSizes ? 'bg-gray-100 text-gray-400' : ''
+                      }`}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Available sizes (separate multiple with commas)</p>
+                  </div>
+                </div>
+
+                {/* Grits */}
+                <div className="flex items-start gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer min-w-[120px] pt-2">
+                    <input
+                      type="checkbox"
+                      name="showGrits"
+                      checked={formData.showGrits}
+                      onChange={handleChange}
+                      className="w-4 h-4 rounded border-gray-300 text-[#004D8B] focus:ring-[#004D8B]"
+                    />
+                    <span className="text-sm text-gray-700">Grits</span>
+                  </label>
+                  <div className="flex-1">
+                    <input
+                      type="text"
+                      name="grits"
+                      value={formData.grits}
+                      onChange={handleChange}
+                      disabled={!formData.showGrits}
+                      placeholder="e.g., 36, 60, 80, 120"
+                      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B] text-sm ${
+                        !formData.showGrits ? 'bg-gray-100 text-gray-400' : ''
+                      }`}
+                    />
+                    <p className="text-xs text-gray-400 mt-1">Available grit options (separate multiple with commas)</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div>

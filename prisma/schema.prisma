@@ -213,6 +213,15 @@ model Product {
   isNew            Boolean     @default(true)
   metaTitle        String?
   metaDescription  String?
+
+  // Quick Specs (optional, admin-activated per product)
+  showDimensions   Boolean     @default(false)
+  dimensions       String?     // e.g., "90x100 mm", "150x200x10 mm"
+  showSizes        Boolean     @default(false)
+  sizes            String?     // e.g., "115 mm", "125 mm, 150 mm"
+  showGrits        Boolean     @default(false)
+  grits            String?     // e.g., "36", "60, 80, 120"
+
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
   publishedAt      DateTime?

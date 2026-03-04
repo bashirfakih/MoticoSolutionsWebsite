@@ -246,6 +246,13 @@ export async function POST(request: NextRequest) {
         metaTitle: body.metaTitle || null,
         metaDescription: body.metaDescription || null,
         publishedAt: body.isPublished ? new Date() : null,
+        // Quick Specs
+        showDimensions: body.showDimensions ?? false,
+        dimensions: body.showDimensions ? (body.dimensions || null) : null,
+        showSizes: body.showSizes ?? false,
+        sizes: body.showSizes ? (body.sizes || null) : null,
+        showGrits: body.showGrits ?? false,
+        grits: body.showGrits ? (body.grits || null) : null,
         // Create related images
         images: body.images?.length > 0 ? {
           create: body.images.map((img: { url: string; alt: string; sortOrder?: number; isPrimary?: boolean }, index: number) => ({

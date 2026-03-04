@@ -138,7 +138,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       'categoryId', 'subcategoryId', 'brandId', 'hasVariants', 'price',
       'compareAtPrice', 'currency', 'stockQuantity', 'stockStatus',
       'minStockLevel', 'trackInventory', 'allowBackorder', 'isPublished',
-      'isFeatured', 'isNew', 'metaTitle', 'metaDescription'
+      'isFeatured', 'isNew', 'metaTitle', 'metaDescription',
+      // Quick Specs
+      'showDimensions', 'dimensions', 'showSizes', 'sizes', 'showGrits', 'grits'
     ];
 
     for (const field of simpleFields) {

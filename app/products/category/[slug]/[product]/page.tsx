@@ -50,6 +50,13 @@ interface Product {
   specifications: Specification[]
   brand: Brand | null
   category: Category | null
+  // Quick Specs
+  showDimensions?: boolean
+  dimensions?: string | null
+  showSizes?: boolean
+  sizes?: string | null
+  showGrits?: boolean
+  grits?: string | null
 }
 
 const DEFAULT_IMAGE = '/images/slides/slide-1.png'
@@ -264,6 +271,63 @@ export default function ProductDetailPage() {
             <p className="text-gray-600 text-lg leading-relaxed mb-8">
               {product.shortDescription || product.description || 'Contact us for product details.'}
             </p>
+
+            {/* Quick Specs - Dropdown Selectors */}
+            {(product.showDimensions || product.showSizes || product.showGrits) && (
+              <div className="mb-8 space-y-4">
+                {product.showDimensions && product.dimensions && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Dimensions:
+                    </label>
+                    <select
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
+                      defaultValue={product.dimensions.split(',')[0]?.trim()}
+                    >
+                      {product.dimensions.split(',').map((dim, idx) => (
+                        <option key={idx} value={dim.trim()}>
+                          {dim.trim()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {product.showSizes && product.sizes && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Size:
+                    </label>
+                    <select
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
+                      defaultValue={product.sizes.split(',')[0]?.trim()}
+                    >
+                      {product.sizes.split(',').map((size, idx) => (
+                        <option key={idx} value={size.trim()}>
+                          {size.trim()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+                {product.showGrits && product.grits && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Grit:
+                    </label>
+                    <select
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
+                      defaultValue={product.grits.split(',')[0]?.trim()}
+                    >
+                      {product.grits.split(',').map((grit, idx) => (
+                        <option key={idx} value={grit.trim()}>
+                          {grit.trim()}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Features */}
             {product.features && product.features.length > 0 && (
