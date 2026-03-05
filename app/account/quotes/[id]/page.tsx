@@ -31,6 +31,12 @@ interface QuoteItem {
   quantity: number;
   unitPrice: number | null;
   totalPrice: number | null;
+  // Selected specs
+  selectedDimension?: string | null;
+  selectedSize?: string | null;
+  selectedGrit?: string | null;
+  selectedPackaging?: string | null;
+  discountApplied?: number | null;
 }
 
 interface Quote {
@@ -41,6 +47,8 @@ interface Quote {
   company: string | null;
   status: string;
   subtotal: number | null;
+  tax: number;
+  taxLabel: string | null;
   discount: number;
   total: number | null;
   currency: string;
@@ -234,6 +242,20 @@ export default function QuoteDetailPage() {
                       SKU: {item.sku}
                     </p>
                   )}
+                  {/* Selected Specs */}
+                  {(item.selectedDimension || item.selectedSize || item.selectedGrit || item.selectedPackaging) && (
+                    <div className="mt-1 text-xs text-gray-500 dark:text-gray-400 space-y-0.5">
+                      {item.selectedDimension && <p>Dimension: {item.selectedDimension}</p>}
+                      {item.selectedSize && <p>Size: {item.selectedSize}</p>}
+                      {item.selectedGrit && <p>Grit: {item.selectedGrit}</p>}
+                      {item.selectedPackaging && <p>Packaging: {item.selectedPackaging}</p>}
+                    </div>
+                  )}
+                  {item.discountApplied && item.discountApplied > 0 && (
+                    <p className="text-xs text-green-600 mt-1">
+                      Discount: {item.discountApplied}% applied
+                    </p>
+                  )}
                   {item.description && (
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                       {item.description}
@@ -282,6 +304,16 @@ export default function QuoteDetailPage() {
                   <span className="text-gray-500 dark:text-gray-400">Discount</span>
                   <span className="text-green-600 dark:text-green-400">
                     -{formatCurrency(quote.discount, quote.currency)}
+                  </span>
+                </div>
+              )}
+              {quote.tax > 0 && (
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-500 dark:text-gray-400">
+                    {quote.taxLabel || 'TVA'}
+                  </span>
+                  <span className="text-gray-900 dark:text-white">
+                    {formatCurrency(quote.tax, quote.currency)}
                   </span>
                 </div>
               )}

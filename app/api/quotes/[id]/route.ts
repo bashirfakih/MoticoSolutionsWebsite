@@ -47,12 +47,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       ...quote,
       subtotal: quote.subtotal ? Number(quote.subtotal) : null,
+      tax: Number(quote.tax),
       discount: Number(quote.discount),
       total: quote.total ? Number(quote.total) : null,
       items: quote.items.map(item => ({
         ...item,
         unitPrice: item.unitPrice ? Number(item.unitPrice) : null,
         totalPrice: item.totalPrice ? Number(item.totalPrice) : null,
+        discountApplied: item.discountApplied ? Number(item.discountApplied) : null,
         product: item.product ? {
           ...item.product,
           price: item.product.price ? Number(item.product.price) : null,
@@ -150,6 +152,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       ...quote,
       subtotal: quote.subtotal ? Number(quote.subtotal) : null,
+      tax: Number(quote.tax),
       discount: Number(quote.discount),
       total: quote.total ? Number(quote.total) : null,
       items: quote.items.map(item => ({

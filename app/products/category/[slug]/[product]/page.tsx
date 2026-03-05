@@ -6,8 +6,11 @@ import Link from 'next/link'
 import { useState, useEffect } from 'react'
 import {
   ArrowLeft, CheckCircle, ChevronLeft, ChevronRight,
-  MessageCircle, Loader2, Package, X, ZoomIn,
+  MessageCircle, Loader2, Package, X, ZoomIn, Lock, LogIn, ShoppingCart,
 } from 'lucide-react'
+import { useAuth } from '@/lib/auth/AuthContext'
+import { useCart } from '@/lib/cart/CartContext'
+import { useToast } from '@/components/ui/Toast'
 
 // Types
 interface ProductImage {
@@ -76,6 +79,17 @@ export default function ProductDetailPage() {
   const [activeImage, setActiveImage] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
 
+  // Auth state
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth()
+
+  // Selected specs state
+  const [selectedDimension, setSelectedDimension] = useState<string>('')
+  const [selectedSize, setSelectedSize] = useState<string>('')
+  const [selectedGrit, setSelectedGrit] = useState<string>('')
+  const [selectedPackaging, setSelectedPackaging] = useState<string>('')
+  const [quantity, setQuantity] = useState(1)
+  const [isOrdering, setIsOrdering] = useState(false)
+
   // Fetch product from database
   useEffect(() => {
     async function loadProduct() {
@@ -114,6 +128,51 @@ export default function ProductDetailPage() {
 
   const nextImage = () => setActiveImage((prev) => (prev + 1) % images.length)
   const prevImage = () => setActiveImage((prev) => (prev - 1 + images.length) % images.length)
+
+  // Calculate discounted price based on user's discount percentage
+  const calculateDiscountedPrice = (price: number | null): number | null => {
+    if (!price || !user?.discountPercentage) return price
+    return price * (1 - user.discountPercentage / 100)
+  }
+
+  const discountedPrice = calculateDiscountedPrice(product?.price ?? null)
+  const hasDiscount = user?.discountPercentage && user.discountPercentage > 0
+
+  // Cart and toast
+  const { addItem } = useCart()
+  const toast = useToast()
+
+  // Handle add to cart
+  const handleAddToCart = () => {
+    if (!user || !product) return
+    setIsOrdering(true)
+
+    try {
+      const primaryImage = product.images?.find(img => img.isPrimary)?.url || product.images?.[0]?.url || null
+
+      addItem({
+        productId: product.id,
+        productName: product.name,
+        sku: product.sku,
+        slug: product.slug,
+        categorySlug: categorySlug,
+        image: primaryImage,
+        quantity,
+        unitPrice: discountedPrice || product.price || 0,
+        selectedDimension: selectedDimension || undefined,
+        selectedSize: selectedSize || undefined,
+        selectedGrit: selectedGrit || undefined,
+        selectedPackaging: selectedPackaging || undefined,
+      })
+
+      toast.success(`${product.name} added to cart`)
+    } catch (error) {
+      console.error('Add to cart failed:', error)
+      toast.error('Failed to add item to cart')
+    } finally {
+      setIsOrdering(false)
+    }
+  }
 
   // Loading state
   if (loading) {
@@ -276,78 +335,93 @@ export default function ProductDetailPage() {
               {product.shortDescription || product.description || 'Contact us for product details.'}
             </p>
 
-            {/* Quick Specs - Dropdown Selectors */}
-            {(product.showDimensions || product.showSizes || product.showGrits || product.showPackaging) && (
-              <div className="mb-8 space-y-4">
-                {product.showDimensions && product.dimensions && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Dimensions:
-                    </label>
-                    <select
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
-                      defaultValue={product.dimensions.split(',')[0]?.trim()}
-                    >
-                      {product.dimensions.split(',').map((dim, idx) => (
-                        <option key={idx} value={dim.trim()}>
-                          {dim.trim()}
-                        </option>
-                      ))}
-                    </select>
+            {/* Quick Specs - Only shown to logged-in users */}
+            {isAuthenticated ? (
+              (product.showDimensions || product.showSizes || product.showGrits || product.showPackaging) && (
+                <div className="mb-8 space-y-4">
+                  {product.showDimensions && product.dimensions && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Dimensions:
+                      </label>
+                      <select
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
+                        value={selectedDimension || product.dimensions.split(',')[0]?.trim()}
+                        onChange={(e) => setSelectedDimension(e.target.value)}
+                      >
+                        {product.dimensions.split(',').map((dim, idx) => (
+                          <option key={idx} value={dim.trim()}>
+                            {dim.trim()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  {product.showSizes && product.sizes && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Size:
+                      </label>
+                      <select
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
+                        value={selectedSize || product.sizes.split(',')[0]?.trim()}
+                        onChange={(e) => setSelectedSize(e.target.value)}
+                      >
+                        {product.sizes.split(',').map((size, idx) => (
+                          <option key={idx} value={size.trim()}>
+                            {size.trim()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  {product.showGrits && product.grits && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        Grit:
+                      </label>
+                      <select
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
+                        value={selectedGrit || product.grits.split(',')[0]?.trim()}
+                        onChange={(e) => setSelectedGrit(e.target.value)}
+                      >
+                        {product.grits.split(',').map((grit, idx) => (
+                          <option key={idx} value={grit.trim()}>
+                            {grit.trim()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  {product.showPackaging && product.packagingOptions && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                        {product.packagingUnit || 'Quantity'}:
+                      </label>
+                      <select
+                        className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
+                        value={selectedPackaging || product.packagingOptions.split(',')[0]?.trim()}
+                        onChange={(e) => setSelectedPackaging(e.target.value)}
+                      >
+                        {product.packagingOptions.split(',').map((option, idx) => (
+                          <option key={idx} value={option.trim()}>
+                            {option.trim()}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              )
+            ) : (
+              (product.showDimensions || product.showSizes || product.showGrits || product.showPackaging) && (
+                <div className="mb-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Lock className="w-4 h-4" />
+                    <span className="text-sm">Product specifications are available for registered customers.</span>
                   </div>
-                )}
-                {product.showSizes && product.sizes && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Size:
-                    </label>
-                    <select
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
-                      defaultValue={product.sizes.split(',')[0]?.trim()}
-                    >
-                      {product.sizes.split(',').map((size, idx) => (
-                        <option key={idx} value={size.trim()}>
-                          {size.trim()}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-                {product.showGrits && product.grits && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Grit:
-                    </label>
-                    <select
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
-                      defaultValue={product.grits.split(',')[0]?.trim()}
-                    >
-                      {product.grits.split(',').map((grit, idx) => (
-                        <option key={idx} value={grit.trim()}>
-                          {grit.trim()}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-                {product.showPackaging && product.packagingOptions && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      {product.packagingUnit || 'Quantity'}:
-                    </label>
-                    <select
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#004D8B] focus:border-[#004D8B] cursor-pointer"
-                      defaultValue={product.packagingOptions.split(',')[0]?.trim()}
-                    >
-                      {product.packagingOptions.split(',').map((option, idx) => (
-                        <option key={idx} value={option.trim()}>
-                          {option.trim()}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-              </div>
+                </div>
+              )
             )}
 
             {/* Features */}
@@ -365,33 +439,106 @@ export default function ProductDetailPage() {
               </div>
             )}
 
-            {/* Price */}
-            {product.price && (
-              <div className="mb-8">
-                <div className="flex items-baseline gap-3">
-                  <span className="text-3xl font-bold text-[#004D8B]">
-                    {product.currency === 'USD' ? '$' : product.currency} {product.price.toFixed(2)}
-                  </span>
-                  {product.compareAtPrice && product.compareAtPrice > product.price && (
-                    <span className="text-xl text-gray-400 line-through">
-                      ${product.compareAtPrice.toFixed(2)}
-                    </span>
-                  )}
+            {/* Price - Only shown to logged-in users */}
+            {isAuthenticated ? (
+              product.price && (
+                <div className="mb-8">
+                  <div className="flex items-baseline gap-3 flex-wrap">
+                    {hasDiscount ? (
+                      <>
+                        <span className="text-3xl font-bold text-green-600">
+                          {product.currency === 'USD' ? '$' : product.currency} {discountedPrice?.toFixed(2)}
+                        </span>
+                        <span className="text-xl text-gray-400 line-through">
+                          ${product.price.toFixed(2)}
+                        </span>
+                        <span className="px-2.5 py-1 bg-green-100 text-green-700 text-sm font-semibold rounded-full">
+                          {user?.discountPercentage}% OFF
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-3xl font-bold text-[#004D8B]">
+                          {product.currency === 'USD' ? '$' : product.currency} {product.price.toFixed(2)}
+                        </span>
+                        {product.compareAtPrice && product.compareAtPrice > product.price && (
+                          <span className="text-xl text-gray-400 line-through">
+                            ${product.compareAtPrice.toFixed(2)}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              )
+            ) : (
+              <div className="mb-8 p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <p className="text-blue-700 font-medium flex items-center gap-2">
+                  <LogIn className="w-5 h-5" />
+                  Login to see pricing and place orders
+                </p>
+              </div>
+            )}
+
+            {/* Quantity Selector - Only for logged-in users */}
+            {isAuthenticated && (
+              <div className="flex items-center gap-4 mb-6">
+                <label className="text-sm font-medium text-gray-700">Quantity:</label>
+                <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min="1"
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="w-16 text-center border-x border-gray-300 py-2 focus:outline-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setQuantity(quantity + 1)}
+                    className="px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors"
+                  >
+                    +
+                  </button>
                 </div>
               </div>
             )}
 
-            {/* CTA Buttons */}
+            {/* CTA Buttons - Conditional based on auth */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href={`https://wa.me/9613741565?text=Hello!%20I'm%20interested%20in%20${encodeURIComponent(product.name)}%20(${product.sku}).`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-bold text-lg rounded-2xl transition-all shadow-lg hover:shadow-xl"
-              >
-                <MessageCircle className="w-6 h-6" />
-                Inquire on WhatsApp
-              </a>
+              {isAuthenticated ? (
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isOrdering}
+                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#004D8B] hover:bg-[#003a6a] text-white font-bold text-lg rounded-2xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isOrdering ? (
+                    <>
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-6 h-6" />
+                      Add to Cart
+                    </>
+                  )}
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#004D8B] hover:bg-[#003a6a] text-white font-bold text-lg rounded-2xl transition-all shadow-lg hover:shadow-xl"
+                >
+                  <LogIn className="w-6 h-6" />
+                  Login to Add to Cart
+                </Link>
+              )}
             </div>
           </div>
         </div>

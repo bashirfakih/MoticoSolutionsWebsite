@@ -56,6 +56,7 @@ import NewsletterForm from '@/components/ui/NewsletterForm'
 import FloatingActions from '@/components/ui/FloatingActions'
 import ThemeToggle from '@/components/ui/ThemeToggle'
 import NavAuthButton from '@/components/auth/NavAuthButton'
+import { CartIcon } from '@/components/cart/CartIcon'
 import { useSettings } from '@/lib/hooks/useSettings'
 
 /* ─── Hooks ─────────────────────────────────────────────── */
@@ -627,6 +628,7 @@ export default function Home() {
 
             {/* Right buttons */}
             <div className="hidden md:flex items-center gap-3">
+              <CartIcon />
               <NavAuthButton />
               <a
                 href="#cta"
@@ -709,8 +711,9 @@ export default function Home() {
                 </Link>
               </div>
 
-              {/* Auth Section */}
-              <div className="py-3 border-b" style={{ borderColor: '#f1f5f9' }}>
+              {/* Cart & Auth Section */}
+              <div className="py-3 border-b flex items-center justify-between" style={{ borderColor: '#f1f5f9' }}>
+                <CartIcon />
                 <NavAuthButton variant="mobile" />
               </div>
 

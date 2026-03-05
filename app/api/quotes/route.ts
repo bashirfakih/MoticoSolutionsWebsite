@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
       data: quotes.map(quote => ({
         ...quote,
         subtotal: quote.subtotal ? Number(quote.subtotal) : null,
+        tax: Number(quote.tax),
         discount: Number(quote.discount),
         total: quote.total ? Number(quote.total) : null,
         itemCount: quote._count.items,
@@ -112,10 +113,16 @@ export async function POST(request: NextRequest) {
       data: {
         quoteNumber: generateQuoteNumber(),
         customerId: body.customerId || null,
+        userId: body.userId || null,  // Link to authenticated user
         customerName: body.customerName,
         customerEmail: body.customerEmail,
         customerPhone: body.customerPhone || null,
         company: body.company || null,
+        subtotal: body.subtotal || null,
+        tax: body.tax || 0,
+        taxLabel: body.taxLabel || null,
+        discount: body.discount || 0,
+        total: body.total || null,
         currency: body.currency || 'USD',
         status: 'pending',
         customerMessage: body.customerMessage || null,
@@ -126,12 +133,26 @@ export async function POST(request: NextRequest) {
             sku?: string;
             description?: string;
             quantity: number;
+            unitPrice?: number;
+            totalPrice?: number;
+            selectedDimension?: string;
+            selectedSize?: string;
+            selectedGrit?: string;
+            selectedPackaging?: string;
+            discountApplied?: number;
           }) => ({
             productId: item.productId || null,
             productName: item.productName,
             sku: item.sku || null,
             description: item.description || null,
             quantity: item.quantity,
+            unitPrice: item.unitPrice || null,
+            totalPrice: item.totalPrice || null,
+            selectedDimension: item.selectedDimension || null,
+            selectedSize: item.selectedSize || null,
+            selectedGrit: item.selectedGrit || null,
+            selectedPackaging: item.selectedPackaging || null,
+            discountApplied: item.discountApplied || null,
           })),
         },
       },
@@ -143,6 +164,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ...quote,
       subtotal: quote.subtotal ? Number(quote.subtotal) : null,
+      tax: Number(quote.tax),
       discount: Number(quote.discount),
       total: quote.total ? Number(quote.total) : null,
     }, { status: 201 });

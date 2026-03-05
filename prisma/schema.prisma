@@ -107,6 +107,7 @@ model User {
   position     String?
   address      String?
   city         String?
+  discountPercentage Decimal  @default(0) @db.Decimal(5, 2)  // 0-100% discount for this user
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   lastLogin    DateTime?
@@ -115,6 +116,7 @@ model User {
   sessions       Session[]
   inventoryLogs  InventoryLog[]
   messageReplies Message[]      @relation("RepliedBy")
+  quotes         Quote[]        @relation("UserQuotes")
 
   @@map("users")
 }
@@ -317,25 +319,26 @@ model InventoryLog {
 // ═══════════════════════════════════════════════════════════════
 
 model Customer {
-  id          String         @id @default(cuid())
-  email       String         @unique
-  name        String
-  company     String?
-  phone       String?
-  address     String?
-  city        String?
-  region      String?
-  postalCode  String?
-  country     String         @default("Lebanon")
-  totalOrders Int            @default(0)
-  totalSpent  Decimal        @default(0) @db.Decimal(10, 2)
-  lastOrderAt DateTime?
-  status      CustomerStatus @default(active)
-  isVerified  Boolean        @default(false)
-  notes       String?
-  tags        String[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  id                 String         @id @default(cuid())
+  email              String         @unique
+  name               String
+  company            String?
+  phone              String?
+  address            String?
+  city               String?
+  region             String?
+  postalCode         String?
+  country            String         @default("Lebanon")
+  totalOrders        Int            @default(0)
+  totalSpent         Decimal        @default(0) @db.Decimal(10, 2)
+  discountPercentage Decimal        @default(0) @db.Decimal(5, 2)
+  lastOrderAt        DateTime?
+  status             CustomerStatus @default(active)
+  isVerified         Boolean        @default(false)
+  notes              String?
+  tags               String[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 
   orders Order[]
   quotes Quote[]
@@ -407,11 +410,14 @@ model Quote {
   id              String      @id @default(cuid())
   quoteNumber     String      @unique
   customerId      String?
+  userId          String?     // Link to User for authenticated orders
   customerName    String
   customerEmail   String
   customerPhone   String?
   company         String?
   subtotal        Decimal?    @db.Decimal(10, 2)
+  tax             Decimal     @default(0) @db.Decimal(10, 2)
+  taxLabel        String?     // e.g., "TVA", "VAT"
   discount        Decimal     @default(0) @db.Decimal(10, 2)
   total           Decimal?    @db.Decimal(10, 2)
   currency        Currency    @default(USD)
@@ -428,6 +434,7 @@ model Quote {
   respondedAt     DateTime?
 
   customer Customer?   @relation(fields: [customerId], references: [id])
+  user     User?       @relation("UserQuotes", fields: [userId], references: [id])
   order    Order?      @relation("QuoteToOrder", fields: [orderId], references: [id])
   items    QuoteItem[]
 
@@ -444,6 +451,12 @@ model QuoteItem {
   quantity    Int
   unitPrice   Decimal? @db.Decimal(10, 2)
   totalPrice  Decimal? @db.Decimal(10, 2)
+  // Selected product specs
+  selectedDimension String?
+  selectedSize      String?
+  selectedGrit      String?
+  selectedPackaging String?
+  discountApplied   Decimal? @db.Decimal(5, 2)  // User's discount % at time of order
 
   quote   Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
   product Product? @relation(fields: [productId], references: [id])
