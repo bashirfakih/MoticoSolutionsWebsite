@@ -82,8 +82,13 @@ describe('Products API', () => {
         mockProductFindMany.mockResolvedValue([
           {
             id: 'prod-1',
+            sku: 'SKU-001',
+            name: 'Product A',
             price: 99.99,
             compareAtPrice: 129.99,
+            category: { id: 'cat-1', name: 'Category', slug: 'category' },
+            brand: { id: 'brand-1', name: 'Brand', slug: 'brand' },
+            images: [],
             _count: { variants: 0 },
           },
         ]);
@@ -235,7 +240,16 @@ describe('Products API', () => {
 
       it('transforms variant count', async () => {
         mockProductFindMany.mockResolvedValue([
-          { id: 'prod-1', _count: { variants: 5 } },
+          {
+            id: 'prod-1',
+            sku: 'SKU-001',
+            name: 'Product A',
+            price: 99.99,
+            category: { id: 'cat-1', name: 'Category', slug: 'category' },
+            brand: { id: 'brand-1', name: 'Brand', slug: 'brand' },
+            images: [],
+            _count: { variants: 5 },
+          },
         ]);
         mockProductCount.mockResolvedValue(1);
 

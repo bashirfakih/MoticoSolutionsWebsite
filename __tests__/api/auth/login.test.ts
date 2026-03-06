@@ -199,6 +199,18 @@ describe('POST /api/auth/login', () => {
 
   describe('Success (200)', () => {
     it('returns user data on successful login', async () => {
+      const mockDecimal = (value: number) => {
+        const decimal = {
+          toNumber: () => value,
+          valueOf: () => value,
+          toString: () => String(value),
+        };
+        Object.defineProperty(decimal, Symbol.toPrimitive, {
+          value: () => value,
+        });
+        return decimal;
+      };
+
       const mockUser = {
         id: 'user-1',
         email: 'test@example.com',
@@ -208,6 +220,7 @@ describe('POST /api/auth/login', () => {
         company: 'Test Company',
         avatar: '/avatar.jpg',
         isActive: true,
+        discountPercentage: mockDecimal(15),
       };
       mockUserFindUnique.mockResolvedValue(mockUser);
       mockVerifyPassword.mockResolvedValue(true);
@@ -218,7 +231,7 @@ describe('POST /api/auth/login', () => {
       });
 
       const response = await POST(request);
-      const data = (await response.json()) as { user: { id: string; email: string; name: string; role: string; company: string; avatar: string } };
+      const data = (await response.json()) as { user: { id: string; email: string; name: string; role: string; company: string; avatar: string; discountPercentage: number } };
 
       expect(response.status).toBe(200);
       expect(data.user).toEqual({
@@ -228,9 +241,37 @@ describe('POST /api/auth/login', () => {
         role: 'customer',
         company: 'Test Company',
         avatar: '/avatar.jpg',
+        discountPercentage: 15,
       });
       expect(mockCreateSession).toHaveBeenCalledWith('user-1');
       expect(mockSetSessionCookie).toHaveBeenCalledWith('mock-session-token');
+    });
+
+    it('returns discountPercentage as 0 when null', async () => {
+      const mockUser = {
+        id: 'user-1',
+        email: 'test@example.com',
+        name: 'Test User',
+        passwordHash: 'hashed_password',
+        role: 'customer',
+        company: null,
+        avatar: null,
+        isActive: true,
+        discountPercentage: null,
+      };
+      mockUserFindUnique.mockResolvedValue(mockUser);
+      mockVerifyPassword.mockResolvedValue(true);
+
+      const request = createMockRequest('http://localhost/api/auth/login', {
+        method: 'POST',
+        body: { email: 'test@example.com', password: 'password123' },
+      });
+
+      const response = await POST(request);
+      const data = (await response.json()) as { user: { discountPercentage: number } };
+
+      expect(response.status).toBe(200);
+      expect(data.user.discountPercentage).toBe(0);
     });
 
     it('normalizes email to lowercase', async () => {

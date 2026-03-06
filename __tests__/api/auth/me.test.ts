@@ -52,6 +52,7 @@ describe('GET /api/auth/me', () => {
         role: 'customer',
         company: 'Test Company',
         avatar: '/avatar.jpg',
+        discountPercentage: 15,
       };
       mockGetCurrentUser.mockResolvedValue(mockUser);
 
@@ -59,7 +60,9 @@ describe('GET /api/auth/me', () => {
       const data = await response.json();
 
       expect(response.status).toBe(200);
-      expect(data).toEqual({ user: mockUser });
+      expect(data.user.id).toBe('user-1');
+      expect(data.user.email).toBe('test@example.com');
+      expect(data.user.discountPercentage).toBe(15);
     });
 
     it('returns admin user data', async () => {

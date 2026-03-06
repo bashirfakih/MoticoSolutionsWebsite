@@ -62,17 +62,20 @@ describe('Customers API', () => {
         expect(data.total).toBe(1);
       });
 
-      it('transforms totalSpent to number and adds orderCount/quoteCount', async () => {
+      it('transforms totalSpent and discountPercentage to numbers', async () => {
         mockCustomerFindMany.mockResolvedValue([
-          { id: 'cust-1', totalSpent: 1500.50, _count: { orders: 5, quotes: 2 } },
+          { id: 'cust-1', totalSpent: 1500.50, discountPercentage: 15.5, _count: { orders: 5, quotes: 2 } },
         ]);
         mockCustomerCount.mockResolvedValue(1);
 
         const request = createMockRequest('http://localhost/api/customers');
         const response = await GET(request);
-        const data = await getResponseJson(response) as { data: { totalSpent: number; orderCount: number; quoteCount: number; _count?: unknown }[] };
+        const data = await getResponseJson(response) as { data: { totalSpent: number; discountPercentage: number; orderCount: number; quoteCount: number; _count?: unknown }[] };
 
         expect(typeof data.data[0].totalSpent).toBe('number');
+        expect(data.data[0].totalSpent).toBe(1500.50);
+        expect(typeof data.data[0].discountPercentage).toBe('number');
+        expect(data.data[0].discountPercentage).toBe(15.5);
         expect(data.data[0].orderCount).toBe(5);
         expect(data.data[0].quoteCount).toBe(2);
         expect(data.data[0]._count).toBeUndefined();
@@ -262,7 +265,7 @@ describe('Customers API', () => {
 
       it('defaults country to Lebanon', async () => {
         mockCustomerFindUnique.mockResolvedValue(null);
-        mockCustomerCreate.mockResolvedValue({ id: 'cust-1', totalSpent: 0 });
+        mockCustomerCreate.mockResolvedValue({ id: 'cust-1', totalSpent: 0, discountPercentage: 0 });
 
         const request = createMockRequest('http://localhost/api/customers', {
           method: 'POST',
@@ -272,6 +275,49 @@ describe('Customers API', () => {
 
         expect(mockCustomerCreate).toHaveBeenCalledWith({
           data: expect.objectContaining({ country: 'Lebanon' }),
+        });
+      });
+
+      it('creates customer with discount percentage', async () => {
+        mockCustomerFindUnique.mockResolvedValue(null);
+        mockCustomerCreate.mockResolvedValue({
+          id: 'cust-1',
+          name: 'Discount Customer',
+          email: 'discount@example.com',
+          totalSpent: 0,
+          discountPercentage: 20,
+        });
+
+        const request = createMockRequest('http://localhost/api/customers', {
+          method: 'POST',
+          body: {
+            name: 'Discount Customer',
+            email: 'discount@example.com',
+            discountPercentage: 20,
+          },
+        });
+        const response = await POST(request);
+        const data = await getResponseJson(response) as { discountPercentage: number };
+
+        expect(response.status).toBe(201);
+        expect(mockCustomerCreate).toHaveBeenCalledWith({
+          data: expect.objectContaining({ discountPercentage: 20 }),
+        });
+        expect(data.discountPercentage).toBe(20);
+      });
+
+      it('defaults discount percentage to 0', async () => {
+        mockCustomerFindUnique.mockResolvedValue(null);
+        mockCustomerCreate.mockResolvedValue({ id: 'cust-1', totalSpent: 0, discountPercentage: 0 });
+
+        const request = createMockRequest('http://localhost/api/customers', {
+          method: 'POST',
+          body: { name: 'Test', email: 'test@example.com' },
+        });
+        await POST(request);
+
+        expect(mockCustomerCreate).toHaveBeenCalledWith({
+          data: expect.objectContaining({ discountPercentage: 0 }),
         });
       });
     });
