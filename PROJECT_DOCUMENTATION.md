@@ -928,6 +928,16 @@ The platform includes automatic inventory synchronization:
 - Enable wishlist
 - Enable compare
 - Enable blog
+- Show tooltip help (on/off)
+
+**UI Enhancements:**
+
+- **Tooltip Help System**: Contextual help icons (ⓘ) on form fields
+  - Controlled via "Show Tooltip Help" toggle in Features settings
+  - Info icons appear next to form labels with tooltips
+  - Covers inventory, pricing, user management fields
+  - Portal-based tooltips with smart positioning
+  - Respects site-wide setting via useSettings hook
 
 **Maintenance:**
 - Maintenance mode (on/off)
@@ -1962,7 +1972,44 @@ This software is proprietary and confidential. Unauthorized copying, distributio
 
 ## Changelog
 
-### Version 1.4.0 (Current)
+### Version 1.5.0 (Current)
+
+**Real-Time Inventory Sync:**
+
+- ✅ Race-condition-safe stock validation using `validateStockInTransaction`
+- ✅ Stock validation inside Prisma transactions (TOCTOU fix)
+- ✅ Auto-decrement stock on order creation
+- ✅ Auto-decrement stock on quote-to-order conversion
+- ✅ Auto-restore stock on order cancellation/refund
+- ✅ Auto-restore stock on pending order deletion
+- ✅ Idempotency check prevents double stock restoration
+- ✅ Batched product queries (N+1 fix)
+- ✅ Pre-fetched settings to avoid repeated queries
+- ✅ Inventory audit logging to InventoryLog table
+- ✅ Stock status auto-updates (in_stock, low_stock, out_of_stock)
+- ✅ Respects per-product `trackInventory` and `allowBackorder` flags
+
+**Tooltip Help System:**
+
+- ✅ Contextual help icons (ⓘ) on form fields
+- ✅ `showTooltipHelp` setting in SiteSettings (Features tab)
+- ✅ FieldLabel component with Info icon
+- ✅ Portal-based Tooltip component with smart positioning
+- ✅ 30+ tooltip strings in centralized tooltips.ts
+- ✅ Respects site-wide setting via useSettings hook
+- ✅ Covers inventory, pricing, user management, and settings fields
+
+**Files Added/Modified:**
+
+- `lib/services/inventoryService.ts` - Core inventory service
+- `lib/content/tooltips.ts` - Centralized tooltip content
+- `components/ui/Tooltip.tsx` - Accessible tooltip component
+- `components/ui/FieldLabel.tsx` - Label with help icon
+- `app/api/orders/route.ts` - Stock validation in transaction
+- `app/api/orders/[id]/route.ts` - Stock restore on cancel/delete
+- `app/api/quotes/[id]/convert/route.ts` - Stock validation on conversion
+
+### Version 1.4.0
 
 **Analytics Dashboard:**
 
@@ -2067,6 +2114,6 @@ This software is proprietary and confidential. Unauthorized copying, distributio
 
 ---
 
-**Document Version**: 1.4
+**Document Version**: 1.5
 **Last Updated**: March 6, 2026
 **Maintained By**: Motico Solutions Development Team

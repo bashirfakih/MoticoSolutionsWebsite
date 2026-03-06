@@ -10,6 +10,7 @@
 
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
+import { FieldLabel } from './FieldLabel';
 
 interface FormFieldProps {
   id: string;
@@ -28,6 +29,7 @@ interface FormFieldProps {
   autoComplete?: string;
   rightElement?: React.ReactNode;
   hint?: string;
+  tooltip?: string;
   className?: string;
 }
 
@@ -48,19 +50,24 @@ export default function FormField({
   autoComplete,
   rightElement,
   hint,
+  tooltip,
   className = '',
 }: FormFieldProps) {
   const showError = touched && error;
 
   return (
     <div className={className}>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-gray-700 mb-1.5"
-      >
-        {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
+      {tooltip ? (
+        <FieldLabel htmlFor={id} label={label} required={required} tooltip={tooltip} />
+      ) : (
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
+          {label}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
+      )}
       <div className="relative">
         {Icon && (
           <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -120,6 +127,7 @@ interface SelectFieldProps {
   required?: boolean;
   disabled?: boolean;
   placeholder?: string;
+  tooltip?: string;
   className?: string;
 }
 
@@ -137,19 +145,24 @@ export function SelectField({
   required = false,
   disabled = false,
   placeholder,
+  tooltip,
   className = '',
 }: SelectFieldProps) {
   const showError = touched && error;
 
   return (
     <div className={className}>
-      <label
-        htmlFor={id}
-        className="block text-sm font-medium text-gray-700 mb-1.5"
-      >
-        {label}
-        {required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
+      {tooltip ? (
+        <FieldLabel htmlFor={id} label={label} required={required} tooltip={tooltip} />
+      ) : (
+        <label
+          htmlFor={id}
+          className="block text-sm font-medium text-gray-700 mb-1.5"
+        >
+          {label}
+          {required && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
+      )}
       <div className="relative">
         {Icon && (
           <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

@@ -31,6 +31,8 @@ import {
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useToast } from '@/components/ui/Toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { FieldLabel } from '@/components/ui/FieldLabel';
+import { TOOLTIPS } from '@/lib/content/tooltips';
 
 interface User {
   id: string;
@@ -801,8 +803,14 @@ function UsersContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+                <FieldLabel
+                  htmlFor="createRole"
+                  label="Role"
+                  required
+                  tooltip={TOOLTIPS.admin.users.role}
+                />
                 <select
+                  id="createRole"
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as 'admin' | 'customer' })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
@@ -855,9 +863,14 @@ function UsersContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Discount Percentage</label>
+                <FieldLabel
+                  htmlFor="createDiscount"
+                  label="Discount Percentage"
+                  tooltip={TOOLTIPS.admin.users.discountPercentage}
+                />
                 <div className="relative">
                   <input
+                    id="createDiscount"
                     type="number"
                     min="0"
                     max="100"
@@ -868,7 +881,6 @@ function UsersContent() {
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">0-100%. Applies to all products for this user.</p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -879,7 +891,12 @@ function UsersContent() {
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                   className="w-4 h-4 text-[#004D8B] border-gray-300 rounded focus:ring-[#004D8B]"
                 />
-                <label htmlFor="isActive" className="text-sm text-gray-700">Active account</label>
+                <FieldLabel
+                  htmlFor="isActive"
+                  label="Active account"
+                  tooltip={TOOLTIPS.admin.users.active}
+                  className="mb-0"
+                />
               </div>
 
               <div className="flex gap-3 pt-4">
@@ -957,8 +974,14 @@ function UsersContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Role *</label>
+                <FieldLabel
+                  htmlFor="editRole"
+                  label="Role"
+                  required
+                  tooltip={TOOLTIPS.admin.users.role}
+                />
                 <select
+                  id="editRole"
                   value={formData.role}
                   onChange={(e) => setFormData({ ...formData, role: e.target.value as 'admin' | 'customer' })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
@@ -1011,9 +1034,14 @@ function UsersContent() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Discount Percentage</label>
+                <FieldLabel
+                  htmlFor="editDiscount"
+                  label="Discount Percentage"
+                  tooltip={TOOLTIPS.admin.users.discountPercentage}
+                />
                 <div className="relative">
                   <input
+                    id="editDiscount"
                     type="number"
                     min="0"
                     max="100"
@@ -1024,7 +1052,6 @@ function UsersContent() {
                   />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">0-100%. Applies to all products for this user.</p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -1035,7 +1062,12 @@ function UsersContent() {
                   onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                   className="w-4 h-4 text-[#004D8B] border-gray-300 rounded focus:ring-[#004D8B]"
                 />
-                <label htmlFor="editIsActive" className="text-sm text-gray-700">Active account</label>
+                <FieldLabel
+                  htmlFor="editIsActive"
+                  label="Active account"
+                  tooltip={TOOLTIPS.admin.users.active}
+                  className="mb-0"
+                />
               </div>
 
               <div className="flex gap-3 pt-4">

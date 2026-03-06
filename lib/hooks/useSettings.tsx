@@ -77,6 +77,7 @@ export interface SiteSettings {
   enableWishlist: boolean;
   enableCompare?: boolean;
   enableBlog?: boolean;
+  showTooltipHelp?: boolean;
 
   // Maintenance
   maintenanceMode: boolean;
@@ -129,6 +130,7 @@ const defaultSettings: SiteSettings = {
   enableQuotes: true,
   enableReviews: false,
   enableWishlist: false,
+  showTooltipHelp: true,
   maintenanceMode: false,
   maintenanceMessage: 'We are currently performing maintenance. Please check back soon.',
 };

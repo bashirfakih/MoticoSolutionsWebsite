@@ -26,6 +26,8 @@ import {
   Shield,
 } from 'lucide-react';
 import { useToast } from '@/components/ui/Toast';
+import { FieldLabel } from '@/components/ui/FieldLabel';
+import { TOOLTIPS } from '@/lib/content/tooltips';
 
 interface SiteSettings {
   // Company Information
@@ -95,6 +97,7 @@ interface SiteSettings {
   enableWishlist: boolean;
   enableCompare: boolean;
   enableBlog: boolean;
+  showTooltipHelp: boolean;
 
   // SEO
   metaTitle: string | null;
@@ -814,18 +817,27 @@ export default function AdminSettingsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Low Stock Threshold</label>
+                    <FieldLabel
+                      htmlFor="lowStockThreshold"
+                      label="Low Stock Threshold"
+                      tooltip={TOOLTIPS.admin.settings.inventory.lowStockThreshold}
+                    />
                     <input
+                      id="lowStockThreshold"
                       type="number"
                       value={settings.lowStockThreshold}
                       onChange={(e) => updateSetting('lowStockThreshold', parseInt(e.target.value) || 0)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Alert when stock falls below this number</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Out of Stock Behavior</label>
+                    <FieldLabel
+                      htmlFor="outOfStockBehavior"
+                      label="Out of Stock Behavior"
+                      tooltip={TOOLTIPS.admin.settings.inventory.outOfStockBehavior}
+                    />
                     <select
+                      id="outOfStockBehavior"
                       value={settings.outOfStockBehavior}
                       onChange={(e) => updateSetting('outOfStockBehavior', e.target.value)}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
@@ -838,24 +850,36 @@ export default function AdminSettingsPage() {
                 </div>
 
                 <div className="border-t pt-6 space-y-3">
-                  <label className="flex items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
+                      id="trackInventory"
                       checked={settings.trackInventory}
                       onChange={(e) => updateSetting('trackInventory', e.target.checked)}
                       className="w-4 h-4 text-[#004D8B] border-gray-300 rounded focus:ring-[#004D8B]"
                     />
-                    <span className="text-sm text-gray-700">Track inventory levels</span>
-                  </label>
-                  <label className="flex items-center gap-2">
+                    <FieldLabel
+                      htmlFor="trackInventory"
+                      label="Track inventory levels"
+                      tooltip={TOOLTIPS.admin.settings.inventory.trackInventory}
+                      className="mb-0"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
+                      id="allowBackorders"
                       checked={settings.allowBackorders}
                       onChange={(e) => updateSetting('allowBackorders', e.target.checked)}
                       className="w-4 h-4 text-[#004D8B] border-gray-300 rounded focus:ring-[#004D8B]"
                     />
-                    <span className="text-sm text-gray-700">Allow backorders by default</span>
-                  </label>
+                    <FieldLabel
+                      htmlFor="allowBackorders"
+                      label="Allow backorders by default"
+                      tooltip={TOOLTIPS.admin.settings.inventory.allowBackorders}
+                      className="mb-0"
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -870,8 +894,13 @@ export default function AdminSettingsPage() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tax Rate (%)</label>
+                    <FieldLabel
+                      htmlFor="taxRate"
+                      label="Tax Rate (%)"
+                      tooltip={TOOLTIPS.admin.settings.pricing.taxRate}
+                    />
                     <input
+                      id="taxRate"
                       type="number"
                       step="0.01"
                       value={settings.taxRate}
@@ -880,8 +909,13 @@ export default function AdminSettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tax Label</label>
+                    <FieldLabel
+                      htmlFor="taxLabel"
+                      label="Tax Label"
+                      tooltip={TOOLTIPS.admin.settings.pricing.taxLabel}
+                    />
                     <input
+                      id="taxLabel"
                       type="text"
                       value={settings.taxLabel}
                       onChange={(e) => updateSetting('taxLabel', e.target.value)}
@@ -890,8 +924,13 @@ export default function AdminSettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Shipping Fee</label>
+                    <FieldLabel
+                      htmlFor="shippingFee"
+                      label="Shipping Fee"
+                      tooltip={TOOLTIPS.admin.settings.pricing.shippingFee}
+                    />
                     <input
+                      id="shippingFee"
                       type="number"
                       step="0.01"
                       value={settings.shippingFee}
@@ -900,8 +939,13 @@ export default function AdminSettingsPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Free Shipping Threshold</label>
+                    <FieldLabel
+                      htmlFor="freeShippingThreshold"
+                      label="Free Shipping Threshold"
+                      tooltip={TOOLTIPS.admin.settings.pricing.freeShippingThreshold}
+                    />
                     <input
+                      id="freeShippingThreshold"
                       type="number"
                       step="0.01"
                       value={settings.freeShippingThreshold || ''}
@@ -913,24 +957,36 @@ export default function AdminSettingsPage() {
                 </div>
 
                 <div className="border-t pt-6 space-y-3">
-                  <label className="flex items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
+                      id="pricesIncludeTax"
                       checked={settings.pricesIncludeTax}
                       onChange={(e) => updateSetting('pricesIncludeTax', e.target.checked)}
                       className="w-4 h-4 text-[#004D8B] border-gray-300 rounded focus:ring-[#004D8B]"
                     />
-                    <span className="text-sm text-gray-700">Prices include tax</span>
-                  </label>
-                  <label className="flex items-center gap-2">
+                    <FieldLabel
+                      htmlFor="pricesIncludeTax"
+                      label="Prices include tax"
+                      tooltip={TOOLTIPS.admin.settings.pricing.pricesIncludeTax}
+                      className="mb-0"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
                     <input
                       type="checkbox"
+                      id="showPricesWithTax"
                       checked={settings.showPricesWithTax}
                       onChange={(e) => updateSetting('showPricesWithTax', e.target.checked)}
                       className="w-4 h-4 text-[#004D8B] border-gray-300 rounded focus:ring-[#004D8B]"
                     />
-                    <span className="text-sm text-gray-700">Show prices with tax</span>
-                  </label>
+                    <FieldLabel
+                      htmlFor="showPricesWithTax"
+                      label="Show prices with tax"
+                      tooltip={TOOLTIPS.admin.settings.pricing.showPricesWithTax}
+                      className="mb-0"
+                    />
+                  </div>
                   <label className="flex items-center gap-2">
                     <input
                       type="checkbox"
@@ -1028,19 +1084,42 @@ export default function AdminSettingsPage() {
                     </label>
                   </div>
 
-                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                  <div className="bg-gray-50 rounded-lg p-4">
                     <label className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-orange-900">Maintenance Mode</p>
-                        <p className="text-xs text-orange-700">Take site offline for maintenance</p>
+                        <p className="text-sm font-medium text-gray-900">Show Tooltip Help</p>
+                        <p className="text-xs text-gray-500">Display help icons with tooltips on form fields</p>
                       </div>
                       <input
                         type="checkbox"
+                        checked={settings.showTooltipHelp}
+                        onChange={(e) => updateSetting('showTooltipHelp', e.target.checked)}
+                        className="w-4 h-4 text-[#004D8B] border-gray-300 rounded focus:ring-[#004D8B]"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div>
+                          <FieldLabel
+                            htmlFor="maintenanceMode"
+                            label="Maintenance Mode"
+                            tooltip={TOOLTIPS.admin.settings.features.maintenanceMode}
+                            className="mb-0 text-orange-900"
+                          />
+                          <p className="text-xs text-orange-700">Take site offline for maintenance</p>
+                        </div>
+                      </div>
+                      <input
+                        type="checkbox"
+                        id="maintenanceMode"
                         checked={settings.maintenanceMode}
                         onChange={(e) => updateSetting('maintenanceMode', e.target.checked)}
                         className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-600"
                       />
-                    </label>
+                    </div>
                     {settings.maintenanceMode && (
                       <div className="mt-3">
                         <textarea

@@ -30,6 +30,8 @@ import {
   Percent,
   Info,
 } from 'lucide-react';
+import { FieldLabel } from '@/components/ui/FieldLabel';
+import { TOOLTIPS } from '@/lib/content/tooltips';
 
 // ═══════════════════════════════════════════════════════════════
 // TYPES
@@ -359,9 +361,11 @@ export default function ProfilePage() {
 
             {/* Phone */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Phone Number
-              </label>
+              <FieldLabel
+                htmlFor="phone"
+                label="Phone Number"
+                tooltip={TOOLTIPS.account.profile.phone}
+              />
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -378,9 +382,11 @@ export default function ProfilePage() {
 
             {/* Company */}
             <div>
-              <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Company
-              </label>
+              <FieldLabel
+                htmlFor="company"
+                label="Company"
+                tooltip={TOOLTIPS.account.profile.company}
+              />
               <div className="relative">
                 <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
@@ -396,9 +402,11 @@ export default function ProfilePage() {
 
             {/* Position */}
             <div>
-              <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-1.5">
-                Job Title / Position
-              </label>
+              <FieldLabel
+                htmlFor="position"
+                label="Job Title / Position"
+                tooltip={TOOLTIPS.account.profile.position}
+              />
               <div className="relative">
                 <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input

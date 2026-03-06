@@ -17,20 +17,37 @@ import {
   Save,
   Check,
   AlertCircle,
+  HelpCircle,
 } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
+import { TOOLTIPS } from '@/lib/content/tooltips';
 
 interface SettingToggleProps {
   label: string;
   description: string;
   enabled: boolean;
   onChange: (enabled: boolean) => void;
+  tooltip?: string;
 }
 
-function SettingToggle({ label, description, enabled, onChange }: SettingToggleProps) {
+function SettingToggle({ label, description, enabled, onChange, tooltip }: SettingToggleProps) {
   return (
     <div className="flex items-start justify-between py-4 border-b border-gray-100 last:border-0">
       <div className="flex-1 pr-4">
-        <p className="font-medium text-gray-900">{label}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="font-medium text-gray-900">{label}</p>
+          {tooltip && (
+            <Tooltip content={tooltip} position="top">
+              <button
+                type="button"
+                className="p-0.5 text-gray-400 hover:text-gray-600 focus:outline-none focus:text-[#004D8B] rounded transition-colors"
+                aria-label={`Help for ${label}`}
+              >
+                <HelpCircle className="w-4 h-4" />
+              </button>
+            </Tooltip>
+          )}
+        </div>
         <p className="text-sm text-gray-500 mt-0.5">{description}</p>
       </div>
       <button
@@ -151,24 +168,28 @@ export default function CustomerSettingsPage() {
             description="Receive important updates via email"
             enabled={emailNotifications}
             onChange={setEmailNotifications}
+            tooltip={TOOLTIPS.account.settings.emailNotifications}
           />
           <SettingToggle
             label="Quote Updates"
             description="Get notified when your quotes are reviewed or updated"
             enabled={quoteNotifications}
             onChange={setQuoteNotifications}
+            tooltip={TOOLTIPS.account.settings.quoteNotifications}
           />
           <SettingToggle
             label="Order Status Updates"
             description="Receive notifications about your order status and deliveries"
             enabled={orderNotifications}
             onChange={setOrderNotifications}
+            tooltip={TOOLTIPS.account.settings.orderNotifications}
           />
           <SettingToggle
             label="Promotional Emails"
             description="Receive news about special offers and promotions"
             enabled={promotionalEmails}
             onChange={setPromotionalEmails}
+            tooltip={TOOLTIPS.account.settings.promotionalEmails}
           />
         </div>
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">

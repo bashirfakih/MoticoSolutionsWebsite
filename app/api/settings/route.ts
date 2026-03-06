@@ -64,6 +64,7 @@ export async function GET(request: NextRequest) {
         enableQuotes: convertedSettings.enableQuotes,
         enableReviews: convertedSettings.enableReviews,
         enableWishlist: convertedSettings.enableWishlist,
+        showTooltipHelp: convertedSettings.showTooltipHelp,
         maintenanceMode: convertedSettings.maintenanceMode,
         maintenanceMessage: convertedSettings.maintenanceMessage,
       });

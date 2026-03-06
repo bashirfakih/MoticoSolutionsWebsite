@@ -144,14 +144,14 @@ git push --force
 
 ---
 
-## Current Version: 1.2.0
+## Current Version: 1.5.0
 ## Next Milestone: Phase 1 — Q2 2026
 Priority queue:
 - [ ] Payment gateway (Stripe)
 - [ ] Product reviews & ratings
 - [ ] Wishlist functionality
-- [ ] Real-time inventory sync
-- [ ] Advanced analytics
+- [x] Real-time inventory sync
+- [x] Advanced analytics
 ```
 
 ---

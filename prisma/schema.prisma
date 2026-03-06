@@ -565,6 +565,7 @@ model SiteSettings {
   enableWishlist        Boolean @default(false)
   enableCompare         Boolean @default(false)
   enableBlog            Boolean @default(false)
+  showTooltipHelp       Boolean @default(true)
 
   // ─── SEO ────────────────────────────────────────────────
   metaTitle       String?
