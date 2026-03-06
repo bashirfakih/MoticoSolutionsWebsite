@@ -75,13 +75,21 @@ describe('Orders API - Inventory Integration', () => {
           email: 'test@test.com',
         });
 
-        // Product has less stock than requested
-        mockProductFindUnique.mockResolvedValue({
-          id: 'prod-1',
-          name: 'Test Product',
-          stockQuantity: 5,
-          trackInventory: true,
-          allowBackorder: false,
+        // Transaction mock that includes product.findMany for validation
+        mockTransaction.mockImplementation(async (fn) => {
+          const mockTx = {
+            product: {
+              // Validation uses findMany - return product with insufficient stock
+              findMany: jest.fn().mockResolvedValue([{
+                id: 'prod-1',
+                name: 'Test Product',
+                stockQuantity: 5,
+                trackInventory: true,
+                allowBackorder: false,
+              }]),
+            },
+          };
+          return fn(mockTx);
         });
 
         const request = createMockRequest('http://localhost/api/orders', {
@@ -116,21 +124,31 @@ describe('Orders API - Inventory Integration', () => {
           email: 'test@test.com',
         });
 
-        mockProductFindUnique
-          .mockResolvedValueOnce({
-            id: 'prod-1',
-            name: 'Product 1',
-            stockQuantity: 5,
-            trackInventory: true,
-            allowBackorder: false,
-          })
-          .mockResolvedValueOnce({
-            id: 'prod-2',
-            name: 'Product 2',
-            stockQuantity: 2,
-            trackInventory: true,
-            allowBackorder: false,
-          });
+        // Transaction mock that includes product.findMany for validation
+        mockTransaction.mockImplementation(async (fn) => {
+          const mockTx = {
+            product: {
+              // Validation uses findMany - return products with insufficient stock
+              findMany: jest.fn().mockResolvedValue([
+                {
+                  id: 'prod-1',
+                  name: 'Product 1',
+                  stockQuantity: 5,
+                  trackInventory: true,
+                  allowBackorder: false,
+                },
+                {
+                  id: 'prod-2',
+                  name: 'Product 2',
+                  stockQuantity: 2,
+                  trackInventory: true,
+                  allowBackorder: false,
+                },
+              ]),
+            },
+          };
+          return fn(mockTx);
+        });
 
         const request = createMockRequest('http://localhost/api/orders', {
           method: 'POST',
@@ -323,7 +341,7 @@ describe('Orders API - Inventory Integration', () => {
           email: 'test@test.com',
         });
 
-        // Product has allowBackorder: true
+        // Product has allowBackorder: true - validation will skip this product
         mockProductFindUnique.mockResolvedValue({
           id: 'prod-1',
           name: 'Test Product',
@@ -350,6 +368,14 @@ describe('Orders API - Inventory Integration', () => {
               update: jest.fn(),
             },
             product: {
+              // Validation uses findMany now
+              findMany: jest.fn().mockResolvedValue([{
+                id: 'prod-1',
+                name: 'Test Product',
+                stockQuantity: 0,
+                trackInventory: true,
+                allowBackorder: true,  // Product allows backorder
+              }]),
               findUnique: jest.fn().mockResolvedValue({
                 id: 'prod-1',
                 stockQuantity: 0,
@@ -440,6 +466,14 @@ describe('Orders API - Inventory Integration', () => {
               update: jest.fn(),
             },
             product: {
+              // Validation uses findMany now
+              findMany: jest.fn().mockResolvedValue([{
+                id: 'prod-1',
+                name: 'Test Product',
+                stockQuantity: 20,
+                trackInventory: true,
+                allowBackorder: false,
+              }]),
               findUnique: jest.fn().mockResolvedValue({
                 id: 'prod-1',
                 stockQuantity: 20,

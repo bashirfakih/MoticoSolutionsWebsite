@@ -68,29 +68,105 @@ export function calculateStockStatus(
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * Validate stock availability for an order's items
+ * Validate stock availability for an order's items (batched query)
  * Returns validation result with any stock errors
+ * NOTE: For race-condition-safe validation, use validateStockInTransaction instead
  */
 export async function validateStockForOrder(
   items: OrderItemForStock[]
 ): Promise<StockValidationResult> {
+  const productIds = items
+    .map(item => item.productId)
+    .filter((id): id is string => !!id);
+
+  if (productIds.length === 0) {
+    return { valid: true, errors: [] };
+  }
+
+  // Batch query all products at once (fixes N+1)
+  const products = await prisma.product.findMany({
+    where: { id: { in: productIds } },
+    select: {
+      id: true,
+      name: true,
+      stockQuantity: true,
+      trackInventory: true,
+      allowBackorder: true,
+    },
+  });
+
+  const productMap = new Map(products.map(p => [p.id, p]));
   const errors: StockValidationError[] = [];
 
   for (const item of items) {
     if (!item.productId) continue;
 
-    const product = await prisma.product.findUnique({
-      where: { id: item.productId },
-      select: {
-        id: true,
-        name: true,
-        stockQuantity: true,
-        trackInventory: true,
-        allowBackorder: true,
-      },
-    });
+    const product = productMap.get(item.productId);
+    if (!product) {
+      console.warn(`Product not found for stock validation: ${item.productId}`);
+      continue;
+    }
 
-    if (!product) continue;
+    // Skip validation if tracking is disabled or backorders allowed
+    if (!product.trackInventory || product.allowBackorder) continue;
+
+    // Check if requested quantity exceeds available stock
+    if (product.stockQuantity < item.quantity) {
+      errors.push({
+        productId: product.id,
+        productName: item.productName || product.name,
+        requested: item.quantity,
+        available: product.stockQuantity,
+        allowBackorder: product.allowBackorder,
+      });
+    }
+  }
+
+  return {
+    valid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Validate stock availability within a transaction (race-condition safe)
+ * Uses the transaction client to ensure consistent reads with subsequent decrements
+ */
+export async function validateStockInTransaction(
+  tx: PrismaTransaction,
+  items: OrderItemForStock[]
+): Promise<StockValidationResult> {
+  const productIds = items
+    .map(item => item.productId)
+    .filter((id): id is string => !!id);
+
+  if (productIds.length === 0) {
+    return { valid: true, errors: [] };
+  }
+
+  // Batch query all products within the transaction
+  const products = await tx.product.findMany({
+    where: { id: { in: productIds } },
+    select: {
+      id: true,
+      name: true,
+      stockQuantity: true,
+      trackInventory: true,
+      allowBackorder: true,
+    },
+  });
+
+  const productMap = new Map(products.map(p => [p.id, p]));
+  const errors: StockValidationError[] = [];
+
+  for (const item of items) {
+    if (!item.productId) continue;
+
+    const product = productMap.get(item.productId);
+    if (!product) {
+      console.warn(`Product not found for stock validation: ${item.productId}`);
+      continue;
+    }
 
     // Skip validation if tracking is disabled or backorders allowed
     if (!product.trackInventory || product.allowBackorder) continue;
@@ -120,6 +196,7 @@ export async function validateStockForOrder(
 /**
  * Decrement stock for a product (within a transaction)
  * Creates an inventory log entry
+ * @param lowStockThreshold - Optional pre-fetched threshold to avoid repeated queries
  */
 export async function decrementStock(
   tx: PrismaTransaction,
@@ -128,7 +205,8 @@ export async function decrementStock(
   quantity: number,
   reason: InventoryReason,
   userId: string,
-  notes?: string
+  notes?: string,
+  lowStockThreshold?: number
 ): Promise<void> {
   // Get current product state
   const product = await tx.product.findUnique({
@@ -141,7 +219,10 @@ export async function decrementStock(
     },
   });
 
-  if (!product) return;
+  if (!product) {
+    console.warn(`Product not found for stock decrement: ${productId}`);
+    return;
+  }
   if (!product.trackInventory) return;
 
   // Calculate new quantity (don't go below 0)
@@ -149,15 +230,19 @@ export async function decrementStock(
   const newQuantity = Math.max(0, previousQuantity - quantity);
   const actualChange = previousQuantity - newQuantity;
 
-  // Get global threshold for status calculation
-  const settings = await tx.siteSettings.findFirst({
-    select: { lowStockThreshold: true },
-  });
+  // Get global threshold for status calculation (use passed value or fetch)
+  let threshold = lowStockThreshold;
+  if (threshold === undefined) {
+    const settings = await tx.siteSettings.findFirst({
+      select: { lowStockThreshold: true },
+    });
+    threshold = settings?.lowStockThreshold;
+  }
 
   const newStatus = calculateStockStatus(
     newQuantity,
     product.minStockLevel,
-    settings?.lowStockThreshold
+    threshold
   );
 
   // Update product stock
@@ -204,6 +289,7 @@ export async function decrementStock(
 /**
  * Increment stock for a product (within a transaction)
  * Creates an inventory log entry
+ * @param lowStockThreshold - Optional pre-fetched threshold to avoid repeated queries
  */
 export async function incrementStock(
   tx: PrismaTransaction,
@@ -212,7 +298,8 @@ export async function incrementStock(
   quantity: number,
   reason: InventoryReason,
   userId: string,
-  notes?: string
+  notes?: string,
+  lowStockThreshold?: number
 ): Promise<void> {
   // Get current product state
   const product = await tx.product.findUnique({
@@ -225,22 +312,29 @@ export async function incrementStock(
     },
   });
 
-  if (!product) return;
+  if (!product) {
+    console.warn(`Product not found for stock increment: ${productId}`);
+    return;
+  }
   if (!product.trackInventory) return;
 
   // Calculate new quantity
   const previousQuantity = product.stockQuantity;
   const newQuantity = previousQuantity + quantity;
 
-  // Get global threshold for status calculation
-  const settings = await tx.siteSettings.findFirst({
-    select: { lowStockThreshold: true },
-  });
+  // Get global threshold for status calculation (use passed value or fetch)
+  let threshold = lowStockThreshold;
+  if (threshold === undefined) {
+    const settings = await tx.siteSettings.findFirst({
+      select: { lowStockThreshold: true },
+    });
+    threshold = settings?.lowStockThreshold;
+  }
 
   const newStatus = calculateStockStatus(
     newQuantity,
     product.minStockLevel,
-    settings?.lowStockThreshold
+    threshold
   );
 
   // Update product stock
@@ -291,6 +385,7 @@ export async function incrementStock(
 /**
  * Process stock decrement for all items in an order
  * Should be called within a transaction during order creation
+ * Pre-fetches settings once to avoid N+1 on settings
  */
 export async function processOrderStockDecrement(
   tx: PrismaTransaction,
@@ -298,6 +393,12 @@ export async function processOrderStockDecrement(
   items: OrderItemForStock[],
   userId: string
 ): Promise<void> {
+  // Pre-fetch settings once for all items
+  const settings = await tx.siteSettings.findFirst({
+    select: { lowStockThreshold: true },
+  });
+  const lowStockThreshold = settings?.lowStockThreshold;
+
   for (const item of items) {
     if (!item.productId) continue;
 
@@ -308,7 +409,8 @@ export async function processOrderStockDecrement(
       item.quantity,
       'sale',
       userId,
-      `Order: ${orderId}`
+      `Order: ${orderId}`,
+      lowStockThreshold
     );
   }
 }
@@ -316,11 +418,25 @@ export async function processOrderStockDecrement(
 /**
  * Restore stock for all items in an order (cancellation/refund)
  * Creates new transaction if not already in one
+ * Includes idempotency check to prevent double restoration
  */
 export async function processOrderStockRestore(
   orderId: string,
   userId: string
-): Promise<void> {
+): Promise<{ restored: boolean; alreadyRestored: boolean }> {
+  // Check if stock was already restored (idempotency)
+  const existingRestoration = await prisma.inventoryLog.findFirst({
+    where: {
+      notes: { contains: orderId },
+      reason: 'return_item',
+    },
+  });
+
+  if (existingRestoration) {
+    console.warn(`Stock already restored for order: ${orderId}`);
+    return { restored: false, alreadyRestored: true };
+  }
+
   // Get order with items
   const order = await prisma.order.findUnique({
     where: { id: orderId },
@@ -335,10 +451,19 @@ export async function processOrderStockRestore(
     },
   });
 
-  if (!order) return;
+  if (!order) {
+    console.warn(`Order not found for stock restoration: ${orderId}`);
+    return { restored: false, alreadyRestored: false };
+  }
 
   // Process stock restoration in a transaction
   await prisma.$transaction(async (tx) => {
+    // Pre-fetch settings once for all items
+    const settings = await tx.siteSettings.findFirst({
+      select: { lowStockThreshold: true },
+    });
+    const lowStockThreshold = settings?.lowStockThreshold;
+
     for (const item of order.items) {
       if (!item.productId) continue;
 
@@ -349,10 +474,13 @@ export async function processOrderStockRestore(
         item.quantity,
         'return_item',
         userId,
-        `Order cancelled/refunded: ${orderId}`
+        `Order cancelled/refunded: ${orderId}`,
+        lowStockThreshold
       );
     }
   });
+
+  return { restored: true, alreadyRestored: false };
 }
 
 // ═══════════════════════════════════════════════════════════════

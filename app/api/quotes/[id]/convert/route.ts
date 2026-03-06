@@ -9,8 +9,18 @@ import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth/session';
 import {
   processOrderStockDecrement,
+  validateStockInTransaction,
   getInventorySettings,
+  StockValidationError,
 } from '@/lib/services/inventoryService';
+
+// Custom error for stock validation failures
+class StockValidationException extends Error {
+  constructor(public errors: StockValidationError[]) {
+    super('Insufficient stock');
+    this.name = 'StockValidationException';
+  }
+}
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -70,10 +80,32 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Get inventory settings
+    const inventorySettings = await getInventorySettings();
+
     // Create the order in a transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // Create the order
-      const order = await tx.order.create({
+    let result;
+    try {
+      result = await prisma.$transaction(async (tx) => {
+        // Validate stock INSIDE transaction to prevent race conditions
+        if (inventorySettings.trackInventory && !inventorySettings.allowBackorders) {
+          const validation = await validateStockInTransaction(
+            tx,
+            quote.items.map((item) => ({
+              productId: item.productId || '',
+              variantId: null,
+              quantity: item.quantity,
+              productName: item.productName,
+            }))
+          );
+
+          if (!validation.valid) {
+            throw new StockValidationException(validation.errors);
+          }
+        }
+
+        // Create the order
+        const order = await tx.order.create({
         data: {
           orderNumber: generateOrderNumber(),
           customerId: quote.customerId || '',
@@ -112,7 +144,6 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       });
 
       // Decrement stock for all items if inventory tracking is enabled
-      const inventorySettings = await getInventorySettings();
       if (inventorySettings.trackInventory) {
         await processOrderStockDecrement(
           tx,
@@ -146,8 +177,21 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         });
       }
 
-      return order;
-    });
+        return order;
+      });
+    } catch (error) {
+      // Handle stock validation errors specifically
+      if (error instanceof StockValidationException) {
+        return NextResponse.json(
+          {
+            error: 'Insufficient stock for one or more items',
+            details: error.errors,
+          },
+          { status: 400 }
+        );
+      }
+      throw error; // Re-throw other errors to be caught by outer try-catch
+    }
 
     return NextResponse.json({
       success: true,

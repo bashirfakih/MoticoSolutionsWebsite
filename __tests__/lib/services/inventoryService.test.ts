@@ -6,10 +6,12 @@
 
 // Mock Prisma
 const mockProductFindUnique = jest.fn();
+const mockProductFindMany = jest.fn();
 const mockProductUpdate = jest.fn();
 const mockOrderFindUnique = jest.fn();
 const mockSiteSettingsFind = jest.fn();
 const mockInventoryLogCreate = jest.fn();
+const mockInventoryLogFindFirst = jest.fn();
 const mockProductVariantFindUnique = jest.fn();
 const mockProductVariantUpdate = jest.fn();
 const mockTransaction = jest.fn();
@@ -18,6 +20,7 @@ jest.mock('@/lib/db', () => ({
   prisma: {
     product: {
       findUnique: (...args: unknown[]) => mockProductFindUnique(...args),
+      findMany: (...args: unknown[]) => mockProductFindMany(...args),
       update: (...args: unknown[]) => mockProductUpdate(...args),
     },
     order: {
@@ -28,6 +31,7 @@ jest.mock('@/lib/db', () => ({
     },
     inventoryLog: {
       create: (...args: unknown[]) => mockInventoryLogCreate(...args),
+      findFirst: (...args: unknown[]) => mockInventoryLogFindFirst(...args),
     },
     productVariant: {
       findUnique: (...args: unknown[]) => mockProductVariantFindUnique(...args),
@@ -91,13 +95,13 @@ describe('Inventory Service', () => {
 
   describe('validateStockForOrder', () => {
     it('returns valid when all items have sufficient stock', async () => {
-      mockProductFindUnique.mockResolvedValue({
+      mockProductFindMany.mockResolvedValue([{
         id: 'prod-1',
         name: 'Product 1',
         stockQuantity: 10,
         trackInventory: true,
         allowBackorder: false,
-      });
+      }]);
 
       const result = await validateStockForOrder([
         { productId: 'prod-1', quantity: 5 },
@@ -108,13 +112,13 @@ describe('Inventory Service', () => {
     });
 
     it('returns invalid when stock is insufficient', async () => {
-      mockProductFindUnique.mockResolvedValue({
+      mockProductFindMany.mockResolvedValue([{
         id: 'prod-1',
         name: 'Test Product',
         stockQuantity: 5,
         trackInventory: true,
         allowBackorder: false,
-      });
+      }]);
 
       const result = await validateStockForOrder([
         { productId: 'prod-1', quantity: 10, productName: 'Test Product' },
@@ -132,13 +136,13 @@ describe('Inventory Service', () => {
     });
 
     it('skips validation when trackInventory is false', async () => {
-      mockProductFindUnique.mockResolvedValue({
+      mockProductFindMany.mockResolvedValue([{
         id: 'prod-1',
         name: 'Product 1',
         stockQuantity: 0,
         trackInventory: false,
         allowBackorder: false,
-      });
+      }]);
 
       const result = await validateStockForOrder([
         { productId: 'prod-1', quantity: 10 },
@@ -149,13 +153,13 @@ describe('Inventory Service', () => {
     });
 
     it('skips validation when allowBackorder is true', async () => {
-      mockProductFindUnique.mockResolvedValue({
+      mockProductFindMany.mockResolvedValue([{
         id: 'prod-1',
         name: 'Product 1',
         stockQuantity: 0,
         trackInventory: true,
         allowBackorder: true,
-      });
+      }]);
 
       const result = await validateStockForOrder([
         { productId: 'prod-1', quantity: 10 },
@@ -171,11 +175,11 @@ describe('Inventory Service', () => {
       ]);
 
       expect(result.valid).toBe(true);
-      expect(mockProductFindUnique).not.toHaveBeenCalled();
+      expect(mockProductFindMany).not.toHaveBeenCalled();
     });
 
     it('skips items when product not found', async () => {
-      mockProductFindUnique.mockResolvedValue(null);
+      mockProductFindMany.mockResolvedValue([]);
 
       const result = await validateStockForOrder([
         { productId: 'non-existent', quantity: 10 },
@@ -186,21 +190,22 @@ describe('Inventory Service', () => {
     });
 
     it('validates multiple items', async () => {
-      mockProductFindUnique
-        .mockResolvedValueOnce({
+      mockProductFindMany.mockResolvedValue([
+        {
           id: 'prod-1',
           name: 'Product 1',
           stockQuantity: 10,
           trackInventory: true,
           allowBackorder: false,
-        })
-        .mockResolvedValueOnce({
+        },
+        {
           id: 'prod-2',
           name: 'Product 2',
           stockQuantity: 3,
           trackInventory: true,
           allowBackorder: false,
-        });
+        },
+      ]);
 
       const result = await validateStockForOrder([
         { productId: 'prod-1', quantity: 5 },
@@ -480,6 +485,9 @@ describe('Inventory Service', () => {
 
   describe('processOrderStockRestore', () => {
     it('restores stock for all items in cancelled order', async () => {
+      // No existing restoration
+      mockInventoryLogFindFirst.mockResolvedValue(null);
+
       mockOrderFindUnique.mockResolvedValue({
         id: 'order-1',
         items: [
@@ -517,8 +525,10 @@ describe('Inventory Service', () => {
         return fn(mockTx);
       });
 
-      await processOrderStockRestore('order-1', 'user-1');
+      const result = await processOrderStockRestore('order-1', 'user-1');
 
+      expect(result.restored).toBe(true);
+      expect(result.alreadyRestored).toBe(false);
       expect(mockOrderFindUnique).toHaveBeenCalledWith({
         where: { id: 'order-1' },
         include: {
@@ -535,10 +545,30 @@ describe('Inventory Service', () => {
     });
 
     it('does nothing when order not found', async () => {
+      // No existing restoration
+      mockInventoryLogFindFirst.mockResolvedValue(null);
       mockOrderFindUnique.mockResolvedValue(null);
 
-      await processOrderStockRestore('non-existent', 'user-1');
+      const result = await processOrderStockRestore('non-existent', 'user-1');
 
+      expect(result.restored).toBe(false);
+      expect(result.alreadyRestored).toBe(false);
+      expect(mockTransaction).not.toHaveBeenCalled();
+    });
+
+    it('returns alreadyRestored when stock was already restored', async () => {
+      // Existing restoration found
+      mockInventoryLogFindFirst.mockResolvedValue({
+        id: 'log-1',
+        notes: 'Order cancelled/refunded: order-1',
+        reason: 'return_item',
+      });
+
+      const result = await processOrderStockRestore('order-1', 'user-1');
+
+      expect(result.restored).toBe(false);
+      expect(result.alreadyRestored).toBe(true);
+      expect(mockOrderFindUnique).not.toHaveBeenCalled();
       expect(mockTransaction).not.toHaveBeenCalled();
     });
   });

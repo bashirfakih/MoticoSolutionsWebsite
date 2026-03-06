@@ -202,6 +202,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       );
     }
 
+    // Restore stock if order was pending (not cancelled - already restored)
+    // Stock was decremented when order was created, so restore it before deletion
+    if (order.status === 'pending') {
+      const user = await getCurrentUser();
+      const userId = user?.id || 'system';
+      await processOrderStockRestore(id, userId);
+    }
+
     // Update customer stats if needed
     if (order.paymentStatus === 'paid') {
       await prisma.customer.update({

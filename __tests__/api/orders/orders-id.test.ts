@@ -17,6 +17,12 @@ const mockOrderFindUnique = jest.fn();
 const mockOrderUpdate = jest.fn();
 const mockOrderDelete = jest.fn();
 const mockCustomerUpdate = jest.fn();
+const mockInventoryLogFindFirst = jest.fn();
+const mockInventoryLogCreate = jest.fn();
+const mockProductFindUnique = jest.fn();
+const mockProductUpdate = jest.fn();
+const mockSiteSettingsFindFirst = jest.fn();
+const mockTransaction = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   prisma: {
@@ -28,7 +34,25 @@ jest.mock('@/lib/db', () => ({
     customer: {
       update: (...args: unknown[]) => mockCustomerUpdate(...args),
     },
+    inventoryLog: {
+      findFirst: (...args: unknown[]) => mockInventoryLogFindFirst(...args),
+      create: (...args: unknown[]) => mockInventoryLogCreate(...args),
+    },
+    product: {
+      findUnique: (...args: unknown[]) => mockProductFindUnique(...args),
+      update: (...args: unknown[]) => mockProductUpdate(...args),
+    },
+    siteSettings: {
+      findFirst: (...args: unknown[]) => mockSiteSettingsFindFirst(...args),
+    },
+    $transaction: (fn: (tx: unknown) => Promise<unknown>) => mockTransaction(fn),
   },
+}));
+
+// Mock auth session
+const mockGetCurrentUser = jest.fn();
+jest.mock('@/lib/auth/session', () => ({
+  getCurrentUser: () => mockGetCurrentUser(),
 }));
 
 // Import route handlers after mocks
@@ -38,6 +62,14 @@ describe('Orders [id] API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCustomerUpdate.mockResolvedValue({});
+    // Default mocks for inventory service operations
+    mockInventoryLogFindFirst.mockResolvedValue(null); // No existing restoration
+    mockInventoryLogCreate.mockResolvedValue({});
+    mockProductFindUnique.mockResolvedValue(null);
+    mockProductUpdate.mockResolvedValue({});
+    mockSiteSettingsFindFirst.mockResolvedValue({ lowStockThreshold: 10 });
+    // Default mock for auth
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', role: 'admin' });
   });
 
   // ═══════════════════════════════════════════════════════════════
@@ -397,14 +429,38 @@ describe('Orders [id] API', () => {
   describe('DELETE /api/orders/[id]', () => {
     describe('Success (200)', () => {
       it('deletes pending order', async () => {
-        mockOrderFindUnique.mockResolvedValue({
-          id: 'order-1',
-          status: 'pending',
-          paymentStatus: 'pending',
-          customerId: 'cust-1',
-          total: 100,
-        });
+        // First call: route handler checks if order exists and status
+        // Second call: processOrderStockRestore gets order with items
+        mockOrderFindUnique
+          .mockResolvedValueOnce({
+            id: 'order-1',
+            status: 'pending',
+            paymentStatus: 'pending',
+            customerId: 'cust-1',
+            total: 100,
+          })
+          .mockResolvedValueOnce({
+            id: 'order-1',
+            items: [], // No items - no stock to restore
+          });
         mockOrderDelete.mockResolvedValue({});
+
+        // Mock transaction for stock restore
+        mockTransaction.mockImplementation(async (fn) => {
+          const mockTx = {
+            product: {
+              findUnique: jest.fn().mockResolvedValue(null),
+              update: jest.fn(),
+            },
+            inventoryLog: {
+              create: jest.fn(),
+            },
+            siteSettings: {
+              findFirst: jest.fn().mockResolvedValue({ lowStockThreshold: 10 }),
+            },
+          };
+          return fn(mockTx);
+        });
 
         const request = createMockRequest('http://localhost/api/orders/order-1', { method: 'DELETE' });
         const params = createRouteParams({ id: 'order-1' });
@@ -418,6 +474,7 @@ describe('Orders [id] API', () => {
       });
 
       it('deletes cancelled order', async () => {
+        // Cancelled orders don't need stock restoration (already restored on cancel)
         mockOrderFindUnique.mockResolvedValue({
           id: 'order-1',
           status: 'cancelled',
@@ -436,14 +493,38 @@ describe('Orders [id] API', () => {
       });
 
       it('decrements customer stats for paid deleted orders', async () => {
-        mockOrderFindUnique.mockResolvedValue({
-          id: 'order-1',
-          status: 'pending',
-          paymentStatus: 'paid',
-          customerId: 'cust-1',
-          total: 150,
-        });
+        // First call: route handler checks if order exists
+        // Second call: processOrderStockRestore gets order with items
+        mockOrderFindUnique
+          .mockResolvedValueOnce({
+            id: 'order-1',
+            status: 'pending',
+            paymentStatus: 'paid',
+            customerId: 'cust-1',
+            total: 150,
+          })
+          .mockResolvedValueOnce({
+            id: 'order-1',
+            items: [], // No items
+          });
         mockOrderDelete.mockResolvedValue({});
+
+        // Mock transaction for stock restore
+        mockTransaction.mockImplementation(async (fn) => {
+          const mockTx = {
+            product: {
+              findUnique: jest.fn().mockResolvedValue(null),
+              update: jest.fn(),
+            },
+            inventoryLog: {
+              create: jest.fn(),
+            },
+            siteSettings: {
+              findFirst: jest.fn().mockResolvedValue({ lowStockThreshold: 10 }),
+            },
+          };
+          return fn(mockTx);
+        });
 
         const request = createMockRequest('http://localhost/api/orders/order-1', { method: 'DELETE' });
         const params = createRouteParams({ id: 'order-1' });

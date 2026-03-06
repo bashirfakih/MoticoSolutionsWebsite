@@ -9,10 +9,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 import {
-  validateStockForOrder,
+  validateStockInTransaction,
   processOrderStockDecrement,
   getInventorySettings,
+  StockValidationError,
 } from '@/lib/services/inventoryService';
+
+// Custom error for stock validation failures
+class StockValidationException extends Error {
+  constructor(public errors: StockValidationError[]) {
+    super('Insufficient stock');
+    this.name = 'StockValidationException';
+  }
+}
 
 // Generate unique order number
 function generateOrderNumber(): string {
@@ -144,34 +153,33 @@ export async function POST(request: NextRequest) {
     const discount = body.discount || 0;
     const total = subtotal + shippingCost + tax - discount;
 
-    // Get inventory settings and validate stock
+    // Get inventory settings
     const inventorySettings = await getInventorySettings();
 
-    if (inventorySettings.trackInventory) {
-      const validation = await validateStockForOrder(
-        body.items.map((item: { productId: string; variantId?: string; quantity: number; productName?: string }) => ({
-          productId: item.productId,
-          variantId: item.variantId,
-          quantity: item.quantity,
-          productName: item.productName,
-        }))
-      );
+    // Create order with items, validate stock, and decrement - all in a single transaction
+    // This prevents TOCTOU race conditions where stock could be depleted between validation and decrement
+    let order;
+    try {
+      order = await prisma.$transaction(async (tx) => {
+        // Validate stock INSIDE transaction to prevent race conditions
+        if (inventorySettings.trackInventory && !inventorySettings.allowBackorders) {
+          const validation = await validateStockInTransaction(
+            tx,
+            body.items.map((item: { productId: string; variantId?: string; quantity: number; productName?: string }) => ({
+              productId: item.productId,
+              variantId: item.variantId,
+              quantity: item.quantity,
+              productName: item.productName,
+            }))
+          );
 
-      if (!validation.valid && !inventorySettings.allowBackorders) {
-        return NextResponse.json(
-          {
-            error: 'Insufficient stock for one or more items',
-            details: validation.errors,
-          },
-          { status: 400 }
-        );
-      }
-    }
+          if (!validation.valid) {
+            throw new StockValidationException(validation.errors);
+          }
+        }
 
-    // Create order with items and decrement stock in a transaction
-    const order = await prisma.$transaction(async (tx) => {
-      // Create the order
-      const newOrder = await tx.order.create({
+        // Create the order
+        const newOrder = await tx.order.create({
         data: {
           orderNumber: generateOrderNumber(),
           customerId: body.customerId,
@@ -243,8 +251,21 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      return newOrder;
-    });
+        return newOrder;
+      });
+    } catch (error) {
+      // Handle stock validation errors specifically
+      if (error instanceof StockValidationException) {
+        return NextResponse.json(
+          {
+            error: 'Insufficient stock for one or more items',
+            details: error.errors,
+          },
+          { status: 400 }
+        );
+      }
+      throw error; // Re-throw other errors to be caught by outer try-catch
+    }
 
     return NextResponse.json({
       ...order,
