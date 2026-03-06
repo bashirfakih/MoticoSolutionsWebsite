@@ -9,7 +9,7 @@
  * @module app/account/layout
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -27,9 +27,10 @@ import {
   X,
   ChevronDown,
   Bell,
-  ArrowLeft,
   HelpCircle,
   MessageSquare,
+  ShoppingBag,
+  Store,
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════════
@@ -241,7 +242,25 @@ function Sidebar({
 // ═══════════════════════════════════════════════════════════════
 
 function TopHeader({ onMenuClick }: { onMenuClick: () => void }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleLogout = async () => {
+    await logout();
+    window.location.href = '/';
+  };
 
   return (
     <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-6">
@@ -254,13 +273,14 @@ function TopHeader({ onMenuClick }: { onMenuClick: () => void }) {
           <Menu className="w-5 h-5" />
         </button>
 
-        {/* Back to Shop */}
+        {/* Continue Shopping Button - Prominent */}
         <Link
           href="/products"
-          className="hidden sm:flex items-center gap-2 text-sm text-gray-600 hover:text-[#004D8B] transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003a6a] transition-colors text-sm font-medium"
         >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Shop
+          <ShoppingBag className="w-4 h-4" />
+          <span className="hidden sm:inline">Continue Shopping</span>
+          <span className="sm:hidden">Shop</span>
         </Link>
       </div>
 
@@ -272,12 +292,70 @@ function TopHeader({ onMenuClick }: { onMenuClick: () => void }) {
           <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
         </button>
 
-        {/* User Menu */}
-        <div className="hidden sm:flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#004D8B] flex items-center justify-center text-white font-medium text-sm">
-            {user?.name?.charAt(0).toUpperCase() || 'U'}
-          </div>
-          <ChevronDown className="w-4 h-4 text-gray-400" />
+        {/* User Menu Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <button
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+            className="flex items-center gap-2 p-1 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full bg-[#004D8B] flex items-center justify-center text-white font-medium text-sm">
+              {user?.name?.charAt(0).toUpperCase() || 'U'}
+            </div>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`} />
+          </button>
+
+          {/* Dropdown Menu */}
+          {dropdownOpen && (
+            <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
+              {/* User Info */}
+              <div className="px-4 py-3 border-b border-gray-100">
+                <p className="font-semibold text-gray-900">{user?.name || 'Customer'}</p>
+                <p className="text-sm text-gray-500 truncate">{user?.email}</p>
+                {user?.company && (
+                  <p className="text-xs text-gray-400 mt-1">{user.company}</p>
+                )}
+              </div>
+
+              {/* Quick Actions */}
+              <div className="py-2 border-b border-gray-100">
+                <Link
+                  href="/products"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <Store className="w-4 h-4 text-gray-400" />
+                  Browse Products
+                </Link>
+                <Link
+                  href="/account/profile"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <User className="w-4 h-4 text-gray-400" />
+                  My Profile
+                </Link>
+                <Link
+                  href="/account/orders"
+                  onClick={() => setDropdownOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  <ShoppingCart className="w-4 h-4 text-gray-400" />
+                  My Orders
+                </Link>
+              </div>
+
+              {/* Logout */}
+              <div className="py-2">
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

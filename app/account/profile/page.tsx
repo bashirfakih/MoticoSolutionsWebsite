@@ -27,6 +27,8 @@ import {
   AlertCircle,
   Camera,
   Save,
+  Percent,
+  Info,
 } from 'lucide-react';
 
 // ═══════════════════════════════════════════════════════════════
@@ -243,6 +245,55 @@ export default function ProfilePage() {
               Member since {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'N/A'}
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Your Pricing / Discount Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Percent className="w-5 h-5 text-[#004D8B]" />
+          <h2 className="text-lg font-semibold text-gray-900">Your Pricing</h2>
+        </div>
+
+        <div className="flex items-start gap-4">
+          {/* Discount Display */}
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <div className={`px-4 py-3 rounded-lg ${
+                (user?.discountPercentage ?? 0) > 0
+                  ? 'bg-green-50 border border-green-200'
+                  : 'bg-gray-50 border border-gray-200'
+              }`}>
+                <p className="text-sm text-gray-500 mb-1">Your Discount Rate</p>
+                <p className={`text-2xl font-bold ${
+                  (user?.discountPercentage ?? 0) > 0 ? 'text-green-600' : 'text-gray-600'
+                }`}>
+                  {user?.discountPercentage ?? 0}%
+                </p>
+              </div>
+
+              {(user?.discountPercentage ?? 0) > 0 && (
+                <div className="text-sm text-gray-600">
+                  <p className="font-medium text-green-700">Special pricing applied!</p>
+                  <p className="text-gray-500">
+                    You receive {user?.discountPercentage}% off on all products.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Info Message */}
+        <div className="mt-4 flex items-start gap-2 p-3 bg-blue-50 border border-blue-100 rounded-lg">
+          <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-blue-700">
+            Your discount rate is set by Motico Solutions based on your account agreement.
+            To discuss pricing adjustments, please{' '}
+            <a href="/account/support" className="font-medium underline hover:no-underline">
+              contact our sales team
+            </a>.
+          </p>
         </div>
       </div>
 
