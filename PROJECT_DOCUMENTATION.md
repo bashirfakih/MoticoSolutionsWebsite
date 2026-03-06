@@ -509,6 +509,56 @@ Pending → Under Review → Quoted → Accepted/Rejected → Order Created
 - Manage customers
 - Update settings
 
+### 1b. Analytics Dashboard (`/admin/analytics`)
+
+**Time Range Filter:**
+- Last 7 days
+- Last 30 days (default)
+- Last 90 days
+- Last 365 days
+
+**Summary Statistics:**
+
+- Total Revenue with period comparison (% change)
+- Total Orders with period comparison
+- Total Quotes
+- Total Customers
+- Average Order Value
+
+**Trend Charts (using Recharts AreaChart):**
+
+- **Revenue Trend**: Daily revenue over selected period with gradient fill
+- **Orders Trend**: Daily order count with gradient fill
+- **Customer Growth**: New customers per day with gradient fill
+
+**Performance Charts (using Recharts BarChart):**
+
+- **Category Performance**: Horizontal bar chart showing revenue by category
+  - Displays top 10 categories sorted by revenue
+  - Includes orders count and quantity sold
+  - Color-coded bars with legend
+- **Brand Performance**: Horizontal bar chart showing revenue by brand
+  - Displays top 10 brands sorted by revenue
+  - Includes orders count and quantity sold
+  - Color-coded bars with legend
+
+**Distribution Charts (using Recharts PieChart):**
+
+- Order Status Breakdown (pending, confirmed, shipped, delivered)
+- Payment Status Breakdown (pending, paid, failed)
+- Quote Status Breakdown (pending, quoted, accepted, rejected)
+- Message Type Distribution
+
+**Top Products Table:**
+
+- Top 10 products by revenue
+- Shows product name, quantity sold, revenue
+
+**Reusable Chart Components:**
+
+- `TrendChart`: Area chart for time-series data with customizable colors
+- `PerformanceChart`: Horizontal bar chart for category/brand metrics
+
 ### 2. Product Management
 
 **Product List:**
@@ -1197,6 +1247,7 @@ model QuoteItem {
 | `/api/settings` | GET | Get settings | No |
 | `/api/settings` | PATCH | Update settings | Admin |
 | `/api/dashboard/stats` | GET | Dashboard metrics | Admin |
+| `/api/analytics` | GET | Analytics charts data | Admin |
 | `/api/messages` | GET | List messages | Admin |
 | `/api/messages` | POST | Create message | User |
 | `/api/messages/[id]` | PATCH | Update message | Admin |
@@ -1422,11 +1473,11 @@ export function middleware(request: NextRequest) {
 
 ### Test Coverage
 
-**Total Tests**: 180+
+**Total Tests**: 205+
 
 **Test Categories:**
 
-1. **API Routes** (85 tests)
+1. **API Routes** (110+ tests)
    - Authentication endpoints
    - Product CRUD operations
    - Order management
@@ -1435,6 +1486,7 @@ export function middleware(request: NextRequest) {
    - CMS endpoints
    - **User discount routes** (create, update, validate 0-100%)
    - **Quote order flow** (specs, pricing, user linking)
+   - **Analytics API** (authentication, period filtering, aggregation)
 
 2. **Components** (35 tests)
    - UI components
@@ -1632,6 +1684,10 @@ motico-solutions/
 │   │   ├── DataTable.tsx
 │   │   ├── ImageUpload.tsx    # Drag-drop upload with cropping
 │   │   ├── ImageCropper.tsx   # Zoom/position/crop modal
+│   │   ├── charts/            # Analytics chart components
+│   │   │   ├── TrendChart.tsx     # Area chart for time-series
+│   │   │   ├── PerformanceChart.tsx # Horizontal bar chart
+│   │   │   └── index.ts
 │   │   └── ...
 │   ├── ui/                    # UI components
 │   │   ├── Button.tsx
@@ -1745,7 +1801,7 @@ motico-solutions/
 ### Phase 1 (Q2 2026)
 - [ ] Payment gateway integration (Stripe/PayPal)
 - [ ] Real-time inventory sync
-- [ ] Advanced analytics dashboard
+- [x] Advanced analytics dashboard
 - [ ] Product reviews and ratings
 - [ ] Wishlist functionality
 - [ ] Product comparison
@@ -1894,7 +1950,24 @@ This software is proprietary and confidential. Unauthorized copying, distributio
 
 ## Changelog
 
-### Version 1.3.0 (Current)
+### Version 1.4.0 (Current)
+
+**Analytics Dashboard:**
+
+- ✅ Full analytics page at `/admin/analytics`
+- ✅ Time range filter (7, 30, 90, 365 days)
+- ✅ Summary statistics with period comparison
+- ✅ Revenue trend chart (Recharts AreaChart)
+- ✅ Orders trend chart (Recharts AreaChart)
+- ✅ Customer growth chart (Recharts AreaChart)
+- ✅ Category performance chart (horizontal bar chart)
+- ✅ Brand performance chart (horizontal bar chart)
+- ✅ Reusable TrendChart component
+- ✅ Reusable PerformanceChart component
+- ✅ Analytics API endpoint with category/brand aggregation
+- ✅ Comprehensive analytics API tests (25+ tests)
+
+### Version 1.3.0
 
 **Shopping Cart System:**
 
@@ -1982,6 +2055,6 @@ This software is proprietary and confidential. Unauthorized copying, distributio
 
 ---
 
-**Document Version**: 1.3
+**Document Version**: 1.4
 **Last Updated**: March 6, 2026
 **Maintained By**: Motico Solutions Development Team

@@ -155,6 +155,96 @@ export async function GET(request: NextRequest) {
       revenue: Number(item._sum.totalPrice || 0),
     }));
 
+    // Category performance - aggregate order items by category
+    const orderItemsWithCategory = await prisma.orderItem.findMany({
+      where: {
+        order: {
+          createdAt: { gte: startDate },
+        },
+      },
+      select: {
+        quantity: true,
+        totalPrice: true,
+        product: {
+          select: {
+            category: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const categoryPerformanceMap = new Map<string, { name: string; orders: number; revenue: number; quantity: number }>();
+    for (const item of orderItemsWithCategory) {
+      const categoryId = item.product.category.id;
+      const categoryName = item.product.category.name;
+      const existing = categoryPerformanceMap.get(categoryId) || { name: categoryName, orders: 0, revenue: 0, quantity: 0 };
+      existing.orders += 1;
+      existing.revenue += Number(item.totalPrice);
+      existing.quantity += item.quantity;
+      categoryPerformanceMap.set(categoryId, existing);
+    }
+
+    const categoryPerformance = Array.from(categoryPerformanceMap.entries())
+      .map(([id, data]) => ({
+        id,
+        name: data.name,
+        orders: data.orders,
+        revenue: Math.round(data.revenue * 100) / 100,
+        quantity: data.quantity,
+      }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 10);
+
+    // Brand performance - aggregate order items by brand
+    const orderItemsWithBrand = await prisma.orderItem.findMany({
+      where: {
+        order: {
+          createdAt: { gte: startDate },
+        },
+      },
+      select: {
+        quantity: true,
+        totalPrice: true,
+        product: {
+          select: {
+            brand: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const brandPerformanceMap = new Map<string, { name: string; orders: number; revenue: number; quantity: number }>();
+    for (const item of orderItemsWithBrand) {
+      const brandId = item.product.brand.id;
+      const brandName = item.product.brand.name;
+      const existing = brandPerformanceMap.get(brandId) || { name: brandName, orders: 0, revenue: 0, quantity: 0 };
+      existing.orders += 1;
+      existing.revenue += Number(item.totalPrice);
+      existing.quantity += item.quantity;
+      brandPerformanceMap.set(brandId, existing);
+    }
+
+    const brandPerformance = Array.from(brandPerformanceMap.entries())
+      .map(([id, data]) => ({
+        id,
+        name: data.name,
+        orders: data.orders,
+        revenue: Math.round(data.revenue * 100) / 100,
+        quantity: data.quantity,
+      }))
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 10);
+
     // Calculate comparison with previous period
     const previousStartDate = new Date(startDate);
     previousStartDate.setDate(previousStartDate.getDate() - days);
@@ -200,6 +290,8 @@ export async function GET(request: NextRequest) {
         quotesByStatus: Object.entries(quotesByStatus).map(([name, value]) => ({ name, value })),
         messagesByType: Object.entries(messagesByType).map(([name, value]) => ({ name, value })),
         topProducts,
+        categoryPerformance,
+        brandPerformance,
       },
     });
   } catch (error) {

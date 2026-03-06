@@ -4,32 +4,59 @@
  * Admin Analytics Page
  *
  * Dashboard with charts, statistics, and business insights.
+ * Fetches data from /api/analytics endpoint.
  *
  * @module app/admin/analytics/page
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   TrendingUp,
-  TrendingDown,
   DollarSign,
   ShoppingCart,
   Users,
   Package,
-  MessageSquare,
   FileText,
   BarChart3,
   PieChart,
   Calendar,
   ArrowUpRight,
   ArrowDownRight,
+  Loader2,
+  AlertCircle,
+  Layers,
+  Tag,
 } from 'lucide-react';
-import { orderService } from '@/lib/data/orderService';
-import { customerService } from '@/lib/data/customerService';
-import { quoteService } from '@/lib/data/quoteService';
-import { messageService } from '@/lib/data/messageService';
-import { productService } from '@/lib/data/productService';
-import { pluralize } from '@/lib/utils/formatting';
+import { TrendChart, PerformanceChart } from '@/components/admin/charts';
+
+// ═══════════════════════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════════════════════
+
+interface AnalyticsData {
+  period: number;
+  summary: {
+    totalRevenue: number;
+    totalOrders: number;
+    totalQuotes: number;
+    totalCustomers: number;
+    averageOrderValue: number;
+    revenueChange: number;
+    ordersChange: number;
+  };
+  charts: {
+    dailyRevenue: Array<{ date: string; value: number }>;
+    dailyOrders: Array<{ date: string; value: number }>;
+    dailyCustomers: Array<{ date: string; value: number }>;
+    ordersByStatus: Array<{ name: string; value: number }>;
+    ordersByPayment: Array<{ name: string; value: number }>;
+    quotesByStatus: Array<{ name: string; value: number }>;
+    messagesByType: Array<{ name: string; value: number }>;
+    topProducts: Array<{ productId: string; name: string; quantity: number; revenue: number }>;
+    categoryPerformance: Array<{ id: string; name: string; orders: number; revenue: number; quantity: number }>;
+    brandPerformance: Array<{ id: string; name: string; orders: number; revenue: number; quantity: number }>;
+  };
+}
 
 interface StatCard {
   title: string;
@@ -46,131 +73,169 @@ interface ChartData {
   color: string;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// HELPER COMPONENTS
+// ═══════════════════════════════════════════════════════════════
+
+function LoadingState() {
+  return (
+    <div className="flex items-center justify-center h-64">
+      <div className="text-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#004D8B] mx-auto mb-4" />
+        <p className="text-gray-500">Loading analytics...</p>
+      </div>
+    </div>
+  );
+}
+
+function ErrorState({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div className="flex items-center justify-center h-64">
+      <div className="text-center">
+        <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to load analytics</h3>
+        <p className="text-gray-500 mb-4">{message}</p>
+        <button
+          onClick={onRetry}
+          className="px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003a6a] transition-colors"
+        >
+          Retry
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════════════════════════
+
 export default function AdminAnalyticsPage() {
-  const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '12m'>('30d');
-  const [stats, setStats] = useState<{
-    orders: ReturnType<typeof orderService.getStats>;
-    customers: ReturnType<typeof customerService.getStats>;
-    quotes: ReturnType<typeof quoteService.getStats>;
-    messages: ReturnType<typeof messageService.getStats>;
-    products: ReturnType<typeof productService.getStats>;
-  } | null>(null);
+  const [timeRange, setTimeRange] = useState<'7' | '30' | '90' | '365'>('30');
+  const [data, setData] = useState<AnalyticsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchAnalytics = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`/api/analytics?period=${timeRange}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch analytics data');
+      }
+      const result = await response.json();
+      setData(result);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [timeRange]);
 
   useEffect(() => {
-    loadStats();
-  }, []);
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
-  const loadStats = () => {
-    setStats({
-      orders: orderService.getStats(),
-      customers: customerService.getStats(),
-      quotes: quoteService.getStats(),
-      messages: messageService.getStats(),
-      products: productService.getStats(),
-    });
-  };
-
-  if (!stats) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#004D8B]"></div>
-      </div>
-    );
+  if (isLoading) {
+    return <LoadingState />;
   }
 
+  if (error) {
+    return <ErrorState message={error} onRetry={fetchAnalytics} />;
+  }
+
+  if (!data) {
+    return null;
+  }
+
+  // Build stat cards from API data
   const statCards: StatCard[] = [
     {
       title: 'Total Revenue',
-      value: `$${stats.orders.totalRevenue.toLocaleString()}`,
-      change: 12.5,
+      value: `$${data.summary.totalRevenue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      change: Math.round(data.summary.revenueChange * 10) / 10,
       icon: DollarSign,
       color: 'text-green-600',
       bgColor: 'bg-green-100',
     },
     {
       title: 'Total Orders',
-      value: stats.orders.total,
-      change: 8.2,
+      value: data.summary.totalOrders,
+      change: Math.round(data.summary.ordersChange * 10) / 10,
       icon: ShoppingCart,
       color: 'text-blue-600',
       bgColor: 'bg-blue-100',
     },
     {
-      title: 'Active Customers',
-      value: stats.customers.active,
-      change: 5.1,
+      title: 'New Customers',
+      value: data.summary.totalCustomers,
+      change: 0,
       icon: Users,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
     },
     {
-      title: 'Products',
-      value: stats.products.totalProducts,
-      change: 2.3,
-      icon: Package,
+      title: 'Avg Order Value',
+      value: `$${data.summary.averageOrderValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      change: 0,
+      icon: TrendingUp,
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',
     },
     {
-      title: 'Pending Quotes',
-      value: stats.quotes.pending,
-      change: -3.2,
+      title: 'Total Quotes',
+      value: data.summary.totalQuotes,
+      change: 0,
       icon: FileText,
       color: 'text-yellow-600',
       bgColor: 'bg-yellow-100',
     },
     {
-      title: 'Unread Messages',
-      value: stats.messages.unread,
-      change: 15.4,
-      icon: MessageSquare,
-      color: 'text-red-600',
-      bgColor: 'bg-red-100',
+      title: 'Top Products',
+      value: data.charts.topProducts.length,
+      change: 0,
+      icon: Package,
+      color: 'text-cyan-600',
+      bgColor: 'bg-cyan-100',
     },
   ];
 
-  const orderStatusData: ChartData[] = [
-    { label: 'Pending', value: stats.orders.pending, color: '#fbbf24' },
-    { label: 'Confirmed', value: stats.orders.confirmed, color: '#3b82f6' },
-    { label: 'Processing', value: stats.orders.processing, color: '#8b5cf6' },
-    { label: 'Shipped', value: stats.orders.shipped, color: '#06b6d4' },
-    { label: 'Delivered', value: stats.orders.delivered, color: '#22c55e' },
-    { label: 'Cancelled', value: stats.orders.cancelled, color: '#ef4444' },
-  ];
+  // Order status colors
+  const statusColors: Record<string, string> = {
+    pending: '#fbbf24',
+    confirmed: '#3b82f6',
+    processing: '#8b5cf6',
+    shipped: '#06b6d4',
+    delivered: '#22c55e',
+    cancelled: '#ef4444',
+    refunded: '#6b7280',
+  };
 
-  const quoteStatusData: ChartData[] = [
-    { label: 'Pending', value: stats.quotes.pending, color: '#fbbf24' },
-    { label: 'Reviewed', value: stats.quotes.reviewed, color: '#3b82f6' },
-    { label: 'Sent', value: stats.quotes.sent, color: '#8b5cf6' },
-    { label: 'Accepted', value: stats.quotes.accepted, color: '#22c55e' },
-    { label: 'Rejected', value: stats.quotes.rejected, color: '#ef4444' },
-    { label: 'Converted', value: stats.quotes.converted, color: '#06b6d4' },
-  ];
+  const orderStatusData: ChartData[] = data.charts.ordersByStatus.map(item => ({
+    label: item.name.charAt(0).toUpperCase() + item.name.slice(1),
+    value: item.value,
+    color: statusColors[item.name] || '#6b7280',
+  }));
 
-  const messageTypeData: ChartData[] = [
-    { label: 'Contact', value: stats.messages.byType.contact, color: '#6b7280' },
-    { label: 'Support', value: stats.messages.byType.support, color: '#3b82f6' },
-    { label: 'Inquiry', value: stats.messages.byType.inquiry, color: '#8b5cf6' },
-    { label: 'Feedback', value: stats.messages.byType.feedback, color: '#22c55e' },
-  ];
-
-  const stockStatusData: ChartData[] = [
-    { label: 'In Stock', value: stats.products.totalProducts - stats.products.lowStockProducts - stats.products.outOfStockProducts, color: '#22c55e' },
-    { label: 'Low Stock', value: stats.products.lowStockProducts, color: '#fbbf24' },
-    { label: 'Out of Stock', value: stats.products.outOfStockProducts, color: '#ef4444' },
-  ];
+  const quoteStatusData: ChartData[] = data.charts.quotesByStatus.map(item => ({
+    label: item.name.charAt(0).toUpperCase() + item.name.slice(1),
+    value: item.value,
+    color: statusColors[item.name] || '#6b7280',
+  }));
 
   // Simple bar chart renderer
-  const renderBarChart = (data: ChartData[], maxValue: number) => {
+  const renderBarChart = (chartData: ChartData[], maxValue: number) => {
     return (
       <div className="space-y-3">
-        {data.map((item, index) => (
+        {chartData.map((item, index) => (
           <div key={index}>
             <div className="flex items-center justify-between text-sm mb-1">
-              <span className="text-gray-600">{item.label}</span>
-              <span className="font-medium text-gray-900">{item.value}</span>
+              <span className="text-gray-600 dark:text-gray-400">{item.label}</span>
+              <span className="font-medium text-gray-900 dark:text-white">{item.value}</span>
             </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{
@@ -186,11 +251,11 @@ export default function AdminAnalyticsPage() {
   };
 
   // Simple pie chart renderer
-  const renderPieChart = (data: ChartData[]) => {
-    const total = data.reduce((sum, item) => sum + item.value, 0);
+  const renderPieChart = (chartData: ChartData[]) => {
+    const total = chartData.reduce((sum, item) => sum + item.value, 0);
     let currentAngle = 0;
 
-    const segments = data.map((item) => {
+    const segments = chartData.map((item) => {
       const angle = total > 0 ? (item.value / total) * 360 : 0;
       const segment = {
         ...item,
@@ -202,7 +267,6 @@ export default function AdminAnalyticsPage() {
       return segment;
     });
 
-    // Create SVG pie chart
     const createArc = (startAngle: number, endAngle: number, radius: number) => {
       const start = ((startAngle - 90) * Math.PI) / 180;
       const end = ((endAngle - 90) * Math.PI) / 180;
@@ -229,17 +293,17 @@ export default function AdminAnalyticsPage() {
               />
             )
           ))}
-          <circle cx="50" cy="50" r="25" fill="white" />
+          <circle cx="50" cy="50" r="25" fill="white" className="dark:fill-gray-800" />
         </svg>
         <div className="space-y-2">
-          {data.map((item, index) => (
+          {chartData.map((item, index) => (
             <div key={index} className="flex items-center gap-2 text-sm">
               <div
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: item.color }}
               />
-              <span className="text-gray-600">{item.label}</span>
-              <span className="font-medium text-gray-900">({item.value})</span>
+              <span className="text-gray-600 dark:text-gray-400">{item.label}</span>
+              <span className="font-medium text-gray-900 dark:text-white">({item.value})</span>
             </div>
           ))}
         </div>
@@ -252,20 +316,22 @@ export default function AdminAnalyticsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-sm text-gray-500 mt-1">Business insights and performance metrics</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Analytics</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Business insights and performance metrics
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Calendar className="w-4 h-4 text-gray-400" />
           <select
             value={timeRange}
             onChange={(e) => setTimeRange(e.target.value as typeof timeRange)}
-            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
           >
-            <option value="7d">Last 7 days</option>
-            <option value="30d">Last 30 days</option>
-            <option value="90d">Last 90 days</option>
-            <option value="12m">Last 12 months</option>
+            <option value="7">Last 7 days</option>
+            <option value="30">Last 30 days</option>
+            <option value="90">Last 90 days</option>
+            <option value="365">Last 12 months</option>
           </select>
         </div>
       </div>
@@ -273,166 +339,128 @@ export default function AdminAnalyticsPage() {
       {/* Stat Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {statCards.map((stat, index) => (
-          <div key={index} className="bg-white rounded-xl p-4 border border-gray-200">
+          <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-between mb-3">
               <div className={`w-10 h-10 rounded-lg ${stat.bgColor} flex items-center justify-center`}>
                 <stat.icon className={`w-5 h-5 ${stat.color}`} />
               </div>
-              <div className={`flex items-center text-xs font-medium ${stat.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {stat.change >= 0 ? (
-                  <ArrowUpRight className="w-3 h-3 mr-0.5" />
-                ) : (
-                  <ArrowDownRight className="w-3 h-3 mr-0.5" />
-                )}
-                {Math.abs(stat.change)}%
-              </div>
+              {stat.change !== 0 && (
+                <div className={`flex items-center text-xs font-medium ${stat.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  {stat.change >= 0 ? (
+                    <ArrowUpRight className="w-3 h-3 mr-0.5" />
+                  ) : (
+                    <ArrowDownRight className="w-3 h-3 mr-0.5" />
+                  )}
+                  {Math.abs(stat.change)}%
+                </div>
+              )}
             </div>
-            <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-            <p className="text-xs text-gray-500 mt-1">{stat.title}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{stat.value}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{stat.title}</p>
           </div>
         ))}
       </div>
 
-      {/* Charts Row 1 */}
+      {/* Trend Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <TrendChart
+          data={data.charts.dailyRevenue}
+          title="Revenue Trend"
+          color="#16a34a"
+          valuePrefix="$"
+        />
+        <TrendChart
+          data={data.charts.dailyOrders}
+          title="Orders Trend"
+          color="#004D8B"
+        />
+        <TrendChart
+          data={data.charts.dailyCustomers}
+          title="Customer Growth"
+          color="#8b5cf6"
+        />
+      </div>
+
+      {/* Performance Charts Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PerformanceChart
+          data={data.charts.categoryPerformance}
+          title="Category Performance"
+          metric="revenue"
+        />
+        <PerformanceChart
+          data={data.charts.brandPerformance}
+          title="Brand Performance"
+          metric="revenue"
+        />
+      </div>
+
+      {/* Status Distribution Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Order Status Chart */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-6">
             <BarChart3 className="w-5 h-5 text-gray-400" />
-            <h2 className="text-lg font-semibold text-gray-900">Order Status Distribution</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Order Status Distribution</h2>
           </div>
-          {renderBarChart(orderStatusData, Math.max(...orderStatusData.map(d => d.value)))}
+          {orderStatusData.length > 0 ? (
+            renderBarChart(orderStatusData, Math.max(...orderStatusData.map(d => d.value)))
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400 text-center py-8">No order data available</p>
+          )}
         </div>
 
         {/* Quote Status Chart */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-6">
             <PieChart className="w-5 h-5 text-gray-400" />
-            <h2 className="text-lg font-semibold text-gray-900">Quote Conversion</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Quote Status Distribution</h2>
           </div>
-          {renderPieChart(quoteStatusData)}
+          {quoteStatusData.length > 0 ? (
+            renderPieChart(quoteStatusData)
+          ) : (
+            <p className="text-gray-500 dark:text-gray-400 text-center py-8">No quote data available</p>
+          )}
         </div>
       </div>
 
-      {/* Charts Row 2 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Message Types Chart */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <div className="flex items-center gap-2 mb-6">
-            <MessageSquare className="w-5 h-5 text-gray-400" />
-            <h2 className="text-lg font-semibold text-gray-900">Message Types</h2>
-          </div>
-          {renderBarChart(messageTypeData, Math.max(...messageTypeData.map(d => d.value)))}
-        </div>
-
-        {/* Stock Status Chart */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
+      {/* Top Products */}
+      {data.charts.topProducts.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-2 mb-6">
             <Package className="w-5 h-5 text-gray-400" />
-            <h2 className="text-lg font-semibold text-gray-900">Stock Status</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Top Selling Products</h2>
           </div>
-          {renderPieChart(stockStatusData)}
-        </div>
-      </div>
-
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Customer Metrics */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Customer Metrics</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Customers</span>
-              <span className="font-semibold text-gray-900">{stats.customers.total}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Active Customers</span>
-              <span className="font-semibold text-green-600">{stats.customers.active}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">With Orders</span>
-              <span className="font-semibold text-blue-600">{stats.customers.withOrders}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">New This Month</span>
-              <span className="font-semibold text-purple-600">{stats.customers.newThisMonth}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Revenue</span>
-              <span className="font-semibold text-gray-900">${stats.customers.totalRevenue.toLocaleString()}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Order Metrics */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Order Metrics</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Orders</span>
-              <span className="font-semibold text-gray-900">{stats.orders.total}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Avg Order Value</span>
-              <span className="font-semibold text-green-600">${stats.orders.averageOrderValue.toFixed(2)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Pending Orders</span>
-              <span className="font-semibold text-yellow-600">{stats.orders.pending}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Delivered Orders</span>
-              <span className="font-semibold text-green-600">{stats.orders.delivered}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Revenue</span>
-              <span className="font-semibold text-gray-900">${stats.orders.totalRevenue.toLocaleString()}</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Quote Metrics */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Quote Metrics</h3>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Quotes</span>
-              <span className="font-semibold text-gray-900">{stats.quotes.total}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Pending Review</span>
-              <span className="font-semibold text-yellow-600">{stats.quotes.pending}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Accepted</span>
-              <span className="font-semibold text-green-600">{stats.quotes.accepted}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Conversion Rate</span>
-              <span className="font-semibold text-blue-600">{stats.quotes.conversionRate.toFixed(1)}%</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Total Value</span>
-              <span className="font-semibold text-gray-900">${stats.quotes.totalValue.toLocaleString()}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Low Stock Alert */}
-      {stats.products.lowStockProducts > 0 && (
-        <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-200">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-yellow-100 flex items-center justify-center">
-              <Package className="w-5 h-5 text-yellow-600" />
-            </div>
-            <div>
-              <h3 className="font-medium text-yellow-800">Low Stock Alert</h3>
-              <p className="text-sm text-yellow-700">
-                {pluralize(stats.products.lowStockProducts, 'product')} {stats.products.lowStockProducts === 1 ? 'is' : 'are'} running low on stock.{' '}
-                <a href="/admin/inventory" className="underline font-medium">View inventory</a>
-              </p>
-            </div>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Product</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Quantity Sold</th>
+                  <th className="text-right py-3 px-4 text-sm font-medium text-gray-500 dark:text-gray-400">Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.charts.topProducts.map((product, index) => (
+                  <tr key={product.productId || index} className="border-b border-gray-100 dark:border-gray-700/50 last:border-0">
+                    <td className="py-3 px-4">
+                      <div className="flex items-center gap-3">
+                        <span className="w-6 h-6 rounded-full bg-[#004D8B] text-white text-xs flex items-center justify-center font-medium">
+                          {index + 1}
+                        </span>
+                        <span className="font-medium text-gray-900 dark:text-white">{product.name}</span>
+                      </div>
+                    </td>
+                    <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-400">
+                      {product.quantity.toLocaleString()}
+                    </td>
+                    <td className="py-3 px-4 text-right font-medium text-gray-900 dark:text-white">
+                      ${product.revenue.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       )}
