@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { useParams } from 'next/navigation'
+import { useParams, usePathname } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowLeft, Phone, MessageCircle, Package, Search, X, Loader2, Filter } from 'lucide-react'
+import { ArrowLeft, Phone, MessageCircle, Package, Search, X, Loader2, Filter, Lock } from 'lucide-react'
+import { useAuth } from '@/lib/auth/AuthContext'
 
 // Types
 interface Category {
@@ -52,7 +53,9 @@ const DEFAULT_CATEGORY_IMAGE = '/images/slides/slide-1.png'
 
 export default function CategoryProductsPage() {
   const params = useParams()
+  const pathname = usePathname()
   const categorySlug = params.slug as string
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
 
   const [category, setCategory] = useState<Category | null>(null)
   const [products, setProducts] = useState<Product[]>([])
@@ -345,15 +348,30 @@ export default function CategoryProductsPage() {
                       {product.shortDescription || product.description}
                     </p>
 
-                    {/* Price */}
-                    <div className="mt-3 flex items-center gap-2">
-                      <span className="font-bold text-[#004D8B]">
-                        {formatPrice(product.price, product.currency)}
-                      </span>
-                      {product.compareAtPrice && product.price && product.compareAtPrice > product.price && (
-                        <span className="text-sm text-gray-400 line-through">
-                          {formatPrice(product.compareAtPrice, product.currency)}
-                        </span>
+                    {/* Price - Only shown to authenticated users */}
+                    <div className="mt-3">
+                      {authLoading ? (
+                        <div className="h-5 w-16 bg-gray-200 rounded animate-pulse" />
+                      ) : isAuthenticated ? (
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-[#004D8B]">
+                            {formatPrice(product.price, product.currency)}
+                          </span>
+                          {product.compareAtPrice && product.price && product.compareAtPrice > product.price && (
+                            <span className="text-sm text-gray-400 line-through">
+                              {formatPrice(product.compareAtPrice, product.currency)}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <Link
+                          href={`/login?returnUrl=${encodeURIComponent(pathname)}`}
+                          className="flex items-center gap-1.5 text-gray-500 hover:text-[#004D8B] text-sm transition-colors"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Lock className="w-3.5 h-3.5" />
+                          <span className="hover:underline">Login for pricing</span>
+                        </Link>
                       )}
                     </div>
 

@@ -3,7 +3,9 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect } from 'react'
-import { ArrowLeft, Phone, MessageCircle, Loader2, Package } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { ArrowLeft, Phone, MessageCircle, Loader2, Package, Lock } from 'lucide-react'
+import { useAuth } from '@/lib/auth/AuthContext'
 
 // Types
 interface ProductImage {
@@ -34,6 +36,8 @@ const badgeColorMap: Record<string, string> = {
 const DEFAULT_PRODUCT_IMAGE = '/images/slides/slide-1.png'
 
 export default function GrindingSleevesPage() {
+  const pathname = usePathname()
+  const { isAuthenticated, isLoading: authLoading } = useAuth()
   const [products, setProducts] = useState<Product[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -243,10 +247,23 @@ export default function GrindingSleevesPage() {
                         <span className="text-blue-800 font-semibold text-sm group-hover:underline">
                           View Details →
                         </span>
-                        {product.price && (
-                          <span className="text-gray-900 font-bold">
-                            ${product.price.toFixed(2)}
-                          </span>
+                        {authLoading ? (
+                          <span className="w-12 h-4 bg-gray-200 rounded animate-pulse" />
+                        ) : isAuthenticated ? (
+                          product.price && (
+                            <span className="text-gray-900 font-bold">
+                              ${product.price.toFixed(2)}
+                            </span>
+                          )
+                        ) : (
+                          <Link
+                            href={`/login?returnUrl=${encodeURIComponent(pathname)}`}
+                            className="flex items-center gap-1 text-gray-500 hover:text-[#004D8B] text-xs transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Lock className="w-3 h-3" />
+                            <span className="hover:underline">Login</span>
+                          </Link>
                         )}
                       </div>
                     </div>

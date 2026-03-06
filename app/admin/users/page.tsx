@@ -44,6 +44,7 @@ interface User {
   country: string | null;
   industry: string | null;
   position: string | null;
+  discountPercentage: number;
   createdAt: string;
   updatedAt: string;
   lastLogin: string | null;
@@ -152,6 +153,7 @@ function UsersContent() {
     country: '',
     position: '',
     isActive: true,
+    discountPercentage: 0,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -304,6 +306,7 @@ function UsersContent() {
       country: '',
       position: '',
       isActive: true,
+      discountPercentage: 0,
     });
   };
 
@@ -349,6 +352,7 @@ function UsersContent() {
         country: formData.country,
         position: formData.position,
         isActive: formData.isActive,
+        discountPercentage: formData.discountPercentage,
       };
 
       // Only include password if it was changed
@@ -391,6 +395,7 @@ function UsersContent() {
       country: user.country || '',
       position: user.position || '',
       isActive: user.isActive,
+      discountPercentage: user.discountPercentage || 0,
     });
     setShowEditModal(true);
   };
@@ -543,6 +548,7 @@ function UsersContent() {
                   currentSortOrder={sortOrder}
                   onSort={handleSort}
                 />
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Discount</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Status</th>
                 <SortableHeader
                   label="Created"
@@ -585,6 +591,15 @@ function UsersContent() {
                   </td>
                   <td className="px-4 py-3">
                     <RoleBadge role={user.role} />
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    {user.discountPercentage > 0 ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        {user.discountPercentage}%
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
                   </td>
                   <td className="px-4 py-3">
                     <StatusBadge isActive={user.isActive} />
@@ -839,6 +854,23 @@ function UsersContent() {
                 </div>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Discount Percentage</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.5"
+                    value={formData.discountPercentage}
+                    onChange={(e) => setFormData({ ...formData, discountPercentage: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">0-100%. Applies to all products for this user.</p>
+              </div>
+
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -976,6 +1008,23 @@ function UsersContent() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Discount Percentage</label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    min="0"
+                    max="100"
+                    step="0.5"
+                    value={formData.discountPercentage}
+                    onChange={(e) => setFormData({ ...formData, discountPercentage: parseFloat(e.target.value) || 0 })}
+                    className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">0-100%. Applies to all products for this user.</p>
               </div>
 
               <div className="flex items-center gap-2">

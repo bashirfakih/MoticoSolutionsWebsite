@@ -3,7 +3,7 @@
 /**
  * Admin Customers Page
  *
- * Customer management with filtering, details view, and status updates.
+ * Customer management with filtering, creation, editing, and status updates.
  *
  * @module app/admin/customers/page
  */
@@ -25,6 +25,9 @@ import {
   Loader2,
   ChevronUp,
   ChevronDown,
+  Plus,
+  Edit2,
+  Building2,
 } from 'lucide-react';
 import FilterChips from '@/components/admin/FilterChips';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
@@ -45,6 +48,7 @@ interface Customer {
   country: string;
   totalOrders: number;
   totalSpent: number;
+  discountPercentage: number;
   lastOrderAt: string | null;
   status: CustomerStatus;
   isVerified: boolean;
@@ -125,6 +129,30 @@ function CustomersContent() {
   const [stats, setStats] = useState<CustomerStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(null);
+
+  // Modal states
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+
+  // Form state
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    company: '',
+    phone: '',
+    address: '',
+    city: '',
+    region: '',
+    postalCode: '',
+    country: 'Lebanon',
+    discountPercentage: 0,
+    status: 'active' as CustomerStatus,
+    isVerified: false,
+    notes: '',
+    tags: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sort state
   const [sortBy, setSortBy] = useState<string>('name');
@@ -228,6 +256,142 @@ function CustomersContent() {
     return () => clearTimeout(timer);
   }, [loadCustomers]);
 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      email: '',
+      company: '',
+      phone: '',
+      address: '',
+      city: '',
+      region: '',
+      postalCode: '',
+      country: 'Lebanon',
+      discountPercentage: 0,
+      status: 'active',
+      isVerified: false,
+      notes: '',
+      tags: '',
+    });
+  };
+
+  const handleCreateCustomer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    try {
+      const tagsArray = formData.tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0);
+
+      const response = await fetch('/api/customers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company || null,
+          phone: formData.phone || null,
+          address: formData.address || null,
+          city: formData.city || null,
+          region: formData.region || null,
+          postalCode: formData.postalCode || null,
+          country: formData.country,
+          discountPercentage: formData.discountPercentage,
+          status: formData.status,
+          isVerified: formData.isVerified,
+          notes: formData.notes || null,
+          tags: tagsArray,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create customer');
+      }
+
+      toast.success('Customer created successfully');
+      setShowCreateModal(false);
+      resetForm();
+      loadCustomers();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to create customer');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleEditCustomer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingCustomer) return;
+    setIsSubmitting(true);
+
+    try {
+      const tagsArray = formData.tags
+        .split(',')
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0);
+
+      const response = await fetch(`/api/customers/${editingCustomer.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company || null,
+          phone: formData.phone || null,
+          address: formData.address || null,
+          city: formData.city || null,
+          region: formData.region || null,
+          postalCode: formData.postalCode || null,
+          country: formData.country,
+          discountPercentage: formData.discountPercentage,
+          status: formData.status,
+          isVerified: formData.isVerified,
+          notes: formData.notes || null,
+          tags: tagsArray,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to update customer');
+      }
+
+      toast.success('Customer updated successfully');
+      setShowEditModal(false);
+      setEditingCustomer(null);
+      resetForm();
+      loadCustomers();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to update customer');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const openEditModal = (customer: Customer) => {
+    setEditingCustomer(customer);
+    setFormData({
+      name: customer.name,
+      email: customer.email,
+      company: customer.company || '',
+      phone: customer.phone || '',
+      address: customer.address || '',
+      city: customer.city || '',
+      region: customer.region || '',
+      postalCode: customer.postalCode || '',
+      country: customer.country,
+      discountPercentage: customer.discountPercentage || 0,
+      status: customer.status,
+      isVerified: customer.isVerified,
+      notes: customer.notes || '',
+      tags: customer.tags?.join(', ') || '',
+    });
+    setShowEditModal(true);
+  };
+
   const handleStatusUpdate = async (customerId: string, newStatus: CustomerStatus) => {
     try {
       const response = await fetch(`/api/customers/${customerId}`, {
@@ -258,7 +422,10 @@ function CustomersContent() {
         method: 'DELETE',
       });
 
-      if (!response.ok) throw new Error('Failed to delete customer');
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete customer');
+      }
 
       toast.success('Customer deleted');
       loadCustomers();
@@ -267,7 +434,7 @@ function CustomersContent() {
         setSelectedCustomer(null);
       }
     } catch (error) {
-      toast.error('Failed to delete customer');
+      toast.error(error instanceof Error ? error.message : 'Failed to delete customer');
     }
     setCustomerToDelete(null);
   };
@@ -306,6 +473,16 @@ function CustomersContent() {
           <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your customer base</p>
         </div>
+        <button
+          onClick={() => {
+            resetForm();
+            setShowCreateModal(true);
+          }}
+          className="flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003d6f] transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add Customer
+        </button>
       </div>
 
       {/* Stats Cards */}
@@ -424,6 +601,7 @@ function CustomersContent() {
                   onSort={handleSort}
                 />
                 <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Orders</th>
+                <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 uppercase">Discount</th>
                 <SortableHeader
                   label="Total Spent"
                   sortKey="totalSpent"
@@ -469,6 +647,15 @@ function CustomersContent() {
                   <td className="px-4 py-3 text-center">
                     <span className="font-semibold text-gray-900">{customer.totalOrders}</span>
                   </td>
+                  <td className="px-4 py-3 text-center">
+                    {customer.discountPercentage > 0 ? (
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                        {customer.discountPercentage}%
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-right">
                     <span className="font-semibold text-gray-900">{formatCurrency(customer.totalSpent)}</span>
                   </td>
@@ -480,12 +667,21 @@ function CustomersContent() {
                       <button
                         onClick={() => setSelectedCustomer(customer)}
                         className="p-2 text-gray-500 hover:text-[#004D8B] hover:bg-gray-100 rounded-lg transition-colors"
+                        title="View details"
                       >
                         <Eye className="w-4 h-4" />
                       </button>
                       <button
+                        onClick={() => openEditModal(customer)}
+                        className="p-2 text-gray-500 hover:text-[#004D8B] hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Edit customer"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button
                         onClick={() => setCustomerToDelete(customer)}
                         className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Delete customer"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -495,7 +691,7 @@ function CustomersContent() {
               ))}
               {customers.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="px-4 py-12 text-center text-gray-500">
+                  <td colSpan={8} className="px-4 py-12 text-center text-gray-500">
                     No customers found
                   </td>
                 </tr>
@@ -554,16 +750,22 @@ function CustomersContent() {
                     <span>{selectedCustomer.phone}</span>
                   </div>
                 )}
+                {selectedCustomer.company && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <Building2 className="w-4 h-4 text-gray-400" />
+                    <span>{selectedCustomer.company}</span>
+                  </div>
+                )}
                 <div className="flex items-center gap-3 text-sm">
                   <MapPin className="w-4 h-4 text-gray-400" />
                   <span>
-                    {[selectedCustomer.city, selectedCustomer.country].filter(Boolean).join(', ')}
+                    {[selectedCustomer.address, selectedCustomer.city, selectedCustomer.country].filter(Boolean).join(', ')}
                   </span>
                 </div>
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="bg-gray-50 rounded-xl p-4 text-center">
                   <p className="text-2xl font-bold text-gray-900">{selectedCustomer.totalOrders}</p>
                   <p className="text-xs text-gray-500">Total Orders</p>
@@ -571,6 +773,10 @@ function CustomersContent() {
                 <div className="bg-gray-50 rounded-xl p-4 text-center">
                   <p className="text-2xl font-bold text-gray-900">{formatCurrency(selectedCustomer.totalSpent)}</p>
                   <p className="text-xs text-gray-500">Total Spent</p>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <p className="text-2xl font-bold text-green-600">{selectedCustomer.discountPercentage || 0}%</p>
+                  <p className="text-xs text-gray-500">Discount</p>
                 </div>
               </div>
 
@@ -619,8 +825,419 @@ function CustomersContent() {
                     </option>
                   ))}
                 </select>
+                <button
+                  onClick={() => {
+                    setSelectedCustomer(null);
+                    openEditModal(selectedCustomer);
+                  }}
+                  className="flex-1 px-4 py-2 bg-[#004D8B] text-white rounded-lg text-sm font-medium hover:bg-[#003d6f] transition-colors"
+                >
+                  Edit Customer
+                </button>
               </div>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Customer Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-900">Create New Customer</h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateCustomer} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                  <input
+                    type="text"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                  <input
+                    type="text"
+                    value={formData.region}
+                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                  <input
+                    type="text"
+                    value={formData.postalCode}
+                    onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                  <input
+                    type="text"
+                    value={formData.country}
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as CustomerStatus })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  >
+                    {Object.entries(CUSTOMER_STATUS).map(([key, value]) => (
+                      <option key={key} value={value}>
+                        {statusConfig[value]?.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value={formData.discountPercentage}
+                      onChange={(e) => setFormData({ ...formData, discountPercentage: parseFloat(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                <input
+                  type="text"
+                  value={formData.tags}
+                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                  placeholder="Enter tags separated by commas"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+                <p className="text-xs text-gray-500 mt-1">Separate multiple tags with commas (e.g., VIP, Wholesale)</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  placeholder="Internal notes about this customer..."
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isVerified"
+                  checked={formData.isVerified}
+                  onChange={(e) => setFormData({ ...formData, isVerified: e.target.checked })}
+                  className="w-4 h-4 text-[#004D8B] border-gray-300 rounded focus:ring-[#004D8B]"
+                />
+                <label htmlFor="isVerified" className="text-sm text-gray-700">Verified customer</label>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003d6f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                  Create Customer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Customer Modal */}
+      {showEditModal && editingCustomer && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-gray-900">Edit Customer</h2>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  setEditingCustomer(null);
+                }}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditCustomer} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <input
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Company</label>
+                  <input
+                    type="text"
+                    value={formData.company}
+                    onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Region</label>
+                  <input
+                    type="text"
+                    value={formData.region}
+                    onChange={(e) => setFormData({ ...formData, region: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Postal Code</label>
+                  <input
+                    type="text"
+                    value={formData.postalCode}
+                    onChange={(e) => setFormData({ ...formData, postalCode: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                  <input
+                    type="text"
+                    value={formData.country}
+                    onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value as CustomerStatus })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  >
+                    {Object.entries(CUSTOMER_STATUS).map(([key, value]) => (
+                      <option key={key} value={value}>
+                        {statusConfig[value]?.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Discount %</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      max="100"
+                      step="0.5"
+                      value={formData.discountPercentage}
+                      onChange={(e) => setFormData({ ...formData, discountPercentage: parseFloat(e.target.value) || 0 })}
+                      className="w-full px-3 py-2 pr-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">%</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                <input
+                  type="text"
+                  value={formData.tags}
+                  onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
+                  placeholder="Enter tags separated by commas"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                />
+                <p className="text-xs text-gray-500 mt-1">Separate multiple tags with commas (e.g., VIP, Wholesale)</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  placeholder="Internal notes about this customer..."
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="editIsVerified"
+                  checked={formData.isVerified}
+                  onChange={(e) => setFormData({ ...formData, isVerified: e.target.checked })}
+                  className="w-4 h-4 text-[#004D8B] border-gray-300 rounded focus:ring-[#004D8B]"
+                />
+                <label htmlFor="editIsVerified" className="text-sm text-gray-700">Verified customer</label>
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingCustomer(null);
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="flex-1 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003d6f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                  Save Changes
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

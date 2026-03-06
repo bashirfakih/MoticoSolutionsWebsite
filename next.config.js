@@ -3,16 +3,16 @@
 // Content Security Policy directives
 const cspDirectives = [
   "default-src 'self'",
-  // Scripts: self + inline (needed for Next.js) + eval in dev only
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  // Scripts: self + inline (needed for Next.js) + eval in dev only + Vercel analytics
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com",
   // Styles: self + inline (needed for styled-jsx, Tailwind, etc.)
   "style-src 'self' 'unsafe-inline'",
   // Images: self + data URIs + blob (Next.js image optimization) + Cloudinary
   "img-src 'self' data: blob: https://res.cloudinary.com",
   // Fonts: self + data URIs
   "font-src 'self' data:",
-  // Connect: self for API routes + Cloudinary for uploads
-  "connect-src 'self' https://res.cloudinary.com https://api.cloudinary.com",
+  // Connect: self for API routes + Cloudinary + Vercel analytics
+  "connect-src 'self' https://res.cloudinary.com https://api.cloudinary.com https://vitals.vercel-insights.com",
   // Media: self
   "media-src 'self'",
   // Object: none (no plugins)
