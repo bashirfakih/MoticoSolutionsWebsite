@@ -132,6 +132,7 @@ export interface User {
   position?: string;
   address?: string;
   city?: string;
+  discountPercentage?: number;
 }
 
 // ═══════════════════════════════════════════════════════════════

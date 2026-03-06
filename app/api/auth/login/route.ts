@@ -73,6 +73,7 @@ export async function POST(request: NextRequest) {
         role: user.role,
         company: user.company,
         avatar: user.avatar,
+        discountPercentage: user.discountPercentage ? Number(user.discountPercentage) : 0,
       },
     });
   } catch (error) {

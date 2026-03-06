@@ -48,6 +48,7 @@ export async function GET(
         position: true,
         address: true,
         city: true,
+        discountPercentage: true,
         createdAt: true,
         updatedAt: true,
         lastLogin: true,
@@ -61,7 +62,10 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json({
+      ...user,
+      discountPercentage: Number(user.discountPercentage),
+    });
   } catch (error) {
     console.error('User GET error:', error);
     return NextResponse.json(
@@ -130,6 +134,17 @@ export async function PATCH(
       }
     }
 
+    // Validate discount percentage if provided
+    if (body.discountPercentage !== undefined) {
+      const discount = Number(body.discountPercentage);
+      if (isNaN(discount) || discount < 0 || discount > 100) {
+        return NextResponse.json(
+          { error: 'Discount percentage must be between 0 and 100' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Build update data
     const updateData: Record<string, unknown> = {};
     if (body.name !== undefined) updateData.name = body.name;
@@ -143,6 +158,7 @@ export async function PATCH(
     if (body.address !== undefined) updateData.address = body.address || null;
     if (body.city !== undefined) updateData.city = body.city || null;
     if (body.isActive !== undefined) updateData.isActive = body.isActive;
+    if (body.discountPercentage !== undefined) updateData.discountPercentage = Number(body.discountPercentage);
 
     // Hash new password if provided
     if (body.password && body.password.length >= 8) {
@@ -163,6 +179,7 @@ export async function PATCH(
         country: true,
         industry: true,
         position: true,
+        discountPercentage: true,
         createdAt: true,
         updatedAt: true,
         lastLogin: true,
@@ -174,7 +191,10 @@ export async function PATCH(
       await deleteAllUserSessions(id);
     }
 
-    return NextResponse.json(user);
+    return NextResponse.json({
+      ...user,
+      discountPercentage: Number(user.discountPercentage),
+    });
   } catch (error) {
     console.error('User PATCH error:', error);
     return NextResponse.json(

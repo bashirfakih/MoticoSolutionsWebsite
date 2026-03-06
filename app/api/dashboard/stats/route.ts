@@ -2,11 +2,27 @@
  * Dashboard Stats API Route
  *
  * GET /api/dashboard/stats - Get dashboard statistics
+ *
+ * Includes simple in-memory caching to improve performance.
  */
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth/session';
+
+// Simple in-memory cache for dashboard stats
+interface CacheEntry {
+  data: unknown;
+  timestamp: number;
+}
+
+const cache: { stats: CacheEntry | null } = { stats: null };
+const CACHE_TTL_MS = 30 * 1000; // 30 seconds
+
+function isCacheValid(): boolean {
+  if (!cache.stats) return false;
+  return Date.now() - cache.stats.timestamp < CACHE_TTL_MS;
+}
 
 export async function GET() {
   try {
@@ -17,6 +33,11 @@ export async function GET() {
         { error: 'Unauthorized' },
         { status: 401 }
       );
+    }
+
+    // Return cached data if still valid
+    if (isCacheValid() && cache.stats) {
+      return NextResponse.json(cache.stats.data);
     }
 
     // Get date ranges
@@ -130,13 +151,11 @@ export async function GET() {
         _count: { status: true },
       }),
 
-      // Low stock products (using raw query for field comparison)
-      prisma.$queryRaw<[{ count: bigint }]>`
-        SELECT COUNT(*)::bigint as count
-        FROM products
-        WHERE "trackInventory" = true
-        AND "stockQuantity" <= "minStockLevel"
-      `,
+      // Low stock products - use Prisma query instead of raw SQL for compatibility
+      prisma.product.findMany({
+        where: { trackInventory: true },
+        select: { stockQuantity: true, minStockLevel: true },
+      }),
 
       // Orders in last 24 hours
       prisma.order.count({
@@ -181,8 +200,10 @@ export async function GET() {
       return acc;
     }, {} as Record<string, number>);
 
-    // Extract low stock count from raw query result
-    const lowStockCount = Number(lowStockProducts[0]?.count || 0);
+    // Count low stock products (where stockQuantity <= minStockLevel)
+    const lowStockCount = lowStockProducts.filter(
+      p => p.stockQuantity !== null && p.minStockLevel !== null && p.stockQuantity <= p.minStockLevel
+    ).length;
 
     // Calculate daily revenue for the last 7 days
     const dailyRevenueMap = new Map<string, number>();
@@ -206,7 +227,8 @@ export async function GET() {
       .map(([date, revenue]) => ({ date, revenue }))
       .sort((a, b) => a.date.localeCompare(b.date));
 
-    return NextResponse.json({
+    // Build response data
+    const responseData = {
       overview: {
         totalOrders,
         ordersThisMonth,
@@ -242,7 +264,12 @@ export async function GET() {
       ordersLast24Hours,
       outOfStockProducts,
       dailyRevenue,
-    });
+    };
+
+    // Cache the response
+    cache.stats = { data: responseData, timestamp: Date.now() };
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error('Dashboard stats error:', error);
     return NextResponse.json(

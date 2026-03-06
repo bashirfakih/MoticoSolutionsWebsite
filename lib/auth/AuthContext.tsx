@@ -91,6 +91,7 @@ function mapApiUserToUser(apiUser: {
   address?: string | null;
   city?: string | null;
   lastLogin?: string | null;
+  discountPercentage?: number | null;
 }): User {
   return {
     id: apiUser.id,
@@ -108,6 +109,7 @@ function mapApiUserToUser(apiUser: {
     city: apiUser.city ?? undefined,
     createdAt: new Date().toISOString(),
     lastLogin: apiUser.lastLogin || new Date().toISOString(),
+    discountPercentage: apiUser.discountPercentage ?? 0,
   };
 }
 

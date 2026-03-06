@@ -59,6 +59,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       ...customer,
       totalSpent: Number(customer.totalSpent),
+      discountPercentage: Number(customer.discountPercentage),
       orders: customer.orders.map(o => ({
         ...o,
         total: Number(o.total),
@@ -124,6 +125,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         region: body.region,
         postalCode: body.postalCode,
         country: body.country,
+        discountPercentage: body.discountPercentage,
         status: body.status,
         isVerified: body.isVerified,
         notes: body.notes,
@@ -134,6 +136,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({
       ...customer,
       totalSpent: Number(customer.totalSpent),
+      discountPercentage: Number(customer.discountPercentage),
     });
   } catch (error) {
     console.error('Customer PATCH error:', error);

@@ -69,6 +69,7 @@ export async function GET(request: NextRequest) {
       data: customers.map(cust => ({
         ...cust,
         totalSpent: Number(cust.totalSpent),
+        discountPercentage: Number(cust.discountPercentage),
         orderCount: cust._count.orders,
         quoteCount: cust._count.quotes,
         _count: undefined,
@@ -124,6 +125,7 @@ export async function POST(request: NextRequest) {
         region: body.region || null,
         postalCode: body.postalCode || null,
         country: body.country || 'Lebanon',
+        discountPercentage: body.discountPercentage ?? 0,
         status: body.status || 'active',
         isVerified: body.isVerified ?? false,
         notes: body.notes || null,
@@ -134,6 +136,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ...customer,
       totalSpent: Number(customer.totalSpent),
+      discountPercentage: Number(customer.discountPercentage),
     }, { status: 201 });
   } catch (error) {
     console.error('Customers POST error:', error);

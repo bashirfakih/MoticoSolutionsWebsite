@@ -19,7 +19,13 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({ user });
+    // Convert Decimal to number for JSON serialization
+    return NextResponse.json({
+      user: {
+        ...user,
+        discountPercentage: user.discountPercentage ? Number(user.discountPercentage) : 0,
+      }
+    });
   } catch (error) {
     console.error('Get current user error:', error);
     return NextResponse.json(

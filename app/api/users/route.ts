@@ -75,6 +75,7 @@ export async function GET(request: NextRequest) {
         country: true,
         industry: true,
         position: true,
+        discountPercentage: true,
         createdAt: true,
         updatedAt: true,
         lastLogin: true,
@@ -85,7 +86,10 @@ export async function GET(request: NextRequest) {
     });
 
     return NextResponse.json({
-      data: users,
+      data: users.map(user => ({
+        ...user,
+        discountPercentage: Number(user.discountPercentage),
+      })),
       total,
       page,
       limit,
@@ -145,6 +149,17 @@ export async function POST(request: NextRequest) {
     // Hash password
     const passwordHash = await hashPassword(body.password);
 
+    // Validate discount percentage if provided
+    if (body.discountPercentage !== undefined) {
+      const discount = Number(body.discountPercentage);
+      if (isNaN(discount) || discount < 0 || discount > 100) {
+        return NextResponse.json(
+          { error: 'Discount percentage must be between 0 and 100' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Create user
     const user = await prisma.user.create({
       data: {
@@ -160,6 +175,7 @@ export async function POST(request: NextRequest) {
         address: body.address || null,
         city: body.city || null,
         isActive: body.isActive ?? true,
+        discountPercentage: body.discountPercentage ?? 0,
       },
       select: {
         id: true,
@@ -172,12 +188,16 @@ export async function POST(request: NextRequest) {
         country: true,
         industry: true,
         position: true,
+        discountPercentage: true,
         createdAt: true,
         updatedAt: true,
       },
     });
 
-    return NextResponse.json(user, { status: 201 });
+    return NextResponse.json({
+      ...user,
+      discountPercentage: Number(user.discountPercentage),
+    }, { status: 201 });
   } catch (error) {
     console.error('Users POST error:', error);
     return NextResponse.json(
