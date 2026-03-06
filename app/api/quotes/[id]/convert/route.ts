@@ -7,6 +7,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth/session';
+import {
+  processOrderStockDecrement,
+  getInventorySettings,
+} from '@/lib/services/inventoryService';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -106,6 +110,21 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
           items: true,
         },
       });
+
+      // Decrement stock for all items if inventory tracking is enabled
+      const inventorySettings = await getInventorySettings();
+      if (inventorySettings.trackInventory) {
+        await processOrderStockDecrement(
+          tx,
+          order.id,
+          quote.items.map((item) => ({
+            productId: item.productId || '',
+            variantId: null,
+            quantity: item.quantity,
+          })),
+          user.id
+        );
+      }
 
       // Update quote status to converted and link to order
       await tx.quote.update({

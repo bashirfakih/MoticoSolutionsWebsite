@@ -22,6 +22,7 @@ const mockQuoteUpdate = jest.fn();
 const mockOrderCreate = jest.fn();
 const mockCustomerUpdate = jest.fn();
 const mockTransaction = jest.fn();
+const mockSiteSettingsFind = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   prisma: {
@@ -35,6 +36,9 @@ jest.mock('@/lib/db', () => ({
     customer: {
       update: (...args: unknown[]) => mockCustomerUpdate(...args),
     },
+    siteSettings: {
+      findFirst: (...args: unknown[]) => mockSiteSettingsFind(...args),
+    },
     $transaction: (fn: (tx: unknown) => Promise<unknown>) => mockTransaction(fn),
   },
 }));
@@ -45,6 +49,12 @@ import { POST } from '@/app/api/quotes/[id]/convert/route';
 describe('POST /api/quotes/[id]/convert', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default: disable inventory tracking to simplify existing tests
+    mockSiteSettingsFind.mockResolvedValue({
+      trackInventory: false,
+      allowBackorders: false,
+      lowStockThreshold: 10,
+    });
   });
 
   describe('Unauthorized (401)', () => {
@@ -218,6 +228,10 @@ describe('POST /api/quotes/[id]/convert', () => {
           order: { create: jest.fn().mockResolvedValue(mockOrder) },
           quote: { update: jest.fn().mockResolvedValue({}) },
           customer: { update: jest.fn().mockResolvedValue({}) },
+          product: { findUnique: jest.fn(), update: jest.fn() },
+          siteSettings: { findFirst: jest.fn().mockResolvedValue({ lowStockThreshold: 10 }) },
+          inventoryLog: { create: jest.fn() },
+          productVariant: { findUnique: jest.fn(), update: jest.fn() },
         };
         return fn(mockTx);
       });
@@ -253,6 +267,10 @@ describe('POST /api/quotes/[id]/convert', () => {
           },
           quote: { update: jest.fn().mockResolvedValue({}) },
           customer: { update: jest.fn().mockResolvedValue({}) },
+          product: { findUnique: jest.fn(), update: jest.fn() },
+          siteSettings: { findFirst: jest.fn().mockResolvedValue({ lowStockThreshold: 10 }) },
+          inventoryLog: { create: jest.fn() },
+          productVariant: { findUnique: jest.fn(), update: jest.fn() },
         };
         return fn(mockTx);
       });
@@ -289,6 +307,10 @@ describe('POST /api/quotes/[id]/convert', () => {
               return {};
             }),
           },
+          product: { findUnique: jest.fn(), update: jest.fn() },
+          siteSettings: { findFirst: jest.fn().mockResolvedValue({ lowStockThreshold: 10 }) },
+          inventoryLog: { create: jest.fn() },
+          productVariant: { findUnique: jest.fn(), update: jest.fn() },
         };
         return fn(mockTx);
       });
@@ -319,6 +341,10 @@ describe('POST /api/quotes/[id]/convert', () => {
             }),
           },
           customer: { update: jest.fn().mockResolvedValue({}) },
+          product: { findUnique: jest.fn(), update: jest.fn() },
+          siteSettings: { findFirst: jest.fn().mockResolvedValue({ lowStockThreshold: 10 }) },
+          inventoryLog: { create: jest.fn() },
+          productVariant: { findUnique: jest.fn(), update: jest.fn() },
         };
         return fn(mockTx);
       });

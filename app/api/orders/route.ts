@@ -8,6 +8,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
+import {
+  validateStockForOrder,
+  processOrderStockDecrement,
+  getInventorySettings,
+} from '@/lib/services/inventoryService';
 
 // Generate unique order number
 function generateOrderNumber(): string {
@@ -139,63 +144,106 @@ export async function POST(request: NextRequest) {
     const discount = body.discount || 0;
     const total = subtotal + shippingCost + tax - discount;
 
-    // Create order with items
-    const order = await prisma.order.create({
-      data: {
-        orderNumber: generateOrderNumber(),
-        customerId: body.customerId,
-        customerName: body.customerName || customer.name,
-        customerEmail: body.customerEmail || customer.email,
-        customerPhone: body.customerPhone || customer.phone,
-        itemCount,
-        subtotal,
-        shippingCost,
-        tax,
-        discount,
-        total,
-        currency: body.currency || 'USD',
-        status: body.status || 'pending',
-        paymentStatus: body.paymentStatus || 'pending',
-        paymentMethod: body.paymentMethod || null,
-        shippingAddress: body.shippingAddress || {},
-        customerNote: body.customerNote || null,
-        internalNote: body.internalNote || null,
-        items: {
-          create: body.items.map((item: {
-            productId: string;
-            productName: string;
-            productSku: string;
-            variantId?: string;
-            variantName?: string;
-            quantity: number;
-            unitPrice: number;
-            totalPrice: number;
-          }) => ({
-            productId: item.productId,
-            productName: item.productName,
-            productSku: item.productSku,
-            variantId: item.variantId || null,
-            variantName: item.variantName || null,
-            quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            totalPrice: item.totalPrice,
-          })),
-        },
-      },
-      include: {
-        customer: { select: { id: true, name: true, email: true } },
-        items: true,
-      },
-    });
+    // Get inventory settings and validate stock
+    const inventorySettings = await getInventorySettings();
 
-    // Update customer stats
-    await prisma.customer.update({
-      where: { id: body.customerId },
-      data: {
-        totalOrders: { increment: 1 },
-        totalSpent: { increment: total },
-        lastOrderAt: new Date(),
-      },
+    if (inventorySettings.trackInventory) {
+      const validation = await validateStockForOrder(
+        body.items.map((item: { productId: string; variantId?: string; quantity: number; productName?: string }) => ({
+          productId: item.productId,
+          variantId: item.variantId,
+          quantity: item.quantity,
+          productName: item.productName,
+        }))
+      );
+
+      if (!validation.valid && !inventorySettings.allowBackorders) {
+        return NextResponse.json(
+          {
+            error: 'Insufficient stock for one or more items',
+            details: validation.errors,
+          },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Create order with items and decrement stock in a transaction
+    const order = await prisma.$transaction(async (tx) => {
+      // Create the order
+      const newOrder = await tx.order.create({
+        data: {
+          orderNumber: generateOrderNumber(),
+          customerId: body.customerId,
+          customerName: body.customerName || customer.name,
+          customerEmail: body.customerEmail || customer.email,
+          customerPhone: body.customerPhone || customer.phone,
+          itemCount,
+          subtotal,
+          shippingCost,
+          tax,
+          discount,
+          total,
+          currency: body.currency || 'USD',
+          status: body.status || 'pending',
+          paymentStatus: body.paymentStatus || 'pending',
+          paymentMethod: body.paymentMethod || null,
+          shippingAddress: body.shippingAddress || {},
+          customerNote: body.customerNote || null,
+          internalNote: body.internalNote || null,
+          items: {
+            create: body.items.map((item: {
+              productId: string;
+              productName: string;
+              productSku: string;
+              variantId?: string;
+              variantName?: string;
+              quantity: number;
+              unitPrice: number;
+              totalPrice: number;
+            }) => ({
+              productId: item.productId,
+              productName: item.productName,
+              productSku: item.productSku,
+              variantId: item.variantId || null,
+              variantName: item.variantName || null,
+              quantity: item.quantity,
+              unitPrice: item.unitPrice,
+              totalPrice: item.totalPrice,
+            })),
+          },
+        },
+        include: {
+          customer: { select: { id: true, name: true, email: true } },
+          items: true,
+        },
+      });
+
+      // Decrement stock for all items if inventory tracking is enabled
+      if (inventorySettings.trackInventory) {
+        await processOrderStockDecrement(
+          tx,
+          newOrder.id,
+          body.items.map((item: { productId: string; variantId?: string; quantity: number }) => ({
+            productId: item.productId,
+            variantId: item.variantId,
+            quantity: item.quantity,
+          })),
+          'system' // System user for API-created orders
+        );
+      }
+
+      // Update customer stats
+      await tx.customer.update({
+        where: { id: body.customerId },
+        data: {
+          totalOrders: { increment: 1 },
+          totalSpent: { increment: total },
+          lastOrderAt: new Date(),
+        },
+      });
+
+      return newOrder;
     });
 
     return NextResponse.json({

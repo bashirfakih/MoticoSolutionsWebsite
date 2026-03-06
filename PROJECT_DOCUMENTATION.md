@@ -901,6 +901,18 @@ Pending → Processing → Shipped → Delivered
 - Allow backorders
 - Out of stock behavior
 
+**Real-Time Inventory Sync:**
+
+The platform includes automatic inventory synchronization:
+
+- **Stock Validation**: Before order placement, validates sufficient stock for all items
+- **Auto-Decrement**: Automatically decrements stock when orders are created
+- **Quote Conversion**: Stock is decremented when quotes are converted to orders
+- **Cancellation Restore**: Stock is automatically restored when orders are cancelled/refunded
+- **Inventory Logging**: All stock changes create audit trail entries in InventoryLog
+- **Status Updates**: Stock status (in_stock, low_stock, out_of_stock) auto-updates based on quantity
+- **Backorder Support**: Respects allowBackorder flag per product and global settings
+
 **Pricing & Tax:**
 - Tax rate
 - Tax label
@@ -1800,7 +1812,7 @@ motico-solutions/
 
 ### Phase 1 (Q2 2026)
 - [ ] Payment gateway integration (Stripe/PayPal)
-- [ ] Real-time inventory sync
+- [x] Real-time inventory sync
 - [x] Advanced analytics dashboard
 - [ ] Product reviews and ratings
 - [ ] Wishlist functionality

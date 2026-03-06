@@ -18,6 +18,9 @@ const mockOrderDelete = jest.fn();
 const mockOrderCount = jest.fn();
 const mockCustomerFindUnique = jest.fn();
 const mockCustomerUpdate = jest.fn();
+const mockSiteSettingsFind = jest.fn();
+const mockProductFindUnique = jest.fn();
+const mockTransaction = jest.fn();
 
 jest.mock('@/lib/db', () => ({
   prisma: {
@@ -33,6 +36,13 @@ jest.mock('@/lib/db', () => ({
       findUnique: (...args: unknown[]) => mockCustomerFindUnique(...args),
       update: (...args: unknown[]) => mockCustomerUpdate(...args),
     },
+    siteSettings: {
+      findFirst: (...args: unknown[]) => mockSiteSettingsFind(...args),
+    },
+    product: {
+      findUnique: (...args: unknown[]) => mockProductFindUnique(...args),
+    },
+    $transaction: (fn: (tx: unknown) => Promise<unknown>) => mockTransaction(fn),
   },
 }));
 
@@ -43,6 +53,38 @@ describe('Orders API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockCustomerUpdate.mockResolvedValue({});
+    // Default: inventory tracking disabled to simplify existing tests
+    mockSiteSettingsFind.mockResolvedValue({
+      trackInventory: false,
+      allowBackorders: false,
+      lowStockThreshold: 10,
+    });
+    // Set up transaction mock to execute the callback with mock transaction client
+    mockTransaction.mockImplementation(async (fn) => {
+      const mockTx = {
+        order: {
+          create: mockOrderCreate,
+        },
+        customer: {
+          update: mockCustomerUpdate,
+        },
+        product: {
+          findUnique: jest.fn(),
+          update: jest.fn(),
+        },
+        siteSettings: {
+          findFirst: jest.fn().mockResolvedValue({ lowStockThreshold: 10 }),
+        },
+        inventoryLog: {
+          create: jest.fn(),
+        },
+        productVariant: {
+          findUnique: jest.fn(),
+          update: jest.fn(),
+        },
+      };
+      return fn(mockTx);
+    });
   });
 
   describe('GET /api/orders', () => {

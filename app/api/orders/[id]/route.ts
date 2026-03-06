@@ -8,6 +8,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { processOrderStockRestore } from '@/lib/services/inventoryService';
+import { getCurrentUser } from '@/lib/auth/session';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -139,6 +141,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         items: true,
       },
     });
+
+    // Restore stock if order was cancelled or refunded
+    const previousStatus = existing.status;
+    const newStatus = body.status;
+
+    if (newStatus && ['cancelled', 'refunded'].includes(newStatus) &&
+        !['cancelled', 'refunded'].includes(previousStatus)) {
+      // Get user for audit trail
+      const user = await getCurrentUser();
+      const userId = user?.id || 'system';
+
+      await processOrderStockRestore(id, userId);
+    }
 
     return NextResponse.json({
       ...order,

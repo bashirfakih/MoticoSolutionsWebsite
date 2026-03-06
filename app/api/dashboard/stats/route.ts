@@ -89,6 +89,9 @@ export async function GET() {
       ordersLast24Hours,
       outOfStockProducts,
       ordersForDailyRevenue,
+
+      // Inventory tracking
+      latestInventoryLog,
     ] = await Promise.all([
       // Counts
       prisma.order.count(),
@@ -181,6 +184,12 @@ export async function GET() {
           total: true,
         },
       }),
+
+      // Latest inventory log for real-time sync detection
+      prisma.inventoryLog.findFirst({
+        orderBy: { createdAt: 'desc' },
+        select: { createdAt: true },
+      }),
     ]);
 
     // Calculate month-over-month changes
@@ -264,6 +273,12 @@ export async function GET() {
       ordersLast24Hours,
       outOfStockProducts,
       dailyRevenue,
+      // Inventory metrics for real-time sync
+      inventory: {
+        criticalCount: outOfStockProducts,
+        warningCount: lowStockCount,
+        lastUpdated: latestInventoryLog?.createdAt || null,
+      },
     };
 
     // Cache the response
