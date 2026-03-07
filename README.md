@@ -547,13 +547,20 @@ npm run build
 
 ## 📊 Performance
 
+### Lighthouse Scores (Login Page — March 2026)
+
+| Category | Score | Target |
+|----------|-------|--------|
+| Performance | 91 | 85+ |
+| Accessibility | 100 | 90+ |
+| Best Practices | 96 | 95+ |
+| SEO | 100 | 80+ |
+
 ### Metrics
-- **Lighthouse Score**: 90+ (target)
-- **First Contentful Paint**: < 1.5s
-- **Time to Interactive**: < 3.5s
-- **Image Optimization**: 80-95% size reduction
-- **Code Splitting**: Route-based
-- **Caching**: Aggressive caching strategy
+- **CLS**: 0.01 (homepage), 0.11 (login)
+- **Image Optimization**: 80-95% size reduction via Sharp + WebP
+- **Code Splitting**: Route-based with `optimizePackageImports`
+- **Console cleanup**: Production builds strip console.log
 
 ### Optimizations
 - ✅ Image optimization with Sharp
