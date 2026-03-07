@@ -83,6 +83,14 @@ const nextConfig = {
       fullUrl: process.env.NODE_ENV === 'development',
     },
   },
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production'
+      ? { exclude: ['error', 'warn'] }
+      : false,
+  },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'recharts'],
+  },
   async headers() {
     return [
       {

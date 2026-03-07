@@ -4,13 +4,14 @@
 User-agent: *
 Allow: /
 
+# Block admin and internal paths
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /temp/
+
 # Sitemap
 Sitemap: https://moticosolutions.com/sitemap.xml
 
 # Crawl-delay (optional, for polite crawling)
 Crawl-delay: 1
-
-# Disallow admin/internal paths (if any)
-Disallow: /api/
-Disallow: /_next/
-Disallow: /temp/

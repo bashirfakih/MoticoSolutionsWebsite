@@ -51,6 +51,9 @@ public/uploads/**/*
 playwright-report/
 test-results/
 
+# Lighthouse reports
+lighthouse/
+
 # Database dumps (keep migration scripts)
 backup/*.sql
 .env*.local
