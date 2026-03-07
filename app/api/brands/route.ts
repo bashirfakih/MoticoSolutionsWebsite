@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { generateSlug } from '@/lib/data/types';
 import { toUrlPath } from '@/lib/utils/imageOptimizer';
+import { sanitizeInput } from '@/lib/security/sanitize';
 
 export async function GET(request: NextRequest) {
   try {
@@ -99,14 +100,15 @@ export async function POST(request: NextRequest) {
       _max: { sortOrder: true },
     });
 
+    // SECURITY: Sanitize string inputs to prevent stored XSS
     const brand = await prisma.brand.create({
       data: {
-        name: body.name,
+        name: sanitizeInput(body.name),
         slug,
         logo: body.logo || null,
-        description: body.description || null,
-        website: body.website || null,
-        countryOfOrigin: body.countryOfOrigin || null,
+        description: body.description ? sanitizeInput(body.description) : null,
+        website: body.website ? sanitizeInput(body.website) : null,
+        countryOfOrigin: body.countryOfOrigin ? sanitizeInput(body.countryOfOrigin) : null,
         isActive: body.isActive ?? true,
         sortOrder: body.sortOrder ?? (maxSortOrder._max.sortOrder || 0) + 1,
       },

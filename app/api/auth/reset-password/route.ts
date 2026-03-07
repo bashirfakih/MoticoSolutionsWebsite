@@ -8,9 +8,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { hashPassword } from '@/lib/auth/password';
 import crypto from 'crypto';
+import { enforceRateLimit, PASSWORD_RESET_LIMIT } from '@/lib/security/rateLimit';
+import { validateOrigin } from '@/lib/security/csrf';
 
 export async function POST(request: NextRequest) {
   try {
+    // SECURITY: Rate limit password reset — max 3 per hour per IP
+    const rateLimited = enforceRateLimit(request, PASSWORD_RESET_LIMIT);
+    if (rateLimited) return rateLimited;
+
+    // SECURITY: Validate request origin
+    const originError = validateOrigin(request);
+    if (originError) return originError;
+
     const { token, password } = await request.json();
 
     if (!token || !password) {

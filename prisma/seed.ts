@@ -14,8 +14,9 @@ import bcrypt from 'bcryptjs';
 import 'dotenv/config';
 
 // Create PostgreSQL connection pool
+// Use DIRECT_URL (bypasses pgBouncer) for seed scripts, fall back to DATABASE_URL
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DIRECT_URL || process.env.DATABASE_URL,
 });
 
 // Create Prisma adapter for pg

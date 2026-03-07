@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { toUrlPath } from '@/lib/utils/imageOptimizer';
+import { sanitizeInput } from '@/lib/security/sanitize';
 
 // Category image mapping for legacy seed data paths
 const categoryImageMap: Record<string, string> = {
@@ -221,16 +222,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create category
+    // SECURITY: Sanitize string inputs to prevent stored XSS
     const category = await prisma.category.create({
       data: {
-        name: body.name,
+        name: sanitizeInput(body.name),
         slug: body.slug,
-        description: body.description || null,
+        description: body.description ? sanitizeInput(body.description) : null,
         image: body.image || null,
-        icon: body.icon || null,
-        color: body.color || null,
-        featuredBrand: body.featuredBrand || null,
+        icon: body.icon ? sanitizeInput(body.icon) : null,
+        color: body.color ? sanitizeInput(body.color) : null,
+        featuredBrand: body.featuredBrand ? sanitizeInput(body.featuredBrand) : null,
         parentId: body.parentId || null,
         sortOrder: body.sortOrder ?? 0,
         isActive: body.isActive ?? true,

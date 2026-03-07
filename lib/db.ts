@@ -5,6 +5,10 @@
  * Prevents connection pool exhaustion during development with hot reloading.
  * Uses Prisma 7's driver adapter pattern for PostgreSQL.
  *
+ * Supports Supabase (production) and local Docker PostgreSQL (development).
+ * - Production: DATABASE_URL points to Supabase pgBouncer (port 6543) with SSL
+ * - Development: DATABASE_URL points to local Docker PostgreSQL (no SSL)
+ *
  * @module lib/db
  */
 
@@ -18,12 +22,20 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
+  const isProduction = process.env.NODE_ENV === 'production';
+
   // Create PostgreSQL connection pool
+  // Production (Supabase): requires SSL
+  // Development (Docker): no SSL needed
   const pool = globalForPrisma.pool ?? new Pool({
     connectionString: process.env.DATABASE_URL,
+    connectionTimeoutMillis: 10000,
+    ...(isProduction && {
+      ssl: { rejectUnauthorized: false },
+    }),
   });
 
-  if (process.env.NODE_ENV !== 'production') {
+  if (!isProduction) {
     globalForPrisma.pool = pool;
   }
 

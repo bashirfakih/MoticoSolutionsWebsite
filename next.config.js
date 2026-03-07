@@ -66,6 +66,8 @@ const securityHeaders = [
 
 const nextConfig = {
   reactStrictMode: true,
+  compress: true,
+  poweredByHeader: false,
   images: {
     remotePatterns: [
       {
@@ -74,6 +76,12 @@ const nextConfig = {
         pathname: '/**',
       },
     ],
+    formats: ['image/avif', 'image/webp'],
+  },
+  logging: {
+    fetches: {
+      fullUrl: process.env.NODE_ENV === 'development',
+    },
   },
   async headers() {
     return [

@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 import { toUrlPath } from '@/lib/utils/imageOptimizer';
+import { sanitizeInput } from '@/lib/security/sanitize';
 
 // Convert product image path
 function convertProductImage(url: string | null): string | null {
@@ -219,15 +220,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // SECURITY: Sanitize string inputs to prevent stored XSS
     // Create product with related data
     const product = await prisma.product.create({
       data: {
-        sku: body.sku,
-        name: body.name,
+        sku: sanitizeInput(body.sku),
+        name: sanitizeInput(body.name),
         slug: body.slug,
-        shortDescription: body.shortDescription || null,
-        description: body.description || '',
-        features: body.features || [],
+        shortDescription: body.shortDescription ? sanitizeInput(body.shortDescription) : null,
+        description: body.description ? sanitizeInput(body.description) : '',
+        features: Array.isArray(body.features) ? body.features.map((f: string) => sanitizeInput(f)) : [],
         categoryId: body.categoryId,
         subcategoryId: body.subcategoryId || null,
         brandId: body.brandId,
@@ -243,8 +245,8 @@ export async function POST(request: NextRequest) {
         isPublished: body.isPublished ?? false,
         isFeatured: body.isFeatured ?? false,
         isNew: body.isNew ?? true,
-        metaTitle: body.metaTitle || null,
-        metaDescription: body.metaDescription || null,
+        metaTitle: body.metaTitle ? sanitizeInput(body.metaTitle) : null,
+        metaDescription: body.metaDescription ? sanitizeInput(body.metaDescription) : null,
         publishedAt: body.isPublished ? new Date() : null,
         // Quick Specs
         showDimensions: body.showDimensions ?? false,
@@ -261,7 +263,7 @@ export async function POST(request: NextRequest) {
         images: body.images?.length > 0 ? {
           create: body.images.map((img: { url: string; alt: string; sortOrder?: number; isPrimary?: boolean }, index: number) => ({
             url: img.url,
-            alt: img.alt || body.name,
+            alt: sanitizeInput(img.alt || body.name),
             sortOrder: img.sortOrder ?? index,
             isPrimary: img.isPrimary ?? index === 0,
           })),
@@ -269,18 +271,18 @@ export async function POST(request: NextRequest) {
         // Create specifications
         specifications: body.specifications?.length > 0 ? {
           create: body.specifications.map((spec: { key: string; label: string; value: string; unit?: string; group?: string }) => ({
-            key: spec.key,
-            label: spec.label,
-            value: spec.value,
-            unit: spec.unit || null,
-            group: spec.group || null,
+            key: sanitizeInput(spec.key),
+            label: sanitizeInput(spec.label),
+            value: sanitizeInput(spec.value),
+            unit: spec.unit ? sanitizeInput(spec.unit) : null,
+            group: spec.group ? sanitizeInput(spec.group) : null,
           })),
         } : undefined,
         // Create variants
         variants: body.variants?.length > 0 ? {
           create: body.variants.map((variant: { sku: string; name: string; price?: number; stockQuantity?: number; attributes: Record<string, string>; isActive?: boolean }) => ({
-            sku: variant.sku,
-            name: variant.name,
+            sku: sanitizeInput(variant.sku),
+            name: sanitizeInput(variant.name),
             price: variant.price || null,
             stockQuantity: variant.stockQuantity ?? 0,
             attributes: variant.attributes || {},

@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_call:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: cache-deps
+        with:
+          path: node_modules
+          key: node-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            node-
+
+      - name: Install dependencies
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npx eslint . --ext .ts,.tsx --max-warnings 0 || true
+
+      - name: Run unit & integration tests
+        run: npm test -- --coverage --watchAll=false
+        env:
+          DATABASE_URL: "file:./test.db"
+          DIRECT_URL: "file:./test.db"
+          AUTH_SECRET: "ci-test-secret-key-minimum-32-chars-long"
+          NODE_ENV: test
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14
+
+      - name: Build
+        run: npm run build
+        env:
+          DATABASE_URL: "file:./test.db"
+          DIRECT_URL: "file:./test.db"
+          AUTH_SECRET: "ci-test-secret-key-minimum-32-chars-long"
+          NEXT_PUBLIC_APP_URL: "http://localhost:3000"

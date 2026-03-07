@@ -28,12 +28,20 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
+// Mock auth — GET /api/quotes now requires authentication
+const mockGetCurrentUser = jest.fn();
+jest.mock('@/lib/auth/session', () => ({
+  getCurrentUser: () => mockGetCurrentUser(),
+}));
+
 // Import route handlers after mocks
 import { GET, POST } from '@/app/api/quotes/route';
 
 describe('Quotes API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default: authenticated user for GET tests
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', role: 'admin', email: 'admin@test.com' });
   });
 
   describe('GET /api/quotes', () => {

@@ -79,7 +79,17 @@ export async function POST(request: NextRequest) {
 
     // Convert file to buffer
     const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    let buffer = Buffer.from(bytes);
+
+    // SECURITY: Sanitize SVG files — they can contain <script> tags and event handlers
+    if (file.type === 'image/svg+xml') {
+      let svgContent = buffer.toString('utf-8');
+      svgContent = svgContent.replace(/<script[\s\S]*?<\/script>/gi, '');
+      svgContent = svgContent.replace(/on\w+\s*=\s*["'][^"']*["']/gi, '');
+      svgContent = svgContent.replace(/javascript\s*:/gi, '');
+      svgContent = svgContent.replace(/<foreignObject[\s\S]*?<\/foreignObject>/gi, '');
+      buffer = Buffer.from(svgContent, 'utf-8');
+    }
 
     // Validate image with Sharp
     const validation = await validateImage(buffer);

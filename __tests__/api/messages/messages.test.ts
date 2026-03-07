@@ -28,6 +28,12 @@ jest.mock('@/lib/db', () => ({
   },
 }));
 
+// Mock security modules — tests run without real rate limiting
+jest.mock('@/lib/security/rateLimit', () => ({
+  enforceRateLimit: () => null,
+  CONTACT_FORM_LIMIT: { windowMs: 3600000, maxAttempts: 5, name: 'contact' },
+}));
+
 // Import route handlers after mocks
 import { GET, POST } from '@/app/api/messages/route';
 

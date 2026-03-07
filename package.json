@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "postinstall": "prisma generate",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -16,8 +17,10 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
+    "db:seed:test": "tsx prisma/seed.test.ts",
     "db:studio": "prisma studio",
-    "db:reset": "prisma migrate reset"
+    "db:reset": "prisma migrate reset",
+    "type-check": "tsc --noEmit"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
@@ -59,6 +62,7 @@
     "ts-jest": "^29.4.6",
     "tsx": "^4.21.0",
     "typescript": "^5.0.0",
+    "wait-on": "^9.0.4",
     "whatwg-fetch": "^3.6.20"
   }
 }

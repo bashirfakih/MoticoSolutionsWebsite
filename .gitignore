@@ -50,3 +50,13 @@ public/uploads/**/*
 # Playwright reports
 playwright-report/
 test-results/
+
+# Database dumps (keep migration scripts)
+backup/*.sql
+.env*.local
+
+# Auth state (Playwright)
+.auth/
+
+# Local dev notes
+restart-dev.md

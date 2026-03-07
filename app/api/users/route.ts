@@ -10,6 +10,7 @@ import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth/session';
 import { hashPassword } from '@/lib/auth/password';
 import { Prisma } from '@prisma/client';
+import { sanitizeInput } from '@/lib/security/sanitize';
 
 // GET - List users with optional filtering (admin only)
 export async function GET(request: NextRequest) {
@@ -160,20 +161,21 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // SECURITY: Sanitize string inputs to prevent stored XSS
     // Create user
     const user = await prisma.user.create({
       data: {
-        email: body.email.toLowerCase(),
+        email: body.email.toLowerCase().trim(),
         passwordHash,
-        name: body.name,
+        name: sanitizeInput(body.name),
         role: body.role || 'customer',
-        company: body.company || null,
-        phone: body.phone || null,
-        country: body.country || null,
-        industry: body.industry || null,
-        position: body.position || null,
-        address: body.address || null,
-        city: body.city || null,
+        company: body.company ? sanitizeInput(body.company) : null,
+        phone: body.phone ? sanitizeInput(body.phone) : null,
+        country: body.country ? sanitizeInput(body.country) : null,
+        industry: body.industry ? sanitizeInput(body.industry) : null,
+        position: body.position ? sanitizeInput(body.position) : null,
+        address: body.address ? sanitizeInput(body.address) : null,
+        city: body.city ? sanitizeInput(body.city) : null,
         isActive: body.isActive ?? true,
         discountPercentage: body.discountPercentage ?? 0,
       },

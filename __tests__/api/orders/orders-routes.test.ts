@@ -9,6 +9,12 @@ jest.mock('next/server', () => require('../helpers/testHelpers').nextServerMock)
 
 import { createMockRequest, getResponseJson } from '../helpers/testHelpers';
 
+// Mock auth — GET /api/orders now requires authentication
+const mockGetCurrentUser = jest.fn();
+jest.mock('@/lib/auth/session', () => ({
+  getCurrentUser: () => mockGetCurrentUser(),
+}));
+
 // Mock Prisma
 const mockOrderFindMany = jest.fn();
 const mockOrderFindUnique = jest.fn();
@@ -52,6 +58,8 @@ import { GET, POST } from '@/app/api/orders/route';
 describe('Orders API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default: authenticated user for GET tests
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', role: 'admin', email: 'admin@test.com' });
     mockCustomerUpdate.mockResolvedValue({});
     // Default: inventory tracking disabled to simplify existing tests
     mockSiteSettingsFind.mockResolvedValue({

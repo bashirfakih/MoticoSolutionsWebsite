@@ -49,6 +49,15 @@ jest.mock('@/lib/auth/session', () => ({
   setSessionCookie: (token: string) => mockSetSessionCookie(token),
 }));
 
+// Mock security modules — tests run without real rate limiting/CSRF
+jest.mock('@/lib/security/rateLimit', () => ({
+  enforceRateLimit: () => null,
+  LOGIN_LIMIT: { windowMs: 900000, maxAttempts: 5, name: 'login' },
+}));
+jest.mock('@/lib/security/csrf', () => ({
+  validateOrigin: () => null,
+}));
+
 // Mock Prisma
 const mockUserFindUnique = jest.fn();
 const mockUserUpdate = jest.fn();

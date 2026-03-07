@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth/session';
+import { sanitizeInput } from '@/lib/security/sanitize';
 
 export async function PATCH(
   request: NextRequest,
@@ -19,9 +20,17 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
+    // SECURITY: Whitelist allowed fields — never pass raw body to Prisma
+    const data: Record<string, unknown> = {};
+    if (body.name !== undefined) data.name = sanitizeInput(body.name);
+    if (body.logo !== undefined) data.logo = body.logo;
+    if (body.website !== undefined) data.website = sanitizeInput(body.website);
+    if (body.isActive !== undefined) data.isActive = Boolean(body.isActive);
+    if (body.sortOrder !== undefined) data.sortOrder = Number(body.sortOrder);
+
     const logo = await prisma.partnerLogo.update({
       where: { id },
-      data: body,
+      data,
     });
 
     return NextResponse.json(logo);

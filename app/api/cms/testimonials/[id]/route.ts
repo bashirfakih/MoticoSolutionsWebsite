@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { getCurrentUser } from '@/lib/auth/session';
+import { sanitizeInput } from '@/lib/security/sanitize';
 
 export async function PATCH(
   request: NextRequest,
@@ -19,9 +20,20 @@ export async function PATCH(
     const { id } = await params;
     const body = await request.json();
 
+    // SECURITY: Whitelist allowed fields — never pass raw body to Prisma
+    const data: Record<string, unknown> = {};
+    if (body.customerName !== undefined) data.customerName = sanitizeInput(body.customerName);
+    if (body.role !== undefined) data.role = sanitizeInput(body.role);
+    if (body.company !== undefined) data.company = sanitizeInput(body.company);
+    if (body.quote !== undefined) data.quote = sanitizeInput(body.quote);
+    if (body.image !== undefined) data.image = body.image;
+    if (body.rating !== undefined) data.rating = Number(body.rating);
+    if (body.isActive !== undefined) data.isActive = Boolean(body.isActive);
+    if (body.sortOrder !== undefined) data.sortOrder = Number(body.sortOrder);
+
     const testimonial = await prisma.testimonial.update({
       where: { id },
-      data: body,
+      data,
     });
 
     return NextResponse.json(testimonial);

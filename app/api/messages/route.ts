@@ -8,6 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
+import { sanitizeInput } from '@/lib/security/sanitize';
+import { enforceRateLimit, CONTACT_FORM_LIMIT } from '@/lib/security/rateLimit';
 
 // GET - List messages with optional filtering
 export async function GET(request: NextRequest) {
@@ -92,6 +94,10 @@ export async function GET(request: NextRequest) {
 // POST - Create new message (contact form submission)
 export async function POST(request: NextRequest) {
   try {
+    // SECURITY: Rate limit contact form — max 5 per hour per IP
+    const rateLimited = enforceRateLimit(request, CONTACT_FORM_LIMIT);
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
 
     // Validate required fields
@@ -111,15 +117,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create message
+    // SECURITY: Sanitize all string inputs to prevent stored XSS
     const message = await prisma.message.create({
       data: {
-        name: body.name,
-        email: body.email,
-        phone: body.phone || null,
-        company: body.company || null,
-        subject: body.subject,
-        message: body.message,
+        name: sanitizeInput(body.name),
+        email: body.email.toLowerCase().trim(),
+        phone: body.phone ? sanitizeInput(body.phone) : null,
+        company: body.company ? sanitizeInput(body.company) : null,
+        subject: sanitizeInput(body.subject),
+        message: sanitizeInput(body.message),
         type: body.type || 'contact',
         status: 'unread',
       },

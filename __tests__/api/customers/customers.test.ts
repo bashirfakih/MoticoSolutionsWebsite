@@ -9,6 +9,12 @@ jest.mock('next/server', () => require('../helpers/testHelpers').nextServerMock)
 
 import { createMockRequest, createRouteParams, getResponseJson } from '../helpers/testHelpers';
 
+// Mock auth — GET /api/customers now requires admin authentication
+const mockGetCurrentUser = jest.fn();
+jest.mock('@/lib/auth/session', () => ({
+  getCurrentUser: () => mockGetCurrentUser(),
+}));
+
 // Mock Prisma
 const mockCustomerFindMany = jest.fn();
 const mockCustomerFindUnique = jest.fn();
@@ -36,6 +42,8 @@ import { GET, POST } from '@/app/api/customers/route';
 describe('Customers API', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    // Default: authenticated admin user
+    mockGetCurrentUser.mockResolvedValue({ id: 'user-1', role: 'admin', email: 'admin@test.com' });
   });
 
   describe('GET /api/customers', () => {

@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { Prisma } from '@prisma/client';
+import { sanitizeInput } from '@/lib/security/sanitize';
 
 // GET - List customers with optional filtering
 export async function GET(request: NextRequest) {
@@ -113,23 +114,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // SECURITY: Sanitize string inputs to prevent stored XSS
     // Create customer
     const customer = await prisma.customer.create({
       data: {
-        email: body.email.toLowerCase(),
-        name: body.name,
-        company: body.company || null,
-        phone: body.phone || null,
-        address: body.address || null,
-        city: body.city || null,
-        region: body.region || null,
-        postalCode: body.postalCode || null,
-        country: body.country || 'Lebanon',
+        email: body.email.toLowerCase().trim(),
+        name: sanitizeInput(body.name),
+        company: body.company ? sanitizeInput(body.company) : null,
+        phone: body.phone ? sanitizeInput(body.phone) : null,
+        address: body.address ? sanitizeInput(body.address) : null,
+        city: body.city ? sanitizeInput(body.city) : null,
+        region: body.region ? sanitizeInput(body.region) : null,
+        postalCode: body.postalCode ? sanitizeInput(body.postalCode) : null,
+        country: body.country ? sanitizeInput(body.country) : 'Lebanon',
         discountPercentage: body.discountPercentage ?? 0,
         status: body.status || 'active',
         isVerified: body.isVerified ?? false,
-        notes: body.notes || null,
-        tags: body.tags || [],
+        notes: body.notes ? sanitizeInput(body.notes) : null,
+        tags: Array.isArray(body.tags) ? body.tags.map((t: string) => sanitizeInput(t)) : [],
       },
     });
 

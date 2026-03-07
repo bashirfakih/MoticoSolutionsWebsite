@@ -234,35 +234,118 @@ npm test -- products.test.ts
 
 ---
 
-## 📦 Deployment
+## CI/CD Pipeline
 
-### Build for Production
+### Pipeline Overview
 
-```bash
-npm run build
+```text
+Push / PR to main
+      |
+      v
++------------------+     +------------------+
+|   CI Workflow    |     |  E2E Workflow    |
+|                  |     |                  |
+|  1. Type check   |     |  1. Install deps |
+|  2. Lint         |     |  2. Start Postgres|
+|  3. Unit tests   |     |  3. Run migrations|
+|  4. Build        |     |  4. Seed test DB  |
++--------+---------+     |  5. Build app     |
+         |               |  6. Playwright    |
+         |               +--------+---------+
+         |                        |
+         +------+    +------------+
+                |    |
+                v    v
+         +------+----+------+
+         |  Deploy Workflow  |
+         |  (main only)      |
+         |                   |
+         |  1. Vercel build  |
+         |  2. Deploy staging|
+         |  3. Output URL    |
+         +-------------------+
 ```
 
-### Start Production Server
+### Workflows
+
+| Workflow | File | Trigger | Purpose |
+|----------|------|---------|---------|
+| CI | `.github/workflows/ci.yml` | Push + PR to `main` | Type check, lint, unit tests, build |
+| E2E | `.github/workflows/e2e.yml` | Push + PR to `main` | Playwright tests against PostgreSQL |
+| Deploy | `.github/workflows/deploy.yml` | Push to `main` (after CI + E2E pass) | Deploy to Vercel staging |
+
+### Required GitHub Secrets
+
+Add these in **Settings > Secrets and variables > Actions**:
+
+| Secret | Description |
+|--------|-------------|
+| `VERCEL_TOKEN` | Vercel API token (from vercel.com/account/tokens) |
+| `VERCEL_ORG_ID` | Vercel org ID (from `.vercel/project.json`) |
+| `VERCEL_PROJECT_ID` | Vercel project ID (from `.vercel/project.json`) |
+| `SUPABASE_DATABASE_URL` | Supabase pooled connection (port 6543, pgBouncer) |
+| `SUPABASE_DIRECT_URL` | Supabase direct connection (port 5432, for migrations) |
+
+CI and E2E workflows use hardcoded test values for `DATABASE_URL`, `DIRECT_URL`, and `AUTH_SECRET` — no secrets needed.
+
+### Branch Protection Rules
+
+Enable in **Settings > Branches > Add rule** for `main`:
+
+- Require status checks to pass before merging:
+  - `ci` (from CI workflow)
+  - `e2e` (from E2E workflow)
+- Require branches to be up to date before merging
+- Dismiss stale pull request approvals when new commits are pushed
+
+---
+
+## Deployment
+
+### Staging (Vercel + Supabase)
+
+The app is deployed to Vercel with a Supabase-managed PostgreSQL database.
+
+**Automatic deploys:** Every push to `main`/`master` triggers CI + E2E tests, then deploys to staging via GitHub Actions.
+
+**Manual deploy:**
 
 ```bash
-npm start
+# From project root (requires Vercel CLI + login)
+vercel deploy --prod=false
 ```
 
-### Environment Setup
+### Environment Variables (Vercel Dashboard)
 
-1. Set `NODE_ENV=production`
-2. Configure production database URL
-3. Set secure `AUTH_SECRET`
-4. Configure domain in `NEXTAUTH_URL`
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | Supabase pooled connection (port 6543, pgBouncer) |
+| `DIRECT_URL` | Yes | Supabase direct connection (port 5432, for migrations) |
+| `AUTH_SECRET` | Yes | 32+ char secret for JWT signing |
+| `NEXT_PUBLIC_APP_URL` | Yes | Staging URL (e.g., `https://motico-staging.vercel.app`) |
+| `CLOUDINARY_CLOUD_NAME` | Yes | Cloudinary cloud name for image uploads |
+| `CLOUDINARY_API_KEY` | Yes | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Yes | Cloudinary API secret |
+| `SMTP_HOST` | No | SMTP server for email notifications |
+| `SMTP_PORT` | No | SMTP port (default: 587) |
+| `SMTP_USER` | No | SMTP username |
+| `SMTP_PASS` | No | SMTP password |
 
-### Deployment Platforms
+### Run Migrations on Supabase
 
-**Recommended:**
-- ✅ **Vercel** - Easiest deployment (native Next.js support)
-- ✅ **Railway** - Great for full-stack with PostgreSQL
-- ✅ **DigitalOcean App Platform** - Scalable and affordable
-- ✅ **AWS Amplify** - Enterprise-grade
-- ✅ **Docker** - Self-hosted option
+```bash
+# Apply all pending migrations (uses DIRECT_URL from prisma.config.ts)
+DIRECT_URL=<supabase_direct_url> npx prisma migrate deploy
+```
+
+### Local Development
+
+Local dev still uses Docker PostgreSQL (no Supabase needed):
+
+```bash
+docker-compose up -d      # Start local PostgreSQL
+npm run dev               # Start Next.js dev server
+```
 
 ---
 
@@ -301,10 +384,10 @@ npm start
 - **Auth**: Custom JWT with httpOnly cookies
 
 ### DevOps
-- **Testing**: Jest 29.7.0
+- **CI/CD**: GitHub Actions (lint, test, build, E2E, deploy)
+- **Testing**: Jest 30 + Playwright E2E
 - **Linting**: ESLint
-- **Formatting**: Prettier (configured)
-- **Git**: Version control
+- **Deployment**: Vercel (automated via CI)
 - **Docker**: PostgreSQL container
 
 ### Key Libraries

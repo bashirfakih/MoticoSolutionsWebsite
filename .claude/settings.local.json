@@ -7,7 +7,12 @@
       "Bash(npm run dev:*)",
       "Bash(curl:*)",
       "Bash(timeout:*)",
-      "Bash(npm install:*)"
+      "Bash(npm install:*)",
+      "Bash(claude mcp list)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ],
+  "enableAllProjectMcpServers": true
 }
