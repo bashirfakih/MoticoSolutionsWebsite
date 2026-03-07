@@ -190,17 +190,20 @@ export default function LoginPage() {
   // Don't show login form if already authenticated
   if (authLoading || (isAuthenticated && user)) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-10 h-10 border-4 border-gray-200 border-t-[#004D8B] rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500">Loading...</p>
+      <main id="main-content" className="min-h-screen flex">
+        <div className="hidden lg:flex lg:w-[40%] bg-[#0f3460]" />
+        <div className="flex-1 flex items-center justify-center bg-white">
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-gray-200 border-t-[#004D8B] rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-gray-500">Loading...</p>
+          </div>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen flex">
+    <main id="main-content" className="min-h-screen flex">
       {/* ═══════════════════════════════════════════════════════
           LEFT PANEL — Brand Side (hidden on mobile)
           ═══════════════════════════════════════════════════════ */}
@@ -228,9 +231,10 @@ export default function LoginPage() {
             <Image
               src="/images/logos/company/logo-moticosolutions-white.png"
               alt="Motico Solutions"
-              width={200}
-              height={60}
-              className="h-14 w-auto"
+              width={250}
+              height={30}
+              className="h-8 w-auto"
+              priority
             />
           </div>
 
@@ -262,7 +266,7 @@ export default function LoginPage() {
             <Image
               src="/images/logos/company/logo-motico-solutions.png"
               alt="Motico Solutions"
-              width={160}
+              width={152}
               height={48}
               className="h-10 w-auto"
             />
@@ -500,6 +504,6 @@ export default function LoginPage() {
           animation: fadeIn 0.2s ease-out;
         }
       `}</style>
-    </div>
+    </main>
   );
 }

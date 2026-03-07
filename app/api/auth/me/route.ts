@@ -13,10 +13,7 @@ export async function GET() {
     const user = await getCurrentUser();
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Not authenticated' },
-        { status: 401 }
-      );
+      return NextResponse.json({ user: null });
     }
 
     // Convert Decimal to number for JSON serialization

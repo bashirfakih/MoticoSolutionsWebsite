@@ -67,6 +67,7 @@ async function fetchCurrentUser(): Promise<User | null> {
     }
 
     const data = await res.json();
+    if (!data.user) return null;
     return mapApiUserToUser(data.user);
   } catch {
     return null;

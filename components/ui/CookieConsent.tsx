@@ -67,12 +67,12 @@ export default function CookieConsent() {
         </button>
 
         <div className="flex-1 pr-8 sm:pr-0">
-          <h3
+          <p
             className="font-bold text-base mb-1.5"
             style={{ color: 'white' }}
           >
             Cookie Notice
-          </h3>
+          </p>
           <p
             className="text-sm leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.6)' }}
@@ -84,7 +84,7 @@ export default function CookieConsent() {
               className="underline hover:no-underline transition-colors"
               style={{ color: 'rgba(255,255,255,0.8)' }}
             >
-              Learn more
+              Read our privacy policy
             </a>
           </p>
         </div>

@@ -21,25 +21,25 @@ describe('GET /api/auth/me', () => {
     jest.clearAllMocks();
   });
 
-  describe('Unauthorized (401)', () => {
-    it('returns 401 when user is not authenticated', async () => {
+  describe('Unauthenticated (200 with null user)', () => {
+    it('returns 200 with null user when not authenticated', async () => {
       mockGetCurrentUser.mockResolvedValue(null);
 
       const response = await GET();
       const data = await response.json();
 
-      expect(response.status).toBe(401);
-      expect(data).toEqual({ error: 'Not authenticated' });
+      expect(response.status).toBe(200);
+      expect(data).toEqual({ user: null });
     });
 
-    it('returns 401 when session is invalid', async () => {
+    it('returns 200 with null user when session is invalid', async () => {
       mockGetCurrentUser.mockResolvedValue(null);
 
       const response = await GET();
       const data = await response.json();
 
-      expect(response.status).toBe(401);
-      expect(data).toEqual({ error: 'Not authenticated' });
+      expect(response.status).toBe(200);
+      expect(data).toEqual({ user: null });
     });
   });
 
