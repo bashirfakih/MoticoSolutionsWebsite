@@ -12,6 +12,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { categoryApiService } from '@/lib/api/categoryService';
 import { Category, CategoryInput, generateSlug } from '@/lib/data/types';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
 import { useToast } from '@/components/ui/Toast';
 import { pluralize } from '@/lib/utils/formatting';
 import {
@@ -112,6 +113,7 @@ function CategoryTreeItem({
           className={`p-1 rounded hover:bg-gray-200 transition-colors ${
             hasChildren ? '' : 'invisible'
           }`}
+          aria-label={isExpanded ? 'Collapse category' : 'Expand category'}
         >
           {isExpanded ? (
             <ChevronDown className="w-4 h-4 text-gray-500" />
@@ -166,6 +168,7 @@ function CategoryTreeItem({
               onClick={() => onAddSubcategory(category.id)}
               className="p-1.5 text-gray-500 hover:text-[#004D8B] hover:bg-blue-50 rounded transition-colors"
               title="Add subcategory"
+              aria-label="Add subcategory"
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -174,6 +177,7 @@ function CategoryTreeItem({
             onClick={() => onEdit(category)}
             className="p-1.5 text-gray-500 hover:text-[#004D8B] hover:bg-blue-50 rounded transition-colors"
             title="Edit"
+            aria-label="Edit category"
           >
             <Edit className="w-4 h-4" />
           </button>
@@ -181,6 +185,7 @@ function CategoryTreeItem({
             onClick={() => onDelete(category)}
             className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             title="Delete"
+            aria-label="Delete category"
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -220,6 +225,8 @@ interface CategoryFormProps {
 }
 
 function CategoryForm({ category, parentId, onSave, onCancel, isSaving }: CategoryFormProps) {
+  useEscapeKey(onCancel, true);
+
   const [name, setName] = useState(category?.name || '');
   const [slug, setSlug] = useState(category?.slug || '');
   const [description, setDescription] = useState(category?.description || '');
@@ -261,6 +268,7 @@ function CategoryForm({ category, parentId, onSave, onCancel, isSaving }: Catego
             <button
               onClick={onCancel}
               className="p-1 text-gray-400 hover:text-gray-600 rounded"
+              aria-label="Close category form"
             >
               <X className="w-5 h-5" />
             </button>

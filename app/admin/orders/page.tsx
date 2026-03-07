@@ -8,7 +8,7 @@
  * @module app/admin/orders/page
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Package,
@@ -21,12 +21,15 @@ import {
   ChevronUp,
   X,
   Plus,
+  Download,
 } from 'lucide-react';
 import FilterChips from '@/components/admin/FilterChips';
+import { exportCsv } from '@/lib/utils/exportCsv';
 import { orderService } from '@/lib/data/orderService';
 import { Order, ORDER_STATUS, PAYMENT_STATUS, OrderStatus } from '@/lib/data/types';
 import { useToast } from '@/components/ui/Toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
 import { pluralize } from '@/lib/utils/formatting';
 
 // Define order flow for detecting backward/destructive transitions
@@ -119,7 +122,6 @@ function SortableHeader({
 
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
-  const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -138,20 +140,21 @@ export default function AdminOrdersPage() {
     toStatus: OrderStatus;
   } | null>(null);
 
+  // Close modal on ESC
+  const closeOrderModal = useCallback(() => setSelectedOrder(null), []);
+  useEscapeKey(closeOrderModal, !!selectedOrder);
+
   useEffect(() => {
     loadOrders();
   }, []);
-
-  useEffect(() => {
-    filterAndSortOrders();
-  }, [orders, search, statusFilter, sortBy, sortOrder]);
 
   const loadOrders = () => {
     setOrders(orderService.getAll());
     setStats(orderService.getStats());
   };
 
-  const filterAndSortOrders = () => {
+  // Derived filtered & sorted orders — no extra state or effect needed
+  const filteredOrders = useMemo(() => {
     let result = orders;
 
     if (search) {
@@ -168,8 +171,7 @@ export default function AdminOrdersPage() {
       result = result.filter(o => o.status === statusFilter);
     }
 
-    // Sort the results
-    result = [...result].sort((a, b) => {
+    return [...result].sort((a, b) => {
       let aVal: string | number | Date;
       let bVal: string | number | Date;
 
@@ -201,33 +203,49 @@ export default function AdminOrdersPage() {
       if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
       return 0;
     });
+  }, [orders, search, statusFilter, sortBy, sortOrder]);
 
-    setFilteredOrders(result);
-  };
-
-  const handleSort = (key: string) => {
+  const handleSort = useCallback((key: string) => {
     if (sortBy === key) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
       setSortBy(key);
       setSortOrder('asc');
     }
-  };
+  }, [sortBy, sortOrder]);
 
   // Clear filters
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setStatusFilter('');
     setSearch('');
-  };
+  }, []);
 
   // Apply filter from chip
-  const handleApplyChipFilter = (filter: Record<string, string | boolean | undefined>) => {
+  const handleApplyChipFilter = useCallback((filter: Record<string, string | boolean | undefined>) => {
     if (filter.status) {
       setStatusFilter(String(filter.status));
     } else {
       setStatusFilter('');
     }
-  };
+  }, []);
+
+  // Export orders to CSV
+  const handleExportCSV = useCallback(() => {
+    exportCsv(
+      [
+        { header: 'Order Number', accessor: (o: Order) => o.orderNumber },
+        { header: 'Customer', accessor: (o: Order) => o.customerName },
+        { header: 'Email', accessor: (o: Order) => o.customerEmail },
+        { header: 'Status', accessor: (o: Order) => o.status },
+        { header: 'Payment Status', accessor: (o: Order) => o.paymentStatus },
+        { header: 'Items', accessor: (o: Order) => o.itemCount },
+        { header: 'Total (USD)', accessor: (o: Order) => o.total.toFixed(2) },
+        { header: 'Created', accessor: (o: Order) => new Date(o.createdAt).toLocaleDateString() },
+      ],
+      filteredOrders,
+      `orders-export-${new Date().toISOString().split('T')[0]}`
+    );
+  }, [filteredOrders]);
 
   const executeStatusUpdate = (orderId: string, newStatus: OrderStatus) => {
     try {
@@ -284,13 +302,23 @@ export default function AdminOrdersPage() {
           <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
           <p className="text-sm text-gray-500 mt-1">Manage customer orders</p>
         </div>
-        <Link
-          href="/admin/orders/new"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003a6a] transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Create Order
-        </Link>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleExportCSV}
+            disabled={filteredOrders.length === 0}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+          <Link
+            href="/admin/orders/new"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003a6a] transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Create Order
+          </Link>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -486,6 +514,7 @@ export default function AdminOrdersPage() {
               <button
                 onClick={() => setSelectedOrder(null)}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Close order details"
               >
                 <X className="w-5 h-5" />
               </button>

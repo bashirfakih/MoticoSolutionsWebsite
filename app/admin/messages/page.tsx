@@ -326,6 +326,7 @@ export default function AdminMessagesPage() {
                       onClick={() => handleArchive(selectedMessage.id)}
                       className="p-2 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
                       title="Archive"
+                      aria-label="Archive message"
                     >
                       <Archive className="w-4 h-4" />
                     </button>
@@ -333,6 +334,7 @@ export default function AdminMessagesPage() {
                       onClick={() => handleMarkAsSpam(selectedMessage.id)}
                       className="p-2 text-gray-500 hover:text-yellow-600 hover:bg-yellow-50 rounded-lg transition-colors"
                       title="Mark as Spam"
+                      aria-label="Mark as spam"
                     >
                       <AlertTriangle className="w-4 h-4" />
                     </button>
@@ -340,6 +342,7 @@ export default function AdminMessagesPage() {
                       onClick={() => handleDelete(selectedMessage.id)}
                       className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Delete"
+                      aria-label="Delete message"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>

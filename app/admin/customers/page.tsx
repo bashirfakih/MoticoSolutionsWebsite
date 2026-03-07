@@ -28,9 +28,12 @@ import {
   Plus,
   Edit2,
   Building2,
+  Download,
 } from 'lucide-react';
 import FilterChips from '@/components/admin/FilterChips';
+import { exportCsv } from '@/lib/utils/exportCsv';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
 import { useToast } from '@/components/ui/Toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { CUSTOMER_STATUS, CustomerStatus } from '@/lib/data/types';
@@ -135,6 +138,19 @@ function CustomersContent() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
 
+  // Close modals on ESC
+  const closeCustomerModal = useCallback(() => {
+    if (showEditModal) {
+      setShowEditModal(false);
+      setEditingCustomer(null);
+    } else if (showCreateModal) {
+      setShowCreateModal(false);
+    } else if (selectedCustomer) {
+      setSelectedCustomer(null);
+    }
+  }, [showEditModal, showCreateModal, selectedCustomer]);
+  useEscapeKey(closeCustomerModal, !!selectedCustomer || showCreateModal || showEditModal);
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -235,19 +251,19 @@ function CustomersContent() {
   };
 
   // Clear filters
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setStatusFilter('');
     setSearch('');
-  };
+  }, []);
 
   // Apply filter from chip
-  const handleApplyChipFilter = (filter: Record<string, string | boolean | undefined>) => {
+  const handleApplyChipFilter = useCallback((filter: Record<string, string | boolean | undefined>) => {
     if (filter.status) {
       setStatusFilter(String(filter.status));
     } else {
       setStatusFilter('');
     }
-  };
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -473,16 +489,41 @@ function CustomersContent() {
           <h1 className="text-2xl font-bold text-gray-900">Customers</h1>
           <p className="text-sm text-gray-500 mt-1">Manage your customer base</p>
         </div>
-        <button
-          onClick={() => {
-            resetForm();
-            setShowCreateModal(true);
-          }}
-          className="flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003d6f] transition-colors"
-        >
-          <Plus className="w-4 h-4" />
-          Add Customer
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              exportCsv(
+                [
+                  { header: 'Name', accessor: (c: Customer) => c.name },
+                  { header: 'Email', accessor: (c: Customer) => c.email },
+                  { header: 'Company', accessor: (c: Customer) => c.company || '' },
+                  { header: 'Phone', accessor: (c: Customer) => c.phone || '' },
+                  { header: 'Status', accessor: (c: Customer) => c.status },
+                  { header: 'Total Orders', accessor: (c: Customer) => c.totalOrders },
+                  { header: 'Total Spent', accessor: (c: Customer) => c.totalSpent.toFixed(2) },
+                  { header: 'Joined', accessor: (c: Customer) => new Date(c.createdAt).toLocaleDateString() },
+                ],
+                customers,
+                `customers-export-${new Date().toISOString().split('T')[0]}`
+              );
+            }}
+            disabled={customers.length === 0}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+          <button
+            onClick={() => {
+              resetForm();
+              setShowCreateModal(true);
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white rounded-lg hover:bg-[#003d6f] transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add Customer
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -710,6 +751,7 @@ function CustomersContent() {
               <button
                 onClick={() => setSelectedCustomer(null)}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Close customer details"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -849,6 +891,7 @@ function CustomersContent() {
               <button
                 onClick={() => setShowCreateModal(false)}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Close create customer form"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1050,6 +1093,7 @@ function CustomersContent() {
                   setEditingCustomer(null);
                 }}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Close edit customer form"
               >
                 <X className="w-5 h-5" />
               </button>

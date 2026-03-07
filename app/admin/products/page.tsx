@@ -72,8 +72,10 @@ import {
   Star,
   StarOff,
   RefreshCw,
+  Download,
 } from 'lucide-react';
 import FilterChips from '@/components/admin/FilterChips';
+import { exportCsv } from '@/lib/utils/exportCsv';
 
 // ═══════════════════════════════════════════════════════════════
 // COMPONENT
@@ -195,17 +197,17 @@ export default function AdminProductsPage() {
   };
 
   // Clear filters
-  const clearFilters = () => {
+  const clearFilters = useCallback(() => {
     setFilters({});
     setSearch('');
     setPage(1);
-  };
+  }, []);
 
   // Apply filter from chip
-  const handleApplyChipFilter = (filter: Record<string, string | boolean | undefined>) => {
+  const handleApplyChipFilter = useCallback((filter: Record<string, string | boolean | undefined>) => {
     setFilters(filter as ProductFilter);
     setPage(1);
-  };
+  }, []);
 
   // Update stock quantity (inline editing)
   const handleUpdateStock = async (productId: string, newQuantity: number) => {
@@ -547,6 +549,7 @@ export default function AdminProductsPage() {
               setActionMenuId(actionMenuId === product.id ? null : product.id);
             }}
             className="p-1.5 hover:bg-gray-100 rounded transition-colors"
+            aria-label="Product actions"
           >
             <MoreVertical className="w-4 h-4 text-gray-500" />
           </button>
@@ -639,6 +642,29 @@ export default function AdminProductsPage() {
           </p>
         </div>
         <div className="flex gap-3">
+          <button
+            onClick={() => {
+              exportCsv(
+                [
+                  { header: 'SKU', accessor: (p: Product) => p.sku },
+                  { header: 'Name', accessor: (p: Product) => p.name },
+                  { header: 'Category', accessor: (p: Product) => p.category?.name || '' },
+                  { header: 'Brand', accessor: (p: Product) => p.brand?.name || '' },
+                  { header: 'Price', accessor: (p: Product) => p.price?.toFixed(2) || '' },
+                  { header: 'Stock', accessor: (p: Product) => p.stockQuantity },
+                  { header: 'Stock Status', accessor: (p: Product) => p.stockStatus },
+                  { header: 'Published', accessor: (p: Product) => p.isPublished ? 'Yes' : 'No' },
+                ],
+                products,
+                `products-export-${new Date().toISOString().split('T')[0]}`
+              );
+            }}
+            disabled={products.length === 0}
+            className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
           <Link
             href="/admin/products/new"
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#004D8B] text-white font-medium rounded-lg hover:bg-[#003a6a] transition-colors"

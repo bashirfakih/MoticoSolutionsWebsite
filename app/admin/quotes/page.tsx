@@ -28,6 +28,7 @@ import {
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
 import { useToast } from '@/components/ui/Toast';
 import { QUOTE_STATUS, QuoteStatus } from '@/lib/data/types';
+import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
 import { notifyQuoteRequest } from '@/lib/notifications/notificationService';
 
 interface QuoteItem {
@@ -127,10 +128,23 @@ function QuotesContent() {
   const [stats, setStats] = useState<QuoteStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
+
   // New Quote Modal State
   const [showNewQuoteModal, setShowNewQuoteModal] = useState(false);
   const [newQuoteForm, setNewQuoteForm] = useState<NewQuoteForm>(initialNewQuoteForm);
   const [isCreatingQuote, setIsCreatingQuote] = useState(false);
+
+  // Close modals on ESC
+  const closeQuoteModal = useCallback(() => {
+    if (showNewQuoteModal) {
+      setShowNewQuoteModal(false);
+      setNewQuoteForm(initialNewQuoteForm);
+    } else if (selectedQuote) {
+      setSelectedQuote(null);
+    }
+  }, [showNewQuoteModal, selectedQuote]);
+  useEscapeKey(closeQuoteModal, !!selectedQuote || showNewQuoteModal);
 
   const loadQuotes = useCallback(async () => {
     setIsLoading(true);
@@ -171,6 +185,7 @@ function QuotesContent() {
   }, [loadQuotes]);
 
   const handleStatusUpdate = async (quoteId: string, newStatus: QuoteStatus) => {
+    setUpdatingStatusId(quoteId);
     try {
       const response = await fetch(`/api/quotes/${quoteId}`, {
         method: 'PATCH',
@@ -189,6 +204,8 @@ function QuotesContent() {
       }
     } catch (error) {
       toast.error('Failed to update quote status');
+    } finally {
+      setUpdatingStatusId(null);
     }
   };
 
@@ -474,6 +491,7 @@ function QuotesContent() {
               <button
                 onClick={() => setSelectedQuote(null)}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Close quote details"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -486,7 +504,8 @@ function QuotesContent() {
                 <select
                   value={selectedQuote.status}
                   onChange={(e) => handleStatusUpdate(selectedQuote.id, e.target.value as QuoteStatus)}
-                  className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#004D8B]"
+                  disabled={updatingStatusId === selectedQuote.id}
+                  className={`px-3 py-1.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#004D8B] ${updatingStatusId === selectedQuote.id ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   {Object.entries(QUOTE_STATUS).map(([key, value]) => (
                     <option key={key} value={value}>
@@ -608,6 +627,7 @@ function QuotesContent() {
                   setNewQuoteForm(initialNewQuoteForm);
                 }}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Close new quote form"
               >
                 <X className="w-5 h-5" />
               </button>

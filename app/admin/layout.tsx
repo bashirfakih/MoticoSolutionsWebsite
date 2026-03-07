@@ -192,6 +192,7 @@ function Sidebar({
             <button
               onClick={onClose}
               className="lg:hidden p-1 text-white/60 hover:text-white transition-colors"
+              aria-label="Close sidebar"
             >
               <X className="w-5 h-5" />
             </button>
@@ -311,6 +312,7 @@ function TopHeader({ onMenuClick, onOpenCommandPalette }: { onMenuClick: () => v
         <button
           onClick={onMenuClick}
           className="lg:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          aria-label="Toggle sidebar"
         >
           <Menu className="w-5 h-5" />
         </button>

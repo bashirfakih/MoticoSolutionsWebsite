@@ -29,6 +29,7 @@ import {
   Edit2,
 } from 'lucide-react';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
 import { useToast } from '@/components/ui/Toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
 import { FieldLabel } from '@/components/ui/FieldLabel';
@@ -143,6 +144,19 @@ function UsersContent() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
+
+  // Close modals on ESC
+  const closeUserModal = useCallback(() => {
+    if (showEditModal) {
+      setShowEditModal(false);
+      setEditingUser(null);
+    } else if (showCreateModal) {
+      setShowCreateModal(false);
+    } else if (selectedUser) {
+      setSelectedUser(null);
+    }
+  }, [showEditModal, showCreateModal, selectedUser]);
+  useEscapeKey(closeUserModal, !!selectedUser || showCreateModal || showEditModal);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -660,6 +674,7 @@ function UsersContent() {
               <button
                 onClick={() => setSelectedUser(null)}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Close user details"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -761,6 +776,7 @@ function UsersContent() {
               <button
                 onClick={() => setShowCreateModal(false)}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Close create user form"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -933,6 +949,7 @@ function UsersContent() {
                   setEditingUser(null);
                 }}
                 className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                aria-label="Close edit user form"
               >
                 <X className="w-5 h-5" />
               </button>

@@ -37,6 +37,7 @@ import {
   FileText,
   ImageIcon,
   AlertTriangle,
+  Clock,
 } from 'lucide-react';
 import { notifyOutOfStock } from '@/lib/notifications/notificationService';
 
@@ -1120,9 +1121,10 @@ export default function AdminProductEditPage() {
             {!isNew && (
               <div className="pt-4 border-t">
                 <h4 className="text-sm font-medium text-gray-700 mb-3">Inventory History</h4>
-                <p className="text-sm text-gray-500">
-                  Coming soon: View stock adjustment history
-                </p>
+                <div className="flex flex-col items-center justify-center py-6 text-gray-400">
+                  <Clock className="w-8 h-8 mb-2" />
+                  <p className="text-sm">No inventory adjustments recorded yet</p>
+                </div>
               </div>
             )}
           </div>

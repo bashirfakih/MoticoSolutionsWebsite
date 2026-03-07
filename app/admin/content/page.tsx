@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect } from 'react';
+import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
 import {
   Image as ImageIcon,
   Plus,
@@ -565,6 +566,7 @@ function SlideModal({
   onSave: (slide: Partial<HeroSlide>) => void;
   onClose: () => void;
 }) {
+  useEscapeKey(onClose, true);
   const [formData, setFormData] = useState(slide);
 
   return (
@@ -574,7 +576,7 @@ function SlideModal({
           <h2 className="text-xl font-semibold text-gray-900">
             {slide.id ? 'Edit Hero Slide' : 'Add Hero Slide'}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded transition-colors" aria-label="Close slide form">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -724,6 +726,7 @@ function TestimonialModal({
   onSave: (testimonial: Partial<Testimonial>) => void;
   onClose: () => void;
 }) {
+  useEscapeKey(onClose, true);
   const [formData, setFormData] = useState(testimonial);
 
   return (
@@ -733,7 +736,7 @@ function TestimonialModal({
           <h2 className="text-xl font-semibold text-gray-900">
             {testimonial.id ? 'Edit Testimonial' : 'Add Testimonial'}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded transition-colors" aria-label="Close testimonial form">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -866,6 +869,7 @@ function LogoModal({
   onSave: (logo: Partial<PartnerLogo>) => void;
   onClose: () => void;
 }) {
+  useEscapeKey(onClose, true);
   const [formData, setFormData] = useState(logo);
 
   return (
@@ -875,7 +879,7 @@ function LogoModal({
           <h2 className="text-xl font-semibold text-gray-900">
             {logo.id ? 'Edit Partner Logo' : 'Add Partner Logo'}
           </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded transition-colors">
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded transition-colors" aria-label="Close logo form">
             <X className="w-5 h-5" />
           </button>
         </div>

@@ -215,6 +215,20 @@ export default function AdminDashboard() {
     fetchData();
   }, []);
 
+  // Refetch when user returns to dashboard (fixes stale counts after reading messages etc.)
+  useEffect(() => {
+    const handleFocus = () => fetchData();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') fetchData();
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, []);
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';

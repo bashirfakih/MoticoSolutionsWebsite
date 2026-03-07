@@ -14,6 +14,7 @@ import { brandService } from '@/lib/data/brandService';
 import { Brand, BrandInput, generateSlug } from '@/lib/data/types';
 import DataTable, { Column } from '@/components/admin/DataTable';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
+import { useEscapeKey } from '@/lib/hooks/useEscapeKey';
 import { useToast } from '@/components/ui/Toast';
 import { ImageUpload } from '@/components/admin/ImageUpload';
 import {
@@ -40,6 +41,8 @@ interface BrandFormProps {
 }
 
 function BrandForm({ brand, onSave, onCancel, isSaving }: BrandFormProps) {
+  useEscapeKey(onCancel, true);
+
   const [name, setName] = useState(brand?.name || '');
   const [slug, setSlug] = useState(brand?.slug || '');
   const [logo, setLogo] = useState(brand?.logo || '');
@@ -78,6 +81,7 @@ function BrandForm({ brand, onSave, onCancel, isSaving }: BrandFormProps) {
             <button
               onClick={onCancel}
               className="p-1 text-gray-400 hover:text-gray-600 rounded"
+              aria-label="Close brand form"
             >
               <X className="w-5 h-5" />
             </button>
@@ -386,6 +390,7 @@ export default function AdminBrandsPage() {
             }}
             className="p-1.5 text-gray-500 hover:text-[#004D8B] hover:bg-blue-50 rounded transition-colors"
             title="Edit"
+            aria-label="Edit brand"
           >
             <Edit className="w-4 h-4" />
           </button>
@@ -396,6 +401,7 @@ export default function AdminBrandsPage() {
             }}
             className="p-1.5 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
             title="Delete"
+            aria-label="Delete brand"
           >
             <Trash2 className="w-4 h-4" />
           </button>
